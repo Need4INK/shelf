@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shelf</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Shelf">
+<meta name="theme-color" content="#1f3a2e">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB3UlEQVR42u3bsY3CQBRF0WdEHy4A5AJcBRE94sgSmetwITSARAMWIgHGM+fEG6yWq+8/w7rrxyGw5eBPgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsSBOBAH4kAciANxgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsTBLxxL+CVuz8fnP3y6L1V+EufL1eRg2zpP6zyJg3eJiIMd9CEOfYgDcRge4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOMg+3nhLGy+Qpbw3U0wOxIE4sHM09Gg3ORAH4kAcWEjjEswubHIgDjxW3HOYHIgDcSAOxIHTSlyCNXiwMjkQB+JAHFhIXZ+bHIgDcWDniEuw2lcckwNx4LHiKGtyIA7EgTgQB04rcQlW+wHK5EAciAM7hxtSkwNxIA7EgYU0DV+CNbLtmhw4ymJyIA7EgTgQB+LAUTb+E6z2E7XJgTgQB3YO1+cmB+JAHIgDC2lcgtW+KZsciANxYOdwCWZyIA7EgTgQB+JAHCAOxIE46lXCt8riQBzGhjiUIQ5lxFf2svinrh8HHwweK4gDcSAOxIE4EAfiQByIA8SBOBAH4kAciANxIA7EgThAHIgDcSAOxIE4EAfiQByIA3GAOBAH4uDrXsZIQjfwkiY3AAAAAElFTkSuQmCC">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB3UlEQVR42u3bsY3CQBRF0WdEHy4A5AJcBRE94sgSmetwITSARAMWIgHGM+fEG6yWq+8/w7rrxyGw5eBPgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsSBOBAH4kAciANxgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsTBLxxL+CVuz8fnP3y6L1V+EufL1eRg2zpP6zyJg3eJiIMd9CEOfYgDcRge4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOMg+3nhLGy+Qpbw3U0wOxIE4sHM09Gg3ORAH4kAcWEjjEswubHIgDjxW3HOYHIgDcSAOxIHTSlyCNXiwMjkQB+JAHFhIXZ+bHIgDcWDniEuw2lcckwNx4LHiKGtyIA7EgTgQB04rcQlW+wHK5EAciAM7hxtSkwNxIA7EgYU0DV+CNbLtmhw4ymJyIA7EgTgQB+LAUTb+E6z2E7XJgTgQB3YO1+cmB+JAHIgDC2lcgtW+KZsciANxYOdwCWZyIA7EgTgQB+JAHCAOxIE46lXCt8riQBzGhjiUIQ5lxFf2svinrh8HHwweK4gDcSAOxIE4EAfiQByIA8SBOBAH4kAciANxIA7EgThAHIgDcSAOxIE4EAfiQByIA3GAOBAH4uDrXsZIQjfwkiY3AAAAAElFTkSuQmCC">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--green:#1f3a2e;--paper:#f6f3ec;--card:#fff;--ink:#1b1b18;--mute:#6b675e;--line:#e2ddd2;--accent:#f2c14e;--red:#c8371e}
+@media(prefers-color-scheme:dark){:root{--paper:#121513;--card:#1c201d;--ink:#eeebe4;--mute:#a19d93;--line:#2e332f}}
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 "Schibsted Grotesk",system-ui,-apple-system,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+header{background:var(--green);color:#fff;padding:calc(env(safe-area-inset-top) + 14px) 18px 18px}
+header h1{margin:0;font-size:32px;font-weight:800;line-height:1.05}
+header p{margin:4px 0 0;opacity:.75;font-size:14px}
+main{max-width:640px;margin:0 auto;padding:16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
+h2{font-size:18px;margin:0 0 12px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{font:inherit;font-weight:600;min-height:46px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+button.primary{background:var(--green);color:#fff;border-color:var(--green)}
+button.warn{color:var(--red)}
+button:disabled{opacity:.5}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.grow{flex:1}
+input[type=text],input[type=search]{font:inherit;font-size:17px;width:100%;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.cam{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:4/3;margin-bottom:12px;display:none}
+.cam.on{display:block}
+.cam video{width:100%;height:100%;object-fit:cover;display:block}
+.cam .guide{position:absolute;left:10%;right:10%;top:32%;bottom:32%;border:3px solid var(--accent);border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.35)}
+.cam .hint{position:absolute;left:0;right:0;bottom:8px;text-align:center;color:#fff;font-size:14px}
+.status{font-size:14px;color:var(--mute);margin-top:10px;min-height:20px}
+.status.err{color:var(--red)}
+.book{display:grid;grid-template-columns:110px minmax(0,1fr);gap:14px}
+.cover{width:110px;aspect-ratio:2/3;border-radius:6px;background:var(--line);object-fit:cover;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:12px;text-align:center}
+.book h3{margin:0;font-size:21px;line-height:1.15}
+.book .sub{color:var(--mute);margin:2px 0 6px}
+.book .by{font-weight:600}
+dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:14px 0 0;font-size:14px}
+dt{color:var(--mute)}dd{margin:0;overflow-wrap:anywhere}
+.desc{font-size:14px;margin-top:12px;color:var(--ink);max-height:9em;overflow:auto}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tags span{font-size:12px;background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+.list{list-style:none;margin:12px 0 0;padding:0}
+.list li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.list img,.list .ph{width:44px;height:64px;border-radius:4px;object-fit:cover;background:var(--line)}
+.list b{display:block;line-height:1.2}
+.list small{color:var(--mute)}
+.empty{color:var(--mute);font-size:14px;padding:12px 0 0}
+.form{display:grid;gap:8px;margin-top:12px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <h1>Shelf</h1>
+  <p id="count">Your book catalog</p>
+</header>
+<main>
+  <section class="panel">
+    <h2>Add a book</h2>
+    <div class="cam" id="cam">
+      <video id="video" playsinline muted autoplay></video>
+      <div class="guide"></div>
+      <div class="hint">Point at the barcode on the back cover</div>
+    </div>
+    <div class="row">
+      <button class="primary grow" id="scanBtn">Scan barcode</button>
+      <label class="btn grow" for="photo">Use a photo</label>
+      <input type="file" id="photo" accept="image/*" capture="environment" class="hidden">
+    </div>
+    <form class="row" id="manual" style="margin-top:10px">
+      <input type="text" id="code" inputmode="numeric" autocomplete="off" placeholder="ISBN, e.g. 978-0-14-118776-1" class="grow" style="flex-basis:200px">
+      <button type="submit">Look up</button>
+    </form>
+    <div class="status" id="status"></div>
+  </section>
+
+  <section class="panel hidden" id="result"></section>
+
+  <section class="panel">
+    <h2>My catalog</h2>
+    <input type="search" id="q" placeholder="Search title, author, ISBN">
+    <ul class="list" id="list"></ul>
+    <div class="row" style="margin-top:14px">
+      <button class="grow" id="exportBtn">Export backup</button>
+      <label class="btn grow" for="importFile">Import backup</label>
+      <input type="file" id="importFile" accept="application/json,.json" class="hidden">
+    </div>
+  </section>
+</main>
+
+<script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
+<script>
+{
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const KEY = 'shelf.books.v1';
+let books = [];
+try { books = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { books = []; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(books)); } catch (e) { status('Could not save — storage unavailable.', true); } };
+let current = null;
+
+function status(msg, err) { const s = $('status'); s.textContent = msg || ''; s.className = 'status' + (err ? ' err' : ''); }
+
+/* ---------- ISBN helpers ---------- */
+function isbn10ok(s) { if (!/^\d{9}[\dX]$/.test(s)) return false; let t = 0; for (let i = 0; i < 10; i++) t += (s[i] === 'X' ? 10 : +s[i]) * (10 - i); return t % 11 === 0; }
+function ean13ok(s) { if (!/^\d{13}$/.test(s)) return false; let t = 0; for (let i = 0; i < 13; i++) t += +s[i] * (i % 2 ? 3 : 1); return t % 10 === 0; }
+function to13(s10) { const b = '978' + s10.slice(0, 9); let t = 0; for (let i = 0; i < 12; i++) t += +b[i] * (i % 2 ? 3 : 1); return b + ((10 - t % 10) % 10); }
+function to10(s13) { if (!s13.startsWith('978')) return ''; const b = s13.slice(3, 12); let t = 0; for (let i = 0; i < 9; i++) t += +b[i] * (10 - i); const c = (11 - t % 11) % 11; return b + (c === 10 ? 'X' : c); }
+function parseCode(raw) {
+  const s = String(raw).toUpperCase().replace(/[^0-9X]/g, '');
+  if (s.length === 10) return { kind: 'ISBN-10', isbn13: to13(s), isbn10: s, valid: isbn10ok(s) };
+  if (s.length === 13 && /^97[89]/.test(s)) return { kind: 'ISBN-13', isbn13: s, isbn10: to10(s), valid: ean13ok(s) };
+  if (s.length === 12 || s.length === 13 || s.length === 8) return { kind: 'UPC/EAN', code: s, valid: true };
+  return null;
+}
+
+/* ---------- Lookup ---------- */
+async function getJSON(url) { const r = await fetch(url); if (!r.ok) throw new Error(r.status); return r.json(); }
+async function fromOpenLibrary(isbn) {
+  const d = await getJSON(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&jscmd=data&format=json`);
+  const b = d['ISBN:' + isbn]; if (!b) return null;
+  return { title: b.title, subtitle: b.subtitle, authors: (b.authors || []).map(a => a.name),
+    publisher: (b.publishers || []).map(p => p.name).join(', '), published: b.publish_date, pages: b.number_of_pages,
+    subjects: (b.subjects || []).map(s => s.name).slice(0, 8), cover: b.cover && (b.cover.large || b.cover.medium), link: b.url };
+}
+async function fromGoogle(q) {
+  const d = await getJSON(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=1`);
+  const v = d.items && d.items[0] && d.items[0].volumeInfo; if (!v) return null;
+  const ids = v.industryIdentifiers || [];
+  const img = v.imageLinks && (v.imageLinks.thumbnail || v.imageLinks.smallThumbnail);
+  return { title: v.title, subtitle: v.subtitle, authors: v.authors || [], publisher: v.publisher, published: v.publishedDate,
+    pages: v.pageCount, description: v.description, subjects: v.categories || [], language: v.language,
+    cover: img && img.replace('http://', 'https://'), link: v.infoLink,
+    isbn13: (ids.find(i => i.type === 'ISBN_13') || {}).identifier, isbn10: (ids.find(i => i.type === 'ISBN_10') || {}).identifier };
+}
+function merge(a, b) { // a = Open Library (preferred for core facts), b = Google
+  if (!a) return b; if (!b) return a;
+  const out = { ...b };
+  for (const k in a) { const v = a[k]; if (v && (!Array.isArray(v) || v.length)) out[k] = v; }
+  out.description = b.description || a.description;
+  out.subjects = [...new Set([...(a.subjects || []), ...(b.subjects || [])])].slice(0, 10);
+  out.cover = a.cover || b.cover;
+  return out;
+}
+async function lookup(raw) {
+  const p = parseCode(raw);
+  if (!p) { status('That doesn’t look like an ISBN or barcode. ISBNs have 10 or 13 digits.', true); return; }
+  if (p.kind === 'UPC/EAN' && !p.valid) { status('Unrecognised code.', true); return; }
+  if (p.isbn13 && !p.valid) status('Checksum doesn’t match — check the digits. Trying anyway…');
+  else status('Looking up ' + (p.isbn13 || p.code) + '…');
+  $('result').classList.add('hidden');
+  const [ol, gb] = await Promise.allSettled(p.isbn13
+    ? [fromOpenLibrary(p.isbn13), fromGoogle('isbn:' + p.isbn13)]
+    : [Promise.resolve(null), fromGoogle(p.code)]);
+  if (ol.status === 'rejected' && gb.status === 'rejected') { status('No connection to the book databases. Check your internet and try again.', true); return; }
+  const info = merge(ol.value, gb.value);
+  const base = { isbn13: p.isbn13 || '', isbn10: p.isbn10 || '', code: p.code || '' };
+  current = info ? { ...info, ...base, isbn13: base.isbn13 || info.isbn13 || '', isbn10: base.isbn10 || info.isbn10 || '',
+    source: [ol.value && 'Open Library', gb.value && 'Google Books'].filter(Boolean).join(' + ') } : null;
+  status('');
+  current ? showBook(current, false) : showNotFound(base);
+}
+
+/* ---------- Rendering ---------- */
+function coverHTML(b, cls) { return b.cover ? `<img class="${cls}" src="${esc(b.cover)}" alt="" onerror="this.outerHTML='<div class=&quot;${cls}&quot;>No cover</div>'">` : `<div class="${cls}">No cover</div>`; }
+function showBook(b, saved) {
+  const dup = !saved && books.some(x => x.isbn13 && x.isbn13 === b.isbn13);
+  const facts = [['ISBN-13', b.isbn13], ['ISBN-10', b.isbn10], ['Code', !b.isbn13 && b.code], ['Publisher', b.publisher], ['Published', b.published],
+    ['Pages', b.pages], ['Language', b.language], ['Source', b.source], ['Added', b.added && new Date(b.added).toLocaleDateString()]].filter(f => f[1]);
+  const r = $('result');
+  r.innerHTML = `
+    <div class="book">${coverHTML(b, 'cover')}
+      <div><h3>${esc(b.title || 'Untitled')}</h3>${b.subtitle ? `<div class="sub">${esc(b.subtitle)}</div>` : ''}
+      <div class="by">${esc((b.authors || []).join(', ') || 'Unknown author')}</div></div></div>
+    <dl>${facts.map(f => `<dt>${f[0]}</dt><dd>${esc(f[1])}</dd>`).join('')}</dl>
+    ${b.subjects && b.subjects.length ? `<div class="tags">${b.subjects.map(s => `<span>${esc(s)}</span>`).join('')}</div>` : ''}
+    ${b.description ? `<div class="desc">${esc(b.description)}</div>` : ''}
+    ${b.link ? `<p style="font-size:14px;margin:10px 0 0"><a href="${esc(b.link)}" target="_blank" rel="noopener">More details</a></p>` : ''}
+    <div class="row" style="margin-top:14px">
+      ${saved ? `<button class="warn grow" id="delBtn">Remove from catalog</button><button class="grow" id="closeBtn">Close</button>`
+              : `<button class="primary grow" id="addBtn" ${dup ? 'disabled' : ''}>${dup ? 'Already in catalog' : 'Add to catalog'}</button><button class="grow" id="closeBtn">Discard</button>`}
+    </div>`;
+  r.classList.remove('hidden');
+  r.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('closeBtn').onclick = () => r.classList.add('hidden');
+  if ($('addBtn')) $('addBtn').onclick = () => addBook(b);
+  if ($('delBtn')) $('delBtn').onclick = e => {
+    if (e.target.dataset.sure) { books = books.filter(x => x.id !== b.id); save(); render(); r.classList.add('hidden'); }
+    else { e.target.dataset.sure = 1; e.target.textContent = 'Tap again to remove'; }
+  };
+}
+function showNotFound(base) {
+  const r = $('result');
+  r.innerHTML = `<h2>Not found in the book databases</h2>
+    <p style="margin:0;color:var(--mute);font-size:14px">${esc(base.isbn13 || base.code)} — you can still add it by hand.</p>
+    <form class="form" id="nf"><input type="text" id="nfT" placeholder="Title" required><input type="text" id="nfA" placeholder="Author">
+    <div class="row"><button class="primary grow" type="submit">Add to catalog</button><button class="grow" type="button" id="closeBtn">Cancel</button></div></form>`;
+  r.classList.remove('hidden');
+  $('closeBtn').onclick = () => r.classList.add('hidden');
+  $('nf').onsubmit = e => { e.preventDefault(); addBook({ ...base, title: $('nfT').value.trim(), authors: $('nfA').value.trim() ? [$('nfA').value.trim()] : [], source: 'Manual' }); };
+}
+function addBook(b) {
+  books.unshift({ ...b, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: Date.now() });
+  save(); render(); $('result').classList.add('hidden'); $('code').value = '';
+  status('Added “' + (b.title || 'book') + '”.');
+}
+function render() {
+  const q = $('q').value.trim().toLowerCase();
+  const shown = books.filter(b => !q || [b.title, b.subtitle, (b.authors || []).join(' '), b.isbn13, b.isbn10].join(' ').toLowerCase().includes(q));
+  $('count').textContent = books.length ? `${books.length} book${books.length > 1 ? 's' : ''} in your catalog` : 'Your book catalog';
+  $('list').innerHTML = shown.map(b => `<li data-id="${b.id}">${b.cover ? `<img src="${esc(b.cover)}" alt="" loading="lazy">` : '<div class="ph"></div>'}
+    <div><b>${esc(b.title || 'Untitled')}</b><small>${esc((b.authors || []).join(', ') || 'Unknown author')}</small></div></li>`).join('')
+    || `<li class="empty" style="display:block;cursor:default">${books.length ? 'No matches.' : 'No books yet — scan your first one above.'}</li>`;
+}
+$('list').onclick = e => { const li = e.target.closest('li[data-id]'); if (li) showBook(books.find(b => b.id === li.dataset.id), true); };
+$('q').oninput = render;
+
+/* ---------- Scanning ---------- */
+let reader = null, scanning = false;
+function makeReader() {
+  if (!window.ZXing) { status('Scanner library didn’t load — check your connection, or type the ISBN.', true); return null; }
+  const Z = window.ZXing, hints = new Map();
+  hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.EAN_8, Z.BarcodeFormat.UPC_A, Z.BarcodeFormat.UPC_E, Z.BarcodeFormat.CODE_128, Z.BarcodeFormat.QR_CODE]);
+  hints.set(Z.DecodeHintType.TRY_HARDER, true);
+  return new Z.BrowserMultiFormatReader(hints, 250);
+}
+function stopScan() { if (reader) reader.reset(); scanning = false; $('cam').classList.remove('on'); $('scanBtn').textContent = 'Scan barcode'; }
+$('scanBtn').onclick = async () => {
+  if (scanning) return stopScan();
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { status('Live camera needs the app opened over https. Use “Use a photo” instead.', true); return; }
+  reader = reader || makeReader(); if (!reader) return;
+  scanning = true; $('cam').classList.add('on'); $('scanBtn').textContent = 'Stop scanning'; status('');
+  try {
+    await reader.decodeFromConstraints({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } }, $('video'), res => {
+      if (res && scanning) { stopScan(); const t = res.getText(); $('code').value = t; lookup(t); }
+    });
+  } catch (e) { stopScan(); status(e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow it in Settings › Safari › Camera, or use a photo.' : 'Couldn’t start the camera. Try “Use a photo”.', true); }
+};
+$('photo').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  reader = reader || makeReader(); if (!reader) return;
+  status('Reading barcode from photo…');
+  const url = URL.createObjectURL(f);
+  try { const res = await reader.decodeFromImageUrl(url); $('code').value = res.getText(); lookup(res.getText()); }
+  catch (err) { status('No barcode found in that photo. Get closer, keep it sharp and well lit, or type the ISBN.', true); }
+  finally { URL.revokeObjectURL(url); }
+};
+$('manual').onsubmit = e => { e.preventDefault(); stopScan(); lookup($('code').value); };
+
+/* ---------- Backup ---------- */
+$('exportBtn').onclick = () => {
+  const blob = new Blob([JSON.stringify(books, null, 2)], { type: 'application/json' });
+  const file = new File([blob], `shelf-backup-${new Date().toISOString().slice(0, 10)}.json`, { type: 'application/json' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file] }).catch(() => {}); return; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click();
+};
+$('importFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text()); if (!Array.isArray(data)) throw 0;
+    const have = new Set(books.map(b => b.id)); const fresh = data.filter(b => b && b.id && !have.has(b.id));
+    books = [...fresh, ...books]; save(); render(); status(`Imported ${fresh.length} book${fresh.length === 1 ? '' : 's'}.`);
+  } catch (err) { status('That file isn’t a Shelf backup.', true); }
+};
+
+render();
+}
+</script>
+</body>
+</html>
