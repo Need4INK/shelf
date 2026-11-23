@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="v10">
+<meta name="app-version" content="v11">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shelf</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -67,7 +67,7 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 <header>
   <h1>Shelf</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">v10</p>
+  <p style="font-size:12px;opacity:.5">v11</p>
 </header>
 <main>
   <section class="panel">
@@ -258,7 +258,6 @@ function stopScan() {
   clearTimeout(releaseTimer); releaseTimer = setTimeout(releaseCamera, 3 * 60 * 1000);
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { stopScan(); releaseCamera(); } });
-let lastErr = '', tries = 0;
 function scanFrame() {
   if (!scanning) return;
   const v = $('video'), vw = v.videoWidth, vh = v.videoHeight;
@@ -277,14 +276,13 @@ function scanFrame() {
       for (let i = 0, j = 0; j < lum.length; i += 4, j++) lum[j] = (px[i] * 77 + px[i + 1] * 150 + px[i + 2] * 29) >> 8;
       const src = new Z.RGBLuminanceSource(lum, w, h);
       const bin = frameNo % 2 ? new Z.GlobalHistogramBinarizer(src) : new Z.HybridBinarizer(src);
-      tries++;
       const t = core.decodeWithState(new Z.BinaryBitmap(bin)).getText();
       if (goodCode(t)) {
         if (t === lastRead) hits++; else { lastRead = t; hits = 1; }
         // ISBN barcodes (978/979 + valid checksum) are accepted at once; other codes must read twice
         if (/^97[89]/.test(t) || hits >= 2) { stopScan(); lastRead = ''; $('code').value = t; lookup(t); return; }
-      } else lastErr = 'ignored ' + t;
-    } catch (e) { lastErr = (e && (e.name || e.message)) || String(e); }
+      }
+    } catch (e) { /* no barcode in this frame */ }
     frameNo++;
   }
   timer = setTimeout(scanFrame, 30);
@@ -323,7 +321,7 @@ $('scanBtn').onclick = async () => {
   } catch (e) { /* zoom/focus not supported — fine */ }
   const v = $('video'); v.srcObject = stream;
   try { await v.play(); } catch (e) {}
-  lastRead = ''; hits = 0; frameNo = 0; tries = 0; lastErr = ''; scanning = true;
+  lastRead = ''; hits = 0; frameNo = 0; scanning = true;
   $('cam').classList.add('on'); $('scanBtn').textContent = 'Stop scanning';
   scanFrame();
 };
@@ -357,7 +355,7 @@ $('importFile').onchange = async e => {
 render();
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'v10';
+const VERSION = 'v11';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
