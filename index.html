@@ -72,7 +72,7 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
     <div class="cam" id="cam">
       <video id="video" playsinline muted autoplay></video>
       <div class="guide"></div>
-      <div class="hint">Point at the barcode on the back cover</div>
+      <div class="hint">Hold about 20 cm away, barcode inside the box</div>
     </div>
     <div class="row">
       <button class="primary grow" id="scanBtn">Scan barcode</button>
@@ -240,20 +240,65 @@ function makeReader() {
   hints.set(Z.DecodeHintType.TRY_HARDER, true);
   return new Z.BrowserMultiFormatReader(hints, 250);
 }
-function stopScan() { if (reader) reader.reset(); scanning = false; $('cam').classList.remove('on'); $('scanBtn').textContent = 'Scan barcode'; }
+let stream = null, timer = 0, frameNo = 0, core = null;
+const cvs = document.createElement('canvas'), cx = cvs.getContext('2d', { willReadFrequently: true });
+function stopScan() {
+  scanning = false; clearTimeout(timer);
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  $('video').srcObject = null; $('cam').classList.remove('on'); $('scanBtn').textContent = 'Scan barcode';
+}
+function scanFrame() {
+  if (!scanning) return;
+  const v = $('video'), vw = v.videoWidth, vh = v.videoHeight;
+  if (vw && vh) {
+    // read only the area under the yellow box (centre band), at full camera resolution
+    const sw = Math.round(vw * 0.85), sh = Math.round(vh * 0.45), sx = (vw - sw) >> 1, sy = (vh - sh) >> 1;
+    cvs.width = sw; cvs.height = sh;
+    cx.drawImage(v, sx, sy, sw, sh, 0, 0, sw, sh);
+    const Z = window.ZXing;
+    try {
+      const lum = new Z.HTMLCanvasElementLuminanceSource(cvs);
+      // alternate binarizers: Hybrid is best for most; GlobalHistogram helps pale / low-contrast codes
+      const bin = frameNo++ % 2 ? new Z.GlobalHistogramBinarizer(lum) : new Z.HybridBinarizer(lum);
+      const t = core.decode(new Z.BinaryBitmap(bin)).getText();
+      if (goodCode(t)) {
+        if (t === lastRead) hits++; else { lastRead = t; hits = 1; }
+        if (hits >= 2) { stopScan(); lastRead = ''; $('code').value = t; lookup(t); return; }
+      }
+    } catch (e) { /* no barcode in this frame */ }
+  }
+  timer = setTimeout(scanFrame, 90);
+}
 $('scanBtn').onclick = async () => {
   if (scanning) return stopScan();
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { status('Live camera needs the app opened over https. Use “Use a photo” instead.', true); return; }
-  reader = reader || makeReader(); if (!reader) return;
-  lastRead = ''; hits = 0; scanning = true; $('cam').classList.add('on'); $('scanBtn').textContent = 'Stop scanning'; status('');
+  if (!window.ZXing) { status('Scanner library didn’t load — check your connection, or type the ISBN.', true); return; }
+  if (!core) {
+    const Z = window.ZXing, hints = new Map();
+    hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.UPC_A]);
+    hints.set(Z.DecodeHintType.TRY_HARDER, true);
+    core = new Z.MultiFormatReader(); core.setHints(hints);
+  }
+  status('');
   try {
-    await reader.decodeFromConstraints({ video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } }, $('video'), res => {
-      if (!res || !scanning) return;
-      const t = res.getText(); if (!goodCode(t)) return;
-      if (t === lastRead) hits++; else { lastRead = t; hits = 1; }
-      if (hits >= 2) { stopScan(); lastRead = ''; $('code').value = t; lookup(t); }
-    });
-  } catch (e) { stopScan(); status(e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow it in Settings › Safari › Camera, or use a photo.' : 'Couldn’t start the camera. Try “Use a photo”.', true); }
+    stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } });
+  } catch (e) {
+    status(e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow it in Settings › Safari › Camera, or use a photo.' : 'Couldn’t start the camera. Try “Use a photo”.', true); return;
+  }
+  const track = stream.getVideoTracks()[0];
+  // zoom in so you can hold the phone further away, where the camera can focus
+  try {
+    const cap = track.getCapabilities ? track.getCapabilities() : {};
+    const adv = {};
+    if (cap.zoom) adv.zoom = Math.min(cap.zoom.max, Math.max(cap.zoom.min, 2));
+    if (cap.focusMode && cap.focusMode.includes('continuous')) adv.focusMode = 'continuous';
+    if (Object.keys(adv).length) await track.applyConstraints({ advanced: [adv] });
+  } catch (e) { /* zoom/focus not supported — fine */ }
+  const v = $('video'); v.srcObject = stream;
+  try { await v.play(); } catch (e) {}
+  lastRead = ''; hits = 0; frameNo = 0; scanning = true;
+  $('cam').classList.add('on'); $('scanBtn').textContent = 'Stop scanning';
+  scanFrame();
 };
 $('photo').onchange = async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
