@@ -350,7 +350,11 @@ async function checkUpdate() {
   try {
     const html = await (await fetch('./?check=' + Date.now(), { cache: 'no-store' })).text();
     const m = html.match(/name="app-version" content="([^"]+)"/);
-    if (m && m[1] !== VERSION) location.reload();
+    if (m && m[1] !== VERSION) {
+      // reload at most once per new version, so a stale cache can't cause a reload loop
+      let tried = ''; try { tried = sessionStorage.getItem('shelf.reloadFor') || ''; } catch (e) {}
+      if (tried !== m[1]) { try { sessionStorage.setItem('shelf.reloadFor', m[1]); } catch (e) {} location.reload(); }
+    }
   } catch (e) { /* offline — keep the current version */ }
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkUpdate(); });
