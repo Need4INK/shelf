@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="v9">
+<meta name="app-version" content="v10">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shelf</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -67,7 +67,7 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 <header>
   <h1>Shelf</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">v9</p>
+  <p style="font-size:12px;opacity:.5">v10</p>
 </header>
 <main>
   <section class="panel">
@@ -80,7 +80,7 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
     <div class="row">
       <button class="primary grow" id="scanBtn">Scan barcode</button>
       <label class="btn grow" for="photo">Use a photo</label>
-      <input type="file" id="photo" accept="image/*" capture="environment" class="hidden">
+      <input type="file" id="photo" accept="image/*" class="hidden">
     </div>
     <form class="row" id="manual" style="margin-top:10px">
       <input type="text" id="code" inputmode="numeric" autocomplete="off" placeholder="ISBN, e.g. 978-0-14-118776-1" class="grow" style="flex-basis:200px">
@@ -357,7 +357,7 @@ $('importFile').onchange = async e => {
 render();
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'v9';
+const VERSION = 'v10';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
