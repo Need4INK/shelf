@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
+<meta name="app-version" content="v6">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shelf</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -66,7 +67,7 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 <header>
   <h1>Shelf</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">v5</p>
+  <p style="font-size:12px;opacity:.5">v6</p>
 </header>
 <main>
   <section class="panel">
@@ -339,6 +340,21 @@ $('importFile').onchange = async e => {
 };
 
 render();
+
+/* ---------- Auto-update ---------- */
+const VERSION = 'v6';
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+// When the app comes back to the front, check for a newer version and reload into it
+async function checkUpdate() {
+  if (scanning) return;
+  try {
+    const html = await (await fetch('./?check=' + Date.now(), { cache: 'no-store' })).text();
+    const m = html.match(/name="app-version" content="([^"]+)"/);
+    if (m && m[1] !== VERSION) location.reload();
+  } catch (e) { /* offline — keep the current version */ }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkUpdate(); });
+checkUpdate();
 }
 </script>
 </body>
