@@ -58,6 +58,7 @@ dt{color:var(--mute)}dd{margin:0;overflow-wrap:anywhere}
 .empty{color:var(--mute);font-size:14px;padding:12px 0 0}
 .form{display:grid;gap:8px;margin-top:12px}
 .hidden{display:none!important}
+a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 </style>
 </head>
 <body>
@@ -153,6 +154,7 @@ function merge(a, b) { // a = Open Library (preferred for core facts), b = Googl
   out.cover = a.cover || b.cover;
   return out;
 }
+function olCover(isbn) { return new Promise(res => { const i = new Image(); const u = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`; i.onload = () => res(i.naturalWidth > 1 ? u : ''); i.onerror = () => res(''); i.src = u; setTimeout(() => res(''), 6000); }); }
 async function lookup(raw) {
   const p = parseCode(raw);
   if (!p) { status('That doesn’t look like an ISBN or barcode. ISBNs have 10 or 13 digits.', true); return; }
@@ -168,6 +170,7 @@ async function lookup(raw) {
   const base = { isbn13: p.isbn13 || '', isbn10: p.isbn10 || '', code: p.code || '' };
   current = info ? { ...info, ...base, isbn13: base.isbn13 || info.isbn13 || '', isbn10: base.isbn10 || info.isbn10 || '',
     source: [ol.value && 'Open Library', gb.value && 'Google Books'].filter(Boolean).join(' + ') } : null;
+  if (current && !current.cover && current.isbn13) current.cover = await olCover(current.isbn13);
   status('');
   current ? showBook(current, false) : showNotFound(base);
 }
@@ -227,11 +230,13 @@ $('list').onclick = e => { const li = e.target.closest('li[data-id]'); if (li) s
 $('q').oninput = render;
 
 /* ---------- Scanning ---------- */
-let reader = null, scanning = false;
+let reader = null, scanning = false, lastRead = '', hits = 0;
+// Book barcodes are EAN-13 (978/979 = ISBN) or 12-digit UPC; reject anything that fails its checksum
+function goodCode(t) { const s = String(t).replace(/\D/g, ''); return (s.length === 13 && ean13ok(s)) || (s.length === 12 && ean13ok('0' + s)); }
 function makeReader() {
   if (!window.ZXing) { status('Scanner library didn’t load — check your connection, or type the ISBN.', true); return null; }
   const Z = window.ZXing, hints = new Map();
-  hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.EAN_8, Z.BarcodeFormat.UPC_A, Z.BarcodeFormat.UPC_E, Z.BarcodeFormat.CODE_128, Z.BarcodeFormat.QR_CODE]);
+  hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.UPC_A]);
   hints.set(Z.DecodeHintType.TRY_HARDER, true);
   return new Z.BrowserMultiFormatReader(hints, 250);
 }
@@ -240,10 +245,13 @@ $('scanBtn').onclick = async () => {
   if (scanning) return stopScan();
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { status('Live camera needs the app opened over https. Use “Use a photo” instead.', true); return; }
   reader = reader || makeReader(); if (!reader) return;
-  scanning = true; $('cam').classList.add('on'); $('scanBtn').textContent = 'Stop scanning'; status('');
+  lastRead = ''; hits = 0; scanning = true; $('cam').classList.add('on'); $('scanBtn').textContent = 'Stop scanning'; status('');
   try {
-    await reader.decodeFromConstraints({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } }, $('video'), res => {
-      if (res && scanning) { stopScan(); const t = res.getText(); $('code').value = t; lookup(t); }
+    await reader.decodeFromConstraints({ video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } }, $('video'), res => {
+      if (!res || !scanning) return;
+      const t = res.getText(); if (!goodCode(t)) return;
+      if (t === lastRead) hits++; else { lastRead = t; hits = 1; }
+      if (hits >= 2) { stopScan(); lastRead = ''; $('code').value = t; lookup(t); }
     });
   } catch (e) { stopScan(); status(e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow it in Settings › Safari › Camera, or use a photo.' : 'Couldn’t start the camera. Try “Use a photo”.', true); }
 };
@@ -252,7 +260,7 @@ $('photo').onchange = async e => {
   reader = reader || makeReader(); if (!reader) return;
   status('Reading barcode from photo…');
   const url = URL.createObjectURL(f);
-  try { const res = await reader.decodeFromImageUrl(url); $('code').value = res.getText(); lookup(res.getText()); }
+  try { const res = await reader.decodeFromImageUrl(url); if (!goodCode(res.getText())) throw 0; $('code').value = res.getText(); lookup(res.getText()); }
   catch (err) { status('No barcode found in that photo. Get closer, keep it sharp and well lit, or type the ISBN.', true); }
   finally { URL.revokeObjectURL(url); }
 };
