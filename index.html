@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="v7">
+<meta name="app-version" content="v8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shelf</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -29,7 +29,7 @@ main{max-width:640px;margin:0 auto;padding:16px}
 h2{font-size:18px;margin:0 0 12px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
 button,.btn{font:inherit;font-weight:600;min-height:46px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
-button.primary{background:var(--green);color:#fff;border-color:var(--green)}
+button.primary,.btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
 button.warn{color:var(--red)}
 button:disabled{opacity:.5}
 button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
@@ -67,7 +67,7 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 <header>
   <h1>Shelf</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">v7</p>
+  <p style="font-size:12px;opacity:.5">v8</p>
 </header>
 <main>
   <section class="panel">
@@ -78,8 +78,8 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
       <div class="hint">Hold about 20 cm away, barcode inside the box</div>
     </div>
     <div class="row">
-      <button class="primary grow" id="scanBtn">Scan barcode</button>
-      <label class="btn grow" for="photo">Use a photo</label>
+      <label class="btn primary grow" for="photo">Scan barcode</label>
+      <button class="grow" id="scanBtn">Live scan</button>
       <input type="file" id="photo" accept="image/*" capture="environment" class="hidden">
     </div>
     <form class="row" id="manual" style="margin-top:10px">
@@ -254,7 +254,7 @@ function releaseCamera() {
 }
 function stopScan() {
   scanning = false; clearTimeout(timer);
-  $('cam').classList.remove('on'); $('scanBtn').textContent = 'Scan barcode';
+  $('cam').classList.remove('on'); $('scanBtn').textContent = 'Live scan';
   clearTimeout(releaseTimer); releaseTimer = setTimeout(releaseCamera, 3 * 60 * 1000);
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { stopScan(); releaseCamera(); } });
@@ -310,7 +310,7 @@ $('scanBtn').onclick = async () => {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } });
   } catch (e) {
-    status(e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow it in Settings › Safari › Camera, or use a photo.' : 'Couldn’t start the camera. Try “Use a photo”.', true); return;
+    status(e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow it in Settings › Safari › Camera, or use \u201cScan barcode\u201d.' : 'Couldn’t start the camera. Try “Use a photo”.', true); return;
   }
   const track = stream.getVideoTracks()[0];
   // zoom in so you can hold the phone further away, where the camera can focus
@@ -357,7 +357,7 @@ $('importFile').onchange = async e => {
 render();
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'v7';
+const VERSION = 'v8';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
