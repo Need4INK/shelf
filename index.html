@@ -66,7 +66,7 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 <header>
   <h1>Shelf</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">v4</p>
+  <p style="font-size:12px;opacity:.5">v5</p>
 </header>
 <main>
   <section class="panel">
@@ -74,7 +74,7 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
     <div class="cam" id="cam">
       <video id="video" playsinline muted autoplay></video>
       <div class="guide"></div>
-      <div class="hint">Hold about 20 cm away, barcode inside the box<br><small id="dbg" style="opacity:.6;font-size:11px"></small></div>
+      <div class="hint">Hold about 20 cm away, barcode inside the box</div>
     </div>
     <div class="row">
       <button class="primary grow" id="scanBtn">Scan barcode</button>
@@ -256,10 +256,10 @@ function scanFrame() {
   if (vw && vh) {
     const Z = window.ZXing;
     // even frames: centre band (under the yellow box); odd frames: whole picture
-    const crop = frameNo % 2 === 0;
+    const crop = frameNo % 4 !== 3; // mostly the centre band, every 4th frame the whole picture
     const sw = crop ? Math.round(vw * 0.9) : vw, sh = crop ? Math.round(vh * 0.5) : vh;
     const sx = (vw - sw) >> 1, sy = (vh - sh) >> 1;
-    const k = Math.min(1, 1280 / sw), w = Math.round(sw * k), h = Math.round(sh * k);
+    const k = Math.min(1, 960 / sw), w = Math.round(sw * k), h = Math.round(sh * k);
     cvs.width = w; cvs.height = h;
     cx.drawImage(v, sx, sy, sw, sh, 0, 0, w, h);
     try {
@@ -267,18 +267,18 @@ function scanFrame() {
       const px = cx.getImageData(0, 0, w, h).data, lum = new Uint8ClampedArray(w * h);
       for (let i = 0, j = 0; j < lum.length; i += 4, j++) lum[j] = (px[i] * 77 + px[i + 1] * 150 + px[i + 2] * 29) >> 8;
       const src = new Z.RGBLuminanceSource(lum, w, h);
-      const bin = (frameNo >> 1) % 2 ? new Z.GlobalHistogramBinarizer(src) : new Z.HybridBinarizer(src);
+      const bin = frameNo % 2 ? new Z.GlobalHistogramBinarizer(src) : new Z.HybridBinarizer(src);
       tries++;
       const t = core.decodeWithState(new Z.BinaryBitmap(bin)).getText();
       if (goodCode(t)) {
         if (t === lastRead) hits++; else { lastRead = t; hits = 1; }
-        if (hits >= 2) { stopScan(); lastRead = ''; $('code').value = t; lookup(t); return; }
+        // ISBN barcodes (978/979 + valid checksum) are accepted at once; other codes must read twice
+        if (/^97[89]/.test(t) || hits >= 2) { stopScan(); lastRead = ''; $('code').value = t; lookup(t); return; }
       } else lastErr = 'ignored ' + t;
     } catch (e) { lastErr = (e && (e.name || e.message)) || String(e); }
     frameNo++;
-    $('dbg').textContent = `${vw}×${vh} · ${tries} tries · ${lastErr}`;
   }
-  timer = setTimeout(scanFrame, 60);
+  timer = setTimeout(scanFrame, 30);
 }
 $('scanBtn').onclick = async () => {
   if (scanning) return stopScan();
