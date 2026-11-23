@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="v6">
+<meta name="app-version" content="v7">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shelf</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -67,7 +67,7 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 <header>
   <h1>Shelf</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">v6</p>
+  <p style="font-size:12px;opacity:.5">v7</p>
 </header>
 <main>
   <section class="panel">
@@ -245,11 +245,19 @@ function makeReader() {
 }
 let stream = null, timer = 0, frameNo = 0, core = null;
 const cvs = document.createElement('canvas'), cx = cvs.getContext('2d', { willReadFrequently: true });
+// Keep the camera open for a while after a scan, so iOS doesn't ask permission again for the next book
+let releaseTimer = 0;
+function releaseCamera() {
+  clearTimeout(releaseTimer);
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  $('video').srcObject = null;
+}
 function stopScan() {
   scanning = false; clearTimeout(timer);
-  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-  $('video').srcObject = null; $('cam').classList.remove('on'); $('scanBtn').textContent = 'Scan barcode';
+  $('cam').classList.remove('on'); $('scanBtn').textContent = 'Scan barcode';
+  clearTimeout(releaseTimer); releaseTimer = setTimeout(releaseCamera, 3 * 60 * 1000);
 }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { stopScan(); releaseCamera(); } });
 let lastErr = '', tries = 0;
 function scanFrame() {
   if (!scanning) return;
@@ -291,7 +299,14 @@ $('scanBtn').onclick = async () => {
     hints.set(Z.DecodeHintType.TRY_HARDER, true);
     core = new Z.MultiFormatReader(); core.setHints(hints);
   }
-  status('');
+  status(''); clearTimeout(releaseTimer);
+  const live = stream && stream.getVideoTracks().some(t => t.readyState === 'live');
+  if (live) {
+    lastRead = ''; hits = 0; frameNo = 0; scanning = true;
+    $('cam').classList.add('on'); $('scanBtn').textContent = 'Stop scanning';
+    try { await $('video').play(); } catch (e) {}
+    scanFrame(); return;
+  }
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } });
   } catch (e) {
@@ -342,7 +357,7 @@ $('importFile').onchange = async e => {
 render();
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'v6';
+const VERSION = 'v7';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
