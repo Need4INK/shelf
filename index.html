@@ -291,7 +291,7 @@ function scanFrame() {
 }
 $('scanBtn').onclick = async () => {
   if (scanning) return stopScan();
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { status('Live camera needs the app opened over https. Use “Use a photo” instead.', true); return; }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { status('Live camera needs the app opened over https. Use “Scan barcode” instead.', true); return; }
   if (!window.ZXing) { status('Scanner library didn’t load — check your connection, or type the ISBN.', true); return; }
   if (!core) {
     const Z = window.ZXing, hints = new Map();
@@ -310,7 +310,7 @@ $('scanBtn').onclick = async () => {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } });
   } catch (e) {
-    status(e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow it in Settings › Safari › Camera, or use \u201cScan barcode\u201d.' : 'Couldn’t start the camera. Try “Use a photo”.', true); return;
+    status(e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow it in Settings › Safari › Camera, or use \u201cScan barcode\u201d.' : 'Couldn’t start the camera. Try “Scan barcode”.', true); return;
   }
   const track = stream.getVideoTracks()[0];
   // zoom in so you can hold the phone further away, where the camera can focus
