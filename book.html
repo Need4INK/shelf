@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-6">
+<meta name="app-version" content="book-7">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -36,22 +36,22 @@ h1{font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:32px
 .by{font-size:19px;color:#f3e3c3;margin:0}
 .series{margin:8px 0 0;font-size:15px;color:var(--gold);letter-spacing:.2px}
 
-.card{position:relative;margin:14px 0;padding:18px 18px 34px;border-radius:22px;color:#f3e3c3;
+.card{position:relative;margin:14px 0;padding:20px 20px 40px;border-radius:30px;color:#f3e3c3;
  background:linear-gradient(rgba(40,8,46,.25),rgba(20,4,26,.45)),url(img/panel.jpg) center/cover;
  box-shadow:0 10px 22px rgba(0,0,0,.55),inset 0 0 40px rgba(0,0,0,.45)}
 /* hand-painted gold rim and leaf sprigs, like the Home banner */
-.card::before{content:"";position:absolute;inset:-6px;pointer-events:none;border:30px solid transparent;border-image:url(img/rim.png) 60 stretch}
+.card::before{content:"";position:absolute;inset:0;pointer-events:none;border-style:solid;border-color:transparent;border-width:35px 45px;border-image:url(img/card_frame.png) 70 90 stretch}
 .card::after{content:"";position:absolute;inset:0;pointer-events:none;
- background:url(img/leaf_m.png) no-repeat right 12px top 10px/30px auto,url(img/leaf.png) no-repeat left 12px bottom 6px/22px auto;opacity:.95}
+ background:url(img/leaf_m.png) no-repeat right 14px top 12px/26px auto,url(img/leaf.png) no-repeat left 14px bottom 10px/23px auto}
 .card>*{position:relative;z-index:1}
 .card h2{margin:0 0 10px;font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:22px;color:#f1cf7c}
 
 .status{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border-radius:999px;background:#14041c;box-shadow:inset 0 2px 5px rgba(0,0,0,.5)}
 .status button{min-height:44px;border:0;border-radius:999px;background:transparent;color:#e7cfa6;font:600 17px "EB Garamond",Georgia,serif;cursor:pointer}
 .status button[aria-pressed=true]{background:linear-gradient(#f6dc96,#c9a24e);color:#2a1408;box-shadow:0 2px 4px rgba(0,0,0,.4),inset 0 1px 0 #fff4c8}
-.rate{display:flex;align-items:center;gap:4px;margin-top:14px}
-.rate span{font-size:16px;margin-right:6px;color:var(--mute);position:relative;top:4px}
-.pk{width:46px;height:46px;border:0;padding:3px;background:transparent;cursor:pointer;opacity:.3;filter:grayscale(1) brightness(.9);transition:opacity .15s,transform .2s,filter .15s}
+.rate{display:flex;align-items:center;gap:2px;margin-top:14px}
+.rate span{font-size:16px;margin-right:4px;color:var(--mute);position:relative;top:4px;white-space:nowrap}
+.pk{width:44px;height:44px;flex:none;border:0;padding:3px;background:transparent;cursor:pointer;opacity:.3;filter:grayscale(1) brightness(.9);transition:opacity .15s,transform .2s,filter .15s}
 .pk.on{animation:bob .35s ease-out}
 @keyframes bob{40%{transform:translateY(-4px) scale(1.12)}}
 .pk.on{opacity:1;filter:none}
