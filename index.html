@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-20">
+<meta name="app-version" content="home-21">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -25,17 +25,18 @@
 :root{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
-#stage{position:absolute;left:50%;top:env(safe-area-inset-top,0px);width:852px;height:1810px;transform-origin:50% 0;overflow:hidden}
+#stage{position:absolute;left:50%;top:env(safe-area-inset-top,0px);width:852px;height:1810px;transform-origin:50% 0;overflow:visible}
 #stage>*{position:absolute;left:0;top:0}
 #sky{width:852px;height:400px}
 #frame{width:852px;height:1810px;pointer-events:none}
+#canopy{width:852px;pointer-events:none}
 #bpC{left:90px!important;top:0!important;width:360px;height:260px;pointer-events:none}
 #faceGlow{left:110px!important;top:70px!important;width:340px;height:250px;pointer-events:none;mix-blend-mode:screen;opacity:0;background:radial-gradient(closest-side at 42% 55%,rgba(255,170,80,.5),rgba(255,130,50,.16) 55%,rgba(255,120,40,0) 100%)}
 #bigPkHit{left:150px;top:25px;width:270px;height:190px;cursor:pointer;z-index:2}
 #catC{left:548px!important;top:176px!important;width:264px;height:108px;pointer-events:none;transform-origin:132px 104px}
 #flame{width:150px;height:170px;left:-15px;top:80px}
-#glow{width:852px;height:900px;pointer-events:none;mix-blend-mode:screen;opacity:0;
- background:radial-gradient(circle at 60px 232px,rgba(255,200,120,.85) 0,rgba(255,155,60,.45) 70px,rgba(255,125,40,.2) 200px,rgba(255,100,30,.07) 360px,transparent 500px)}
+#glow{top:-300px!important;width:852px;height:1200px;pointer-events:none;mix-blend-mode:screen;opacity:0;
+ background:radial-gradient(circle at 60px 532px,rgba(255,200,120,.85) 0,rgba(255,155,60,.45) 70px,rgba(255,125,40,.2) 200px,rgba(255,100,30,.07) 360px,transparent 500px)}
 #catHit{left:575px;top:192px;width:225px;height:88px;cursor:pointer;z-index:2}
 #pumpkinHit{left:700px;top:305px;width:135px;height:135px;cursor:pointer;z-index:2}
 #candleHit{left:0;top:150px;width:120px;height:200px;cursor:pointer;z-index:2}
@@ -83,6 +84,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 <div id="stage">
   <canvas id="sky"></canvas>
   <div id="ghost" aria-hidden="true"><img id="gHeart" src="img/ghost_heart.png" alt=""><canvas id="gBody" width="324" height="312"></canvas><img id="gHeartGlow" src="img/ghost_heart_glow.png" alt=""></div>
+  <img id="canopy" src="img/canopy.png" alt="">
   <img id="frame" src="img/frame.png" alt="">
   <canvas id="bpC" width="720" height="520"></canvas>
   <div id="faceGlow"></div>
@@ -130,7 +132,6 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
     <div class="cr-author" id="laAuthor"></div>
     <div class="la-when" id="laWhen"></div>
   </section>
-  <div id="topFade"></div>
   <div id="clock"><div id="time">--:--</div><div id="phase"></div></div>
 </div>
 <nav id="tabbar" aria-label="Sections">
@@ -151,16 +152,19 @@ const stage=document.getElementById('stage'),sky=document.getElementById('sky'),
 const pkLight=document.getElementById('pkLight'),pkGlow=document.getElementById('pkGlow');
 const glow=document.getElementById('glow'),tEl=document.getElementById('time'),pEl=document.getElementById('phase');
 const sx=sky.getContext('2d'),fx=fl.getContext('2d');
-let S=1;
+let S=1,SKYX=0;
 // the stage starts below the iPhone's notch / Dynamic Island; the sky colour fills the strip above it
 const probe=document.createElement('div');probe.style.cssText='position:fixed;top:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden';document.body.appendChild(probe);
 function fit(){
   const top=probe.offsetHeight||0,vw=innerWidth,vh=innerHeight-top;S=Math.max(vw/852,vh/1810);
   stage.style.transform=`translateX(-50%) scale(${S})`;
   const d=Math.min(devicePixelRatio||1,3)*S;
-  sky.width=Math.round(W*d);sky.height=Math.round(H*d);sx.setTransform(d,0,0,d,0,0);
+  const ext=Math.max(0,(probe.offsetHeight||0)/S);SKYX=ext;
+  sky.style.top=(-ext)+'px';sky.style.height=(H+ext)+'px';
+  sky.width=Math.round(W*d);sky.height=Math.round((H+ext)*d);sx.setTransform(d,0,0,d,0,ext*d);
   fl.width=Math.round(FW*d);fl.height=Math.round(FH*d);fx.setTransform(d,0,0,d,0,0);
   if(window.__fxResize)window.__fxResize(d);
+  const cn=document.getElementById('canopy');if(cn){const hh=Math.max(60,top/S);cn.style.top=(-hh)+'px';cn.style.height=(hh+80)+'px'}   // arch fills exactly the strip above the scene
 }
 addEventListener('resize',fit);fit();
 
@@ -668,7 +672,7 @@ function draw(){
   const day=ss(-.05,.15,alt),night=1-ss(-.2,.02,alt),warm=1-ss(.08,.45,Math.abs(alt));lastNight=night;lastAlt=alt;
   const c=sx;
   // sky
-  let g=c.createLinearGradient(0,0,0,330);g.addColorStop(0,rgb(P[0]));g.addColorStop(1,rgb(P[1]));c.fillStyle=g;c.fillRect(0,0,W,H);
+  let g=c.createLinearGradient(0,0,0,330);g.addColorStop(0,rgb(P[0]));g.addColorStop(1,rgb(P[1]));c.fillStyle=g;c.fillRect(0,-SKYX,W,H+SKYX);
   // stars
   if(night>0)for(const s of stars){const a=night*(.45+.55*Math.sin(t*s.s+s.p));if(a<=0)continue;
     c.fillStyle=s.g?`rgba(255,215,130,${a})`:`rgba(255,245,225,${a*.85})`;
@@ -749,7 +753,7 @@ addEventListener('pageshow',renderLatest);addEventListener('storage',renderLates
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderLatest()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-20';
+const APP_VERSION='home-21';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
