@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-16">
+<meta name="app-version" content="home-17">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -70,7 +70,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 .la-head{left:130px;top:24px;font-size:33px;font-weight:600;letter-spacing:.2px;color:#2a1410}
 .la-when{left:233px;top:180px;width:300px;font-size:21px;font-style:italic;color:#6a3a2a}
 /* framed book: reusable anywhere (home card now, library later); size it by width */
-.bk{position:relative;width:151px;aspect-ratio:151/179;cursor:pointer}
+.bk{position:relative;width:151px;aspect-ratio:151/179;cursor:pointer;--m1:#f6dc96;--m2:#c9a24e;--m3:#8a6420;--m4:#e9c873;--m5:#a07a2c}
 #reading .bk{position:absolute;left:61px;top:66px}
 .bk-shell{position:absolute;inset:0;width:100%;height:100%}
 .bk-frame{position:absolute;left:15.9%;top:6.1%;width:76.8%;height:87.7%;box-sizing:border-box;padding:3px;border-radius:3px;
@@ -83,11 +83,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 .bk-ph[hidden]{display:none}
 .bk-ph svg{width:30%;height:auto}
 .bk-ph span{font-size:15px;line-height:1.1;color:#e9c873;text-align:center;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.bk[data-metal=gold]{--m1:#f6dc96;--m2:#c9a24e;--m3:#8a6420;--m4:#e9c873;--m5:#a07a2c}
-.bk[data-metal=silver]{--m1:#ffffff;--m2:#c9ced8;--m3:#767c88;--m4:#e9ecf2;--m5:#9aa1ad}
-.bk[data-metal=rose]{--m1:#ffe0d6;--m2:#e2a495;--m3:#99574c;--m4:#f4c4b5;--m5:#b97a6a}
-.bk[data-metal=copper]{--m1:#ffcfa6;--m2:#c97b47;--m3:#76381a;--m4:#eaa473;--m5:#a3592d}
-.bk[data-metal=bronze]{--m1:#c9a873;--m2:#7d5c31;--m3:#3b2812;--m4:#a2834f;--m5:#5b4120}
+
 #topFade{width:852px;height:46px;pointer-events:none;background:linear-gradient(var(--skyTop,#12051f),transparent);z-index:1}
 #clock{top:452px;left:60px;width:732px;height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;
  font-family:"IM Fell English SC",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.35),0 2px 2px #000;pointer-events:none}
@@ -141,7 +137,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
   </nav>
   <section id="reading" aria-label="Latest addition">
     <div class="la-head">Latest Addition</div>
-    <div class="bk" id="laBook" data-metal="gold"><img class="bk-shell" src="img/book.png" alt=""><div class="bk-frame"><img class="bk-cover" alt="" hidden><div class="bk-ph"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M24 6a14 14 0 1 0 10 24A11 11 0 1 1 24 6z" fill="#e9c873"/><path d="M31 9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#f6dc96"/></svg><span></span></div></div></div>
+    <div class="bk" id="laBook"><img class="bk-shell" src="img/book.png" alt=""><div class="bk-frame"><img class="bk-cover" alt="" hidden><div class="bk-ph"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M24 6a14 14 0 1 0 10 24A11 11 0 1 1 24 6z" fill="#e9c873"/><path d="M31 9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#f6dc96"/></svg><span></span></div></div></div>
     <div class="cr-title" id="laTitle"></div>
     <div class="cr-author" id="laAuthor"></div>
     <div class="la-when" id="laWhen"></div>
@@ -748,37 +744,55 @@ function whenText(ms){
 }
 let previewIdx=-1;
 function allBooks(){let a=[];try{a=JSON.parse(localStorage.getItem('shelf.books.v1')||'[]')}catch(e){}return Array.isArray(a)?a.slice().sort((x,y)=>(y.added||0)-(x.added||0)):[]}
-/* pick a frame metal from the cover's colours (needs the cover server to allow it; otherwise gold) */
-function pickMetal(img){
-  const c=document.createElement('canvas');c.width=c.height=24;const x=c.getContext('2d',{willReadFrequently:true});
-  x.drawImage(img,0,0,24,24);const d=x.getImageData(0,0,24,24).data;
-  let L=0,n=0,sx=0,sy=0,S=0;
-  for(let i=0;i<d.length;i+=4){const r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2;
-    L+=l;n++;const sat=mx===mn?0:(mx-mn)/(1-Math.abs(2*l-1));if(sat<.2||l<.08||l>.95)continue;
-    let h=mx===r?((g-b)/(mx-mn))%6:mx===g?(b-r)/(mx-mn)+2:(r-g)/(mx-mn)+4;h*=60;if(h<0)h+=360;
-    sx+=Math.cos(h*Math.PI/180)*sat;sy+=Math.sin(h*Math.PI/180)*sat;S+=sat}
-  L/=n;const sat=S/n,hue=(Math.atan2(sy,sx)*180/Math.PI+360)%360;
-  if(L>.78)return 'bronze';            // pale covers: a dark frame keeps the edge
-  if(L<.16)return 'gold';              // near-black: bright gold
-  if(sat<.12)return 'silver';          // greys
-  if(hue<15||hue>=345)return 'gold';   // reds
-  if(hue<45)return 'copper';           // oranges, browns
-  if(hue<70)return 'bronze';           // yellows
-  if(hue<170)return 'gold';            // greens
-  if(hue<290)return 'silver';          // blues, violets
-  return 'rose';                       // pinks, magentas
+/* dominant colour of a cover: strongest hue family, weighted by how vivid it is */
+function coverColor(img){
+  const c=document.createElement('canvas');c.width=c.height=32;const x=c.getContext('2d',{willReadFrequently:true});
+  x.drawImage(img,0,0,32,32);const d=x.getImageData(0,0,32,32).data;
+  const bins=Array.from({length:12},()=>({w:0,r:0,g:0,b:0}));let gr=0,gg=0,gb=0,n=0,vivid=0;
+  for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b),s=mx?(mx-mn)/mx:0,v=mx/255;
+    gr+=r;gg+=g;gb+=b;n++;if(s<.25||v<.15)continue;vivid++;
+    let h=mx===r?((g-b)/(mx-mn))%6:mx===g?(b-r)/(mx-mn)+2:(r-g)/(mx-mn)+4;h=(h*60+360)%360;
+    const k=bins[Math.floor(h/30)],w=s*v;k.w+=w;k.r+=r*w;k.g+=g*w;k.b+=b*w}
+  const best=bins.reduce((a,b)=>b.w>a.w?b:a);
+  const hex=(r,g,b)=>'#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+  if(vivid<n*.12||!best.w)return hex(gr/n,gg/n,gb/n);         // mostly grey / black / white
+  return hex(best.r/best.w,best.g/best.w,best.b/best.w);
+}
+/* a metallic frame in the cover's own colour: five shades of its hue, like polished metal */
+function frameShades(hex){
+  if(!hex)return null;
+  const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
+  const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2;let h=0,s=0;
+  if(mx!==mn){const d=mx-mn;s=l>.5?d/(2-mx-mn):d/(mx+mn);h=mx===r?((g-b)/d+(g<b?6:0)):mx===g?(b-r)/d+2:(r-g)/d+4;h*=60}
+  if(s<.12)s=0;else s=Math.min(.85,.45+s*.4);              // greys/black/white get a silver frame
+  const base=l>.55?.3:.66;                                  // stand out from the cover: darker frame on light covers, lighter on dark
+  const c=(dl,ds=1)=>`hsl(${Math.round(h)} ${Math.round(s*ds*100)}% ${Math.round(Math.max(.08,Math.min(.95,base+dl))*100)}%)`;
+  return [c(.36,.7),c(.08),c(-.2),c(.24,.85),c(-.06)];
+}
+function paintFrame(el,hex){
+  const sh=frameShades(hex);
+  if(!sh){['--m1','--m2','--m3','--m4','--m5'].forEach(k=>el.style.removeProperty(k));return}
+  sh.forEach((v,i)=>el.style.setProperty('--m'+(i+1),v));
+}
+/* store colour + metal on the book the first time we can read its cover */
+function rememberLook(b,look){
+  try{const all=JSON.parse(localStorage.getItem('shelf.books.v1')||'[]');const k=all.find(x=>x.id===b.id||(x.added===b.added&&x.title===b.title));
+    if(k&&k.color!==look.color){k.color=look.color;localStorage.setItem('shelf.books.v1',JSON.stringify(all))}}catch(e){}
 }
 function setBook(el,b){
   const im=el.querySelector('.bk-cover'),ph=el.querySelector('.bk-ph');
   ph.querySelector('span').textContent=b?(b.title||''):'';
-  const showPh=()=>{im.hidden=true;ph.hidden=false;el.dataset.metal='gold'};
+  const look=c=>paintFrame(el,c);
+  const showPh=()=>{im.hidden=true;ph.hidden=false;look(null)};
   if(!(b&&b.cover)){im.removeAttribute('src');showPh();return}
   const url=b.cover;el.dataset.cover=url;
+  // saved colour first (instant), then read the cover if we haven't yet
+  look(b.color||null);
   im.onload=()=>{im.hidden=false;ph.hidden=true};im.onerror=showPh;
   if(im.getAttribute('src')!==url)im.src=url;else if(im.complete&&im.naturalWidth){im.hidden=false;ph.hidden=true}
+  if(b.color)return;
   const probe=new Image();probe.crossOrigin='anonymous';
-  probe.onload=()=>{if(el.dataset.cover!==url)return;try{el.dataset.metal=pickMetal(probe)}catch(e){el.dataset.metal='gold'}};
-  probe.onerror=()=>{if(el.dataset.cover===url)el.dataset.metal='gold'};
+  probe.onload=()=>{if(el.dataset.cover!==url)return;try{const c=coverColor(probe);look(c);rememberLook(b,{color:c})}catch(e){}};
   probe.src=url;
 }
 function renderLatest(){
@@ -795,7 +809,7 @@ addEventListener('pageshow',renderLatest);addEventListener('storage',renderLates
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderLatest()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-16';
+const APP_VERSION='home-17';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{

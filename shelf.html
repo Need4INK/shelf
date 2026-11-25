@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="v12">
+<meta name="app-version" content="v13">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shelf</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -68,7 +68,7 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
   <a href="./" style="display:inline-block;margin-bottom:6px;color:inherit;opacity:.8;text-decoration:none;font-size:15px">&larr; Home</a>
   <h1>Shelf</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">v12</p>
+  <p style="font-size:12px;opacity:.5">v13</p>
 </header>
 <main>
   <section class="panel">
@@ -218,9 +218,34 @@ function showNotFound(base) {
   $('nf').onsubmit = e => { e.preventDefault(); addBook({ ...base, title: $('nfT').value.trim(), authors: $('nfA').value.trim() ? [$('nfA').value.trim()] : [], source: 'Manual' }); };
 }
 function addBook(b) {
-  books.unshift({ ...b, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: Date.now() });
+  const nb = { ...b, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: Date.now() };
+  books.unshift(nb);
   save(); render(); $('result').classList.add('hidden'); $('code').value = '';
   status('Added “' + (b.title || 'book') + '”.');
+  rememberCoverColour(nb);
+}
+// Read the cover's main colour once, when the book is added, and keep it with the book
+// (the home screen tints the book around the cover with it). Needs the cover site to allow it.
+function rememberCoverColour(nb) {
+  if (!nb.cover) return;
+  const im = new Image(); im.crossOrigin = 'anonymous';
+  im.onload = () => {
+    try {
+      const c = document.createElement('canvas'); c.width = c.height = 32; const x = c.getContext('2d', { willReadFrequently: true });
+      x.drawImage(im, 0, 0, 32, 32); const d = x.getImageData(0, 0, 32, 32).data;
+      const bins = Array.from({ length: 12 }, () => ({ w: 0, r: 0, g: 0, b: 0 })); let gr = 0, gg = 0, gb = 0, n = 0, vivid = 0, L = 0;
+      for (let i = 0; i < d.length; i += 4) {
+        const r = d[i], g = d[i + 1], bb = d[i + 2], mx = Math.max(r, g, bb), mn = Math.min(r, g, bb), sat = mx ? (mx - mn) / mx : 0, v = mx / 255;
+        gr += r; gg += g; gb += bb; n++; L += (mx + mn) / 510; if (sat < .25 || v < .15) continue; vivid++;
+        let h = mx === r ? ((g - bb) / (mx - mn)) % 6 : mx === g ? (bb - r) / (mx - mn) + 2 : (r - g) / (mx - mn) + 4; h = (h * 60 + 360) % 360;
+        const k = bins[Math.floor(h / 30)], w = sat * v; k.w += w; k.r += r * w; k.g += g * w; k.b += bb * w;
+      }
+      const best = bins.reduce((a, q) => q.w > a.w ? q : a), hx = (r, g, b2) => '#' + [r, g, b2].map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
+      const color = vivid < n * .12 || !best.w ? hx(gr / n, gg / n, gb / n) : hx(best.r / best.w, best.g / best.w, best.b / best.w);
+      const k = books.find(q => q.id === nb.id); if (k) { k.color = color; save(); }
+    } catch (e) { /* cover site doesn't allow reading its colours */ }
+  };
+  im.src = nb.cover;
 }
 function render() {
   const q = $('q').value.trim().toLowerCase();
@@ -356,7 +381,7 @@ $('importFile').onchange = async e => {
 render();
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'v12';
+const VERSION = 'v13';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
