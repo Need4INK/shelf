@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-18">
+<meta name="app-version" content="home-19">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -75,7 +75,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 .bk-shadow,.bk-tint,.bk-shade,.bk-gold{position:absolute;inset:0;width:100%;height:100%}
 .bk-tint{background:var(--tint);-webkit-mask:url(img/book_shade.png) center/100% 100%;mask:url(img/book_shade.png) center/100% 100%;transition:background .5s}
 .bk-shade{mix-blend-mode:multiply}
-.bk-frame{position:absolute;left:24%;top:12%;width:63%;height:74%;box-sizing:border-box;padding:3px;border-radius:3px;
+.bk-frame{position:absolute;left:15.9%;top:6.1%;width:76.8%;height:87.7%;box-sizing:border-box;padding:3px;border-radius:3px;
  background:linear-gradient(135deg,var(--m1),var(--m2) 30%,var(--m3) 55%,var(--m4) 75%,var(--m5));
  box-shadow:0 0 0 1px rgba(20,8,4,.9),0 2px 5px rgba(0,0,0,.5);transition:background .4s}
 .bk-frame::before{content:"";position:absolute;inset:3px;box-shadow:inset 0 0 0 1px rgba(20,10,5,.75),inset 0 0 6px rgba(0,0,0,.45);z-index:2;pointer-events:none}
@@ -805,7 +805,7 @@ addEventListener('pageshow',renderLatest);addEventListener('storage',renderLates
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderLatest()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-18';
+const APP_VERSION='home-19';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
