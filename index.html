@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-15">
+<meta name="app-version" content="home-16">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -69,16 +69,25 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 .cr-author{left:233px;top:141px;width:300px;font-size:22px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .la-head{left:130px;top:24px;font-size:33px;font-weight:600;letter-spacing:.2px;color:#2a1410}
 .la-when{left:233px;top:180px;width:300px;font-size:21px;font-style:italic;color:#6a3a2a}
-.la-cover{left:85px;top:77px;width:116px;height:157px;padding:3px;border-radius:3px;cursor:pointer;
- background:linear-gradient(135deg,#f6dc96,#c9a24e 30%,#8a6420 55%,#e9c873 75%,#a07a2c);
- box-shadow:0 0 0 1px #2a1408,0 2px 5px rgba(0,0,0,.5)}
-.la-cover::before{content:"";position:absolute;inset:3px;box-shadow:inset 0 0 0 1px rgba(40,20,5,.8),inset 0 0 6px rgba(0,0,0,.45);z-index:2;pointer-events:none}
-.la-cover img{position:absolute;inset:3px;width:calc(100% - 6px);height:calc(100% - 6px);object-fit:cover;display:block}
-.la-ph{position:absolute;inset:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:10px 8px;
+/* framed book: reusable anywhere (home card now, library later); size it by width */
+.bk{position:relative;width:151px;aspect-ratio:151/179;cursor:pointer}
+#reading .bk{position:absolute;left:61px;top:66px}
+.bk-shell{position:absolute;inset:0;width:100%;height:100%}
+.bk-frame{position:absolute;left:15.9%;top:6.1%;width:76.8%;height:87.7%;box-sizing:border-box;padding:3px;border-radius:3px;
+ background:linear-gradient(135deg,var(--m1),var(--m2) 30%,var(--m3) 55%,var(--m4) 75%,var(--m5));
+ box-shadow:0 0 0 1px rgba(20,8,4,.9),0 2px 5px rgba(0,0,0,.5);transition:background .4s}
+.bk-frame::before{content:"";position:absolute;inset:3px;box-shadow:inset 0 0 0 1px rgba(20,10,5,.75),inset 0 0 6px rgba(0,0,0,.45);z-index:2;pointer-events:none}
+.bk-cover{position:absolute;inset:3px;width:calc(100% - 6px);height:calc(100% - 6px);object-fit:cover;display:block}
+.bk-ph{position:absolute;inset:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:10px 8px;
  background:radial-gradient(circle at 50% 30%,#3c2a5c,#1e1232 70%)}
-.la-ph[hidden]{display:none}
-.la-ph svg{width:44px;height:44px}
-.la-ph span{font-size:15px;line-height:1.1;color:#e9c873;text-align:center;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.bk-ph[hidden]{display:none}
+.bk-ph svg{width:30%;height:auto}
+.bk-ph span{font-size:15px;line-height:1.1;color:#e9c873;text-align:center;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.bk[data-metal=gold]{--m1:#f6dc96;--m2:#c9a24e;--m3:#8a6420;--m4:#e9c873;--m5:#a07a2c}
+.bk[data-metal=silver]{--m1:#ffffff;--m2:#c9ced8;--m3:#767c88;--m4:#e9ecf2;--m5:#9aa1ad}
+.bk[data-metal=rose]{--m1:#ffe0d6;--m2:#e2a495;--m3:#99574c;--m4:#f4c4b5;--m5:#b97a6a}
+.bk[data-metal=copper]{--m1:#ffcfa6;--m2:#c97b47;--m3:#76381a;--m4:#eaa473;--m5:#a3592d}
+.bk[data-metal=bronze]{--m1:#c9a873;--m2:#7d5c31;--m3:#3b2812;--m4:#a2834f;--m5:#5b4120}
 #topFade{width:852px;height:46px;pointer-events:none;background:linear-gradient(var(--skyTop,#12051f),transparent);z-index:1}
 #clock{top:452px;left:60px;width:732px;height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;
  font-family:"IM Fell English SC",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.35),0 2px 2px #000;pointer-events:none}
@@ -132,7 +141,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
   </nav>
   <section id="reading" aria-label="Latest addition">
     <div class="la-head">Latest Addition</div>
-    <div class="la-cover"><img id="laImg" alt="" hidden><div id="laPh" class="la-ph"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M24 6a14 14 0 1 0 10 24A11 11 0 1 1 24 6z" fill="#e9c873"/><path d="M31 9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#f6dc96"/></svg><span id="laPhTitle"></span></div></div>
+    <div class="bk" id="laBook" data-metal="gold"><img class="bk-shell" src="img/book.png" alt=""><div class="bk-frame"><img class="bk-cover" alt="" hidden><div class="bk-ph"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M24 6a14 14 0 1 0 10 24A11 11 0 1 1 24 6z" fill="#e9c873"/><path d="M31 9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#f6dc96"/></svg><span></span></div></div></div>
     <div class="cr-title" id="laTitle"></div>
     <div class="cr-author" id="laAuthor"></div>
     <div class="la-when" id="laWhen"></div>
@@ -739,24 +748,54 @@ function whenText(ms){
 }
 let previewIdx=-1;
 function allBooks(){let a=[];try{a=JSON.parse(localStorage.getItem('shelf.books.v1')||'[]')}catch(e){}return Array.isArray(a)?a.slice().sort((x,y)=>(y.added||0)-(x.added||0)):[]}
+/* pick a frame metal from the cover's colours (needs the cover server to allow it; otherwise gold) */
+function pickMetal(img){
+  const c=document.createElement('canvas');c.width=c.height=24;const x=c.getContext('2d',{willReadFrequently:true});
+  x.drawImage(img,0,0,24,24);const d=x.getImageData(0,0,24,24).data;
+  let L=0,n=0,sx=0,sy=0,S=0;
+  for(let i=0;i<d.length;i+=4){const r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2;
+    L+=l;n++;const sat=mx===mn?0:(mx-mn)/(1-Math.abs(2*l-1));if(sat<.2||l<.08||l>.95)continue;
+    let h=mx===r?((g-b)/(mx-mn))%6:mx===g?(b-r)/(mx-mn)+2:(r-g)/(mx-mn)+4;h*=60;if(h<0)h+=360;
+    sx+=Math.cos(h*Math.PI/180)*sat;sy+=Math.sin(h*Math.PI/180)*sat;S+=sat}
+  L/=n;const sat=S/n,hue=(Math.atan2(sy,sx)*180/Math.PI+360)%360;
+  if(L>.78)return 'bronze';            // pale covers: a dark frame keeps the edge
+  if(L<.16)return 'gold';              // near-black: bright gold
+  if(sat<.12)return 'silver';          // greys
+  if(hue<15||hue>=345)return 'gold';   // reds
+  if(hue<45)return 'copper';           // oranges, browns
+  if(hue<70)return 'bronze';           // yellows
+  if(hue<170)return 'gold';            // greens
+  if(hue<290)return 'silver';          // blues, violets
+  return 'rose';                       // pinks, magentas
+}
+function setBook(el,b){
+  const im=el.querySelector('.bk-cover'),ph=el.querySelector('.bk-ph');
+  ph.querySelector('span').textContent=b?(b.title||''):'';
+  const showPh=()=>{im.hidden=true;ph.hidden=false;el.dataset.metal='gold'};
+  if(!(b&&b.cover)){im.removeAttribute('src');showPh();return}
+  const url=b.cover;el.dataset.cover=url;
+  im.onload=()=>{im.hidden=false;ph.hidden=true};im.onerror=showPh;
+  if(im.getAttribute('src')!==url)im.src=url;else if(im.complete&&im.naturalWidth){im.hidden=false;ph.hidden=true}
+  const probe=new Image();probe.crossOrigin='anonymous';
+  probe.onload=()=>{if(el.dataset.cover!==url)return;try{el.dataset.metal=pickMetal(probe)}catch(e){el.dataset.metal='gold'}};
+  probe.onerror=()=>{if(el.dataset.cover===url)el.dataset.metal='gold'};
+  probe.src=url;
+}
 function renderLatest(){
-  const all=allBooks(),b=previewIdx>=0&&all.length?all[previewIdx%all.length]:newestBook(),im=document.getElementById('laImg'),ph=document.getElementById('laPh');
+  const all=allBooks(),b=previewIdx>=0&&all.length?all[previewIdx%all.length]:newestBook();
   const title=b?(b.title||'Untitled'):'No books yet';
   document.getElementById('laTitle').textContent=title;
   document.getElementById('laAuthor').textContent=b?((b.authors||[]).join(', ')||'Unknown author'):'Add your first book';
   document.getElementById('laWhen').textContent=b?whenText(b.added):'';
-  document.getElementById('laPhTitle').textContent=b?title:'';
-  const showPh=()=>{im.hidden=true;ph.hidden=false};
-  if(b&&b.cover){im.onload=()=>{im.hidden=false;ph.hidden=true};im.onerror=showPh;if(im.getAttribute('src')!==b.cover)im.src=b.cover;else if(im.complete&&im.naturalWidth){im.hidden=false;ph.hidden=true}}
-  else{im.removeAttribute('src');showPh()}
+  setBook(document.getElementById('laBook'),b?{...b,title}:null);
 }
-document.querySelector('.la-cover').addEventListener('click',()=>{const n=allBooks().length;if(n){previewIdx=(previewIdx+1)%n;renderLatest()}});
+document.getElementById('laBook').addEventListener('click',()=>{const n=allBooks().length;if(n){previewIdx=(previewIdx+1)%n;renderLatest()}});
 renderLatest();
 addEventListener('pageshow',renderLatest);addEventListener('storage',renderLatest);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderLatest()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-15';
+const APP_VERSION='home-16';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
