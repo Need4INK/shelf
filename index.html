@@ -3,8 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-33">
+<meta name="app-version" content="home-34">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<link rel="preload" as="image" href="img/frame.png" fetchpriority="high">
+<link rel="preload" as="image" href="img/canopy.png">
+<link rel="preload" as="image" href="img/bar_bg.png">
+<link rel="preload" as="image" href="img/reading_bg.png">
+<link rel="preload" as="image" href="img/nook_bg.webp">
+<link rel="preload" as="image" href="img/nook_fg.webp">
+<link rel="preload" as="image" href="img/genres_bg.webp">
+<link rel="preload" as="image" href="img/tabbar.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -25,6 +33,8 @@
 :root{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#stage,#tabbar{opacity:0;transition:opacity .45s ease}
+.ready #stage,.ready #tabbar{opacity:1}   /* Home fades in whole, once its pictures are ready */
 #stage{position:absolute;left:50%;top:env(safe-area-inset-top,0px);width:852px;height:1810px;transform-origin:50% 0;overflow:visible}
 #stage>*{position:absolute;left:0;top:0}
 #sky{width:852px;height:400px}
@@ -262,7 +272,7 @@ seed=11;const winP=wins.map(()=>rnd()*9);
 
 /* ---------- painted castle (falls back to the drawn one until loaded) ---------- */
 const CX=401,CY=28,CW=328,CH=320;
-const img=src=>{const i=new Image();i.src=src;return i};
+const PICS=[];const img=src=>{const i=new Image();i.src=src;PICS.push(i);return i};
 const cShape=img('img/castle_shape.png'),cDay=img('img/castle_day.png'),cLa=img('img/castle_lights_a.png'),cLb=img('img/castle_lights_b.png');
 const ready=i=>i.complete&&i.naturalWidth>0;
 const oc=document.createElement('canvas');oc.width=CW*2;oc.height=CH*2;const o=oc.getContext('2d');
@@ -806,9 +816,22 @@ function renderLatest(){
 }
 document.querySelectorAll('#reading .cr-title,#reading .cr-author,#reading .la-when,#laBook').forEach(e=>{e.style.cursor='pointer';e.addEventListener('click',()=>{
   const b=newestBook();if(b&&b.id)location.href='book.html?id='+encodeURIComponent(b.id)})});
-loadBooks().then(()=>Store.fetchMissingCovers());   // keep a copy of every cover on the phone
+const booksP=loadBooks();booksP.then(()=>Store.fetchMissingCovers());   // keep a copy of every cover on the phone
 Store.onChange(loadBooks);{const ti=document.querySelector('#tabbar img');if(ti&&!ti.complete)ti.addEventListener('load',layoutCards);}layoutCards();if(document.fonts)document.fonts.ready.then(()=>{renderGenres();renderLatest()});addEventListener('pageshow',loadBooks);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadBooks()});
+
+/* ---------- show Home only when it's ready: pictures decoded, fonts, books (max 2.5 s) ---------- */
+(function(){
+  const urls=new Set(PICS.map(i=>i.src)),re=/url\(\s*['"]?([^'")]+)['"]?\s*\)/g;
+  const add=t=>{let m;re.lastIndex=0;while((m=re.exec(t)))if(m[1].includes('img/'))urls.add(new URL(m[1],location.href).href)};
+  document.querySelectorAll('img[src]').forEach(i=>{if(i.getAttribute('src'))urls.add(i.src)});
+  for(const sh of document.styleSheets){try{for(const r of sh.cssRules)add(r.cssText)}catch(e){}}
+  document.querySelectorAll('[style*="url("]').forEach(el=>add(el.getAttribute('style')));
+  const pics=[...urls].map(u=>{const i=new Image();i.src=u;return (i.decode?i.decode():new Promise(r=>{i.onload=i.onerror=r})).catch(()=>{})});
+  const fonts=document.fonts?document.fonts.ready.catch(()=>{}):null;
+  const show=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.add('ready')));
+  Promise.race([Promise.all([...pics,fonts,booksP.catch(()=>{})]),new Promise(r=>setTimeout(r,2500))]).then(show);
+})();
 
 /* ---------- banner: a random magical saying (her list of 300, quotes.json) ---------- */
 let QUOTES=null;
@@ -827,7 +850,7 @@ addEventListener('pageshow',e=>{if(e.persisted)showQuote()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)showQuote()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-33';
+const APP_VERSION='home-34';
 // a new version arrived: drop the saved pictures once so new art shows straight away
 try{const v=localStorage.getItem('home.ver');
   if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);
