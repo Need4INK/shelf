@@ -3,374 +3,617 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="v11">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Shelf</title>
+<meta name="app-version" content="home-1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Shelf">
-<meta name="theme-color" content="#1f3a2e">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB3UlEQVR42u3bsY3CQBRF0WdEHy4A5AJcBRE94sgSmetwITSARAMWIgHGM+fEG6yWq+8/w7rrxyGw5eBPgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsSBOBAH4kAciANxgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsTBLxxL+CVuz8fnP3y6L1V+EufL1eRg2zpP6zyJg3eJiIMd9CEOfYgDcRge4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOMg+3nhLGy+Qpbw3U0wOxIE4sHM09Gg3ORAH4kAcWEjjEswubHIgDjxW3HOYHIgDcSAOxIHTSlyCNXiwMjkQB+JAHFhIXZ+bHIgDcWDniEuw2lcckwNx4LHiKGtyIA7EgTgQB04rcQlW+wHK5EAciAM7hxtSkwNxIA7EgYU0DV+CNbLtmhw4ymJyIA7EgTgQB+LAUTb+E6z2E7XJgTgQB3YO1+cmB+JAHIgDC2lcgtW+KZsciANxYOdwCWZyIA7EgTgQB+JAHCAOxIE46lXCt8riQBzGhjiUIQ5lxFf2svinrh8HHwweK4gDcSAOxIE4EAfiQByIA8SBOBAH4kAciANxIA7EgThAHIgDcSAOxIE4EAfiQByIA3GAOBAH4uDrXsZIQjfwkiY3AAAAAElFTkSuQmCC">
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB3UlEQVR42u3bsY3CQBRF0WdEHy4A5AJcBRE94sgSmetwITSARAMWIgHGM+fEG6yWq+8/w7rrxyGw5eBPgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsSBOBAH4kAciANxgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsTBLxxL+CVuz8fnP3y6L1V+EufL1eRg2zpP6zyJg3eJiIMd9CEOfYgDcRge4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOMg+3nhLGy+Qpbw3U0wOxIE4sHM09Gg3ORAH4kAcWEjjEswubHIgDjxW3HOYHIgDcSAOxIHTSlyCNXiwMjkQB+JAHFhIXZ+bHIgDcWDniEuw2lcckwNx4LHiKGtyIA7EgTgQB04rcQlW+wHK5EAciAM7hxtSkwNxIA7EgYU0DV+CNbLtmhw4ymJyIA7EgTgQB+LAUTb+E6z2E7XJgTgQB3YO1+cmB+JAHIgDC2lcgtW+KZsciANxYOdwCWZyIA7EgTgQB+JAHCAOxIE46lXCt8riQBzGhjiUIQ5lxFf2svinrh8HHwweK4gDcSAOxIE4EAfiQByIA8SBOBAH4kAciANxIA7EgThAHIgDcSAOxIE4EAfiQByIA3GAOBAH4uDrXsZIQjfwkiY3AAAAAElFTkSuQmCC">
+<meta name="theme-color" content="#12051f">
+<title>Shelf</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
-:root{--green:#1f3a2e;--paper:#f6f3ec;--card:#fff;--ink:#1b1b18;--mute:#6b675e;--line:#e2ddd2;--accent:#f2c14e;--red:#c8371e}
-@media(prefers-color-scheme:dark){:root{--paper:#121513;--card:#1c201d;--ink:#eeebe4;--mute:#a19d93;--line:#2e332f}}
+/* VOICE: cosy, enchanted, storybook
+   IDEA: a window in the painted frame onto a living castle landscape
+   PICTURE: the user's frame over an animated sky, castle, flyers; candle that lights at dusk
+   COLOUR and TYPE: the art's own purples, gold, pumpkin orange; IM Fell English SC
+   LAYOUT: full-screen stage, scaled to cover, anchored to the top */
+:root{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 "Schibsted Grotesk",system-ui,-apple-system,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
-header{background:var(--green);color:#fff;padding:calc(env(safe-area-inset-top) + 14px) 18px 18px}
-header h1{margin:0;font-size:32px;font-weight:800;line-height:1.05}
-header p{margin:4px 0 0;opacity:.75;font-size:14px}
-main{max-width:640px;margin:0 auto;padding:16px}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
-h2{font-size:18px;margin:0 0 12px}
-.row{display:flex;gap:8px;flex-wrap:wrap}
-button,.btn{font:inherit;font-weight:600;min-height:46px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
-button.primary,.btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
-button.warn{color:var(--red)}
-button:disabled{opacity:.5}
-button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.grow{flex:1}
-input[type=text],input[type=search]{font:inherit;font-size:17px;width:100%;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
-.cam{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:4/3;margin-bottom:12px;display:none}
-.cam.on{display:block}
-.cam video{width:100%;height:100%;object-fit:cover;display:block}
-.cam .guide{position:absolute;left:10%;right:10%;top:32%;bottom:32%;border:3px solid var(--accent);border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.35)}
-.cam .hint{position:absolute;left:0;right:0;bottom:8px;text-align:center;color:#fff;font-size:14px}
-.status{font-size:14px;color:var(--mute);margin-top:10px;min-height:20px}
-.status.err{color:var(--red)}
-.book{display:grid;grid-template-columns:110px minmax(0,1fr);gap:14px}
-.cover{width:110px;aspect-ratio:2/3;border-radius:6px;background:var(--line);object-fit:cover;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:12px;text-align:center}
-.book h3{margin:0;font-size:21px;line-height:1.15}
-.book .sub{color:var(--mute);margin:2px 0 6px}
-.book .by{font-weight:600}
-dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:14px 0 0;font-size:14px}
-dt{color:var(--mute)}dd{margin:0;overflow-wrap:anywhere}
-.desc{font-size:14px;margin-top:12px;color:var(--ink);max-height:9em;overflow:auto}
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.tags span{font-size:12px;background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
-.list{list-style:none;margin:12px 0 0;padding:0}
-.list li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
-.list img,.list .ph{width:44px;height:64px;border-radius:4px;object-fit:cover;background:var(--line)}
-.list b{display:block;line-height:1.2}
-.list small{color:var(--mute)}
-.empty{color:var(--mute);font-size:14px;padding:12px 0 0}
-.form{display:grid;gap:8px;margin-top:12px}
-.hidden{display:none!important}
-a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
+html,body{margin:0;height:100%;background:#12051f;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#stage{position:absolute;left:50%;top:0;width:852px;height:1810px;transform-origin:50% 0;overflow:hidden}
+#stage>*{position:absolute;left:0;top:0}
+#sky{width:852px;height:400px}
+#frame{width:852px;height:1810px;pointer-events:none}
+#catC{left:548px!important;top:176px!important;width:264px;height:108px;pointer-events:none;transform-origin:132px 104px}
+#flame{width:150px;height:170px;left:-15px;top:80px}
+#glow{width:852px;height:900px;pointer-events:none;mix-blend-mode:screen;opacity:0;
+ background:radial-gradient(circle at 60px 232px,rgba(255,200,120,.85) 0,rgba(255,155,60,.45) 70px,rgba(255,125,40,.2) 200px,rgba(255,100,30,.07) 360px,transparent 500px)}
+#catHit{left:575px;top:192px;width:225px;height:88px;cursor:pointer;z-index:2}
+#pumpkinHit{left:700px;top:305px;width:135px;height:135px;cursor:pointer;z-index:2}
+#candleHit{left:0;top:150px;width:120px;height:200px;cursor:pointer;z-index:2}
+#wand{pointer-events:none}
+#fx{width:852px;height:620px;pointer-events:none}
+#ghost{width:211px;height:203px;pointer-events:none;opacity:0;transform-origin:105px 203px}
+#ghost img,#ghost canvas{position:absolute;inset:0;width:100%;height:100%}
+#gHeart,#gHeartGlow{transform-origin:48% 57%}
+#gHeartGlow{mix-blend-mode:screen;opacity:.7}
+#wandHit{left:430px;top:405px;width:270px;height:70px;cursor:pointer;z-index:2}
+#pkGlow,#pkLight{left:700px;top:340px;width:130px;height:110px;pointer-events:none;opacity:0}
+#pkGlow{mix-blend-mode:screen}
+#openShelf{left:226px!important;top:640px!important;width:400px;height:92px;display:flex;align-items:center;justify-content:center;border-radius:46px;
+ background:linear-gradient(#3a1656,#24093a);border:3px solid #c9a24e;box-shadow:0 0 24px rgba(180,110,255,.35),inset 0 2px 0 rgba(255,230,160,.25);
+ font-family:"IM Fell English SC",Georgia,serif;font-size:40px;color:#f1cf7c;text-decoration:none;text-shadow:0 2px 2px #000;z-index:3}
+#openShelf:active{transform:scale(.97)}
+#clock{top:452px;left:60px;width:732px;height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ font-family:"IM Fell English SC",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.35),0 2px 2px #000;pointer-events:none}
+#time{font-size:46px;line-height:1}
+#phase{font-size:20px;opacity:.75;margin-top:4px}
 </style>
 </head>
 <body>
-<header>
-  <h1>Shelf</h1>
-  <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">v11</p>
-</header>
-<main>
-  <section class="panel">
-    <h2>Add a book</h2>
-    <div class="cam" id="cam">
-      <video id="video" playsinline muted autoplay></video>
-      <div class="guide"></div>
-      <div class="hint">Hold about 20 cm away, barcode inside the box</div>
-    </div>
-    <div class="row">
-      <button class="primary grow" id="scanBtn">Scan barcode</button>
-      <label class="btn grow" for="photo">Use a photo</label>
-      <input type="file" id="photo" accept="image/*" class="hidden">
-    </div>
-    <form class="row" id="manual" style="margin-top:10px">
-      <input type="text" id="code" inputmode="numeric" autocomplete="off" placeholder="ISBN, e.g. 978-0-14-118776-1" class="grow" style="flex-basis:200px">
-      <button type="submit">Look up</button>
-    </form>
-    <div class="status" id="status"></div>
-  </section>
-
-  <section class="panel hidden" id="result"></section>
-
-  <section class="panel">
-    <h2>My catalog</h2>
-    <input type="search" id="q" placeholder="Search title, author, ISBN">
-    <ul class="list" id="list"></ul>
-    <div class="row" style="margin-top:14px">
-      <button class="grow" id="exportBtn">Export backup</button>
-      <label class="btn grow" for="importFile">Import backup</label>
-      <input type="file" id="importFile" accept="application/json,.json" class="hidden">
-    </div>
-  </section>
-</main>
-
-<script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
+<div id="stage">
+  <canvas id="sky"></canvas>
+  <div id="ghost" aria-hidden="true"><img id="gHeart" src="img/ghost_heart.png" alt=""><canvas id="gBody" width="324" height="312"></canvas><img id="gHeartGlow" src="img/ghost_heart_glow.png" alt=""></div>
+  <img id="frame" src="img/frame.png" alt="">
+  <canvas id="catC" width="528" height="216"></canvas>
+  <div id="glow"></div>
+  <svg id="wand" aria-hidden="true" width="852" height="600" viewBox="0 0 852 600"><defs>
+<linearGradient id="wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5432"></stop><stop offset=".45" stop-color="#4a2616"></stop><stop offset="1" stop-color="#22100a"></stop></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b0"></stop><stop offset=".4" stop-color="#e7b24a"></stop><stop offset="1" stop-color="#8a5a18"></stop></linearGradient>
+<linearGradient id="ivory" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf0"></stop><stop offset=".5" stop-color="#e8dcc4"></stop><stop offset="1" stop-color="#9c8a6c"></stop></linearGradient>
+<linearGradient id="crys" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3d8ff"></stop><stop offset=".5" stop-color="#a35ae0"></stop><stop offset="1" stop-color="#4a1a80"></stop></linearGradient>
+<radialGradient id="glowY"><stop offset="0" stop-color="#fff6c8" stop-opacity=".95"></stop><stop offset=".35" stop-color="#ffc85a" stop-opacity=".45"></stop><stop offset="1" stop-color="#ff9a30" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="glowP"><stop offset="0" stop-color="#f4dcff" stop-opacity=".9"></stop><stop offset=".4" stop-color="#b070ff" stop-opacity=".4"></stop><stop offset="1" stop-color="#7a30d0" stop-opacity="0"></stop></radialGradient>
+<filter id="blur"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<linearGradient id="wood2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8955a"></stop><stop offset=".35" stop-color="#9a5530"></stop><stop offset=".75" stop-color="#5a2c16"></stop><stop offset="1" stop-color="#2e140a"></stop></linearGradient>
+<linearGradient id="crys2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6e2ff"></stop><stop offset=".35" stop-color="#c27cff"></stop><stop offset=".75" stop-color="#7a2fd6"></stop><stop offset="1" stop-color="#3c1080"></stop></linearGradient>
+<filter id="soft"><feGaussianBlur stdDeviation="2.2"></feGaussianBlur></filter></defs>
+ <ellipse id="wandShadow" cx="560" cy="447" rx="125" ry="5.5" fill="#0c0314" opacity=".7" filter="url(#blur)"></ellipse>
+ <g id="wandAnim"><g transform="translate(680 441) rotate(4) scale(-1 1)">
+  
+  <path d="M0 -9 L222 -4 L222 4 L0 9Z" fill="#ffcf8a" opacity=".35" filter="url(#soft)"></path>
+  <path d="M0 -8.5 L218 -3.6 Q221 0 218 3.6 L0 8.5 Q-5 0 0 -8.5Z" fill="url(#wood2)" stroke="#140604" stroke-width="2" stroke-linejoin="round"></path>
+  <path d="M6 -5 L212 -2" stroke="#ffe2b8" stroke-opacity=".6" stroke-width="2" stroke-linecap="round"></path>
+  <rect x="2" y="-9.6" width="11" height="19.2" rx="2" fill="url(#gold)" stroke="#1a0a08" stroke-width="1.6" stroke-linejoin="round"></rect><rect x="64" y="-8.2" width="8" height="16.4" rx="2" fill="url(#gold)" stroke="#1a0a08" stroke-width="1.6" stroke-linejoin="round"></rect><rect x="76" y="-8" width="3.5" height="16" rx="2" fill="url(#gold)" stroke="#1a0a08" stroke-width="1.6" stroke-linejoin="round"></rect><rect x="206" y="-4.6" width="6" height="9.2" rx="2" fill="url(#gold)" stroke="#1a0a08" stroke-width="1.6" stroke-linejoin="round"></rect>
+  <circle cx="226" cy="0" r="40" fill="url(#glowP)"></circle><circle cx="226" cy="0" r="18" fill="url(#glowP)"></circle>
+  <path d="M212 0 L219 -8 L234 -7 L241 0 L234 7 L219 8Z" fill="url(#crys2)" stroke="#2a0a4a" stroke-width="1.5" stroke-linejoin="round"></path>
+  <path d="M219 -8 L226 0 L234 -7 M226 0 L219 8 M226 0 L241 0" stroke="#fff" stroke-opacity=".6" stroke-width=".9" fill="none"></path>
+  <circle cx="222" cy="-3" r="2" fill="#fff" opacity=".9"></circle>
+ </g></g></svg>
+  <img id="pkGlow" src="img/pumpkin_glow.png" alt="">
+  <img id="pkLight" src="img/pumpkin_light.png" alt="">
+  <canvas id="flame"></canvas>
+  <canvas id="fx"></canvas>
+  <div id="wandHit" role="button" aria-label="Wave the wand: play a whole day in one minute"></div>
+  <div id="catHit" role="button" aria-label="Poke the cat"></div>
+  <div id="pumpkinHit" role="button" aria-label="Light or put out the pumpkin"></div>
+  <div id="candleHit" role="button" aria-label="Light or put out the candle"></div>
+  <a id="openShelf" href="shelf.html">Open my shelf</a>
+  <div id="clock"><div id="time">--:--</div><div id="phase"></div></div>
+</div>
 <script>
 {
-const $ = id => document.getElementById(id);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const KEY = 'shelf.books.v1';
-let books = [];
-try { books = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { books = []; }
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(books)); } catch (e) { status('Could not save — storage unavailable.', true); } };
-let current = null;
+const W=852,H=400,FW=150,FH=170,WICK={x:75,y:156}; // wick in flame-canvas coords
+const stage=document.getElementById('stage'),sky=document.getElementById('sky'),fl=document.getElementById('flame');
+const pkLight=document.getElementById('pkLight'),pkGlow=document.getElementById('pkGlow');
+const glow=document.getElementById('glow'),tEl=document.getElementById('time'),pEl=document.getElementById('phase');
+const sx=sky.getContext('2d'),fx=fl.getContext('2d');
+let S=1;
+function fit(){
+  const vw=innerWidth,vh=innerHeight;S=Math.max(vw/852,vh/1810);
+  stage.style.transform=`translateX(-50%) scale(${S})`;
+  const d=Math.min(devicePixelRatio||1,3)*S;
+  sky.width=Math.round(W*d);sky.height=Math.round(H*d);sx.setTransform(d,0,0,d,0,0);
+  fl.width=Math.round(FW*d);fl.height=Math.round(FH*d);fx.setTransform(d,0,0,d,0,0);
+  if(window.__fxResize)window.__fxResize(d);
+}
+addEventListener('resize',fit);fit();
 
-function status(msg, err) { const s = $('status'); s.textContent = msg || ''; s.className = 'status' + (err ? ' err' : ''); }
+/* ---------- helpers ---------- */
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const ss=(a,b,v)=>{const t=clamp((v-a)/(b-a));return t*t*(3-2*t)};
+const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const mix=(a,b,t)=>a.map((v,i)=>v+(b[i]-v)*t);
+const rgb=(c,a=1)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const noise=t=>Math.sin(t*1.7)*.5+Math.sin(t*3.1+1.3)*.3+Math.sin(t*7.3+.4)*.2;
 
-/* ---------- ISBN helpers ---------- */
-function isbn10ok(s) { if (!/^\d{9}[\dX]$/.test(s)) return false; let t = 0; for (let i = 0; i < 10; i++) t += (s[i] === 'X' ? 10 : +s[i]) * (10 - i); return t % 11 === 0; }
-function ean13ok(s) { if (!/^\d{13}$/.test(s)) return false; let t = 0; for (let i = 0; i < 13; i++) t += +s[i] * (i % 2 ? 3 : 1); return t % 10 === 0; }
-function to13(s10) { const b = '978' + s10.slice(0, 9); let t = 0; for (let i = 0; i < 12; i++) t += +b[i] * (i % 2 ? 3 : 1); return b + ((10 - t % 10) % 10); }
-function to10(s13) { if (!s13.startsWith('978')) return ''; const b = s13.slice(3, 12); let t = 0; for (let i = 0; i < 9; i++) t += +b[i] * (10 - i); const c = (11 - t % 11) % 11; return b + (c === 10 ? 'X' : c); }
-function parseCode(raw) {
-  const s = String(raw).toUpperCase().replace(/[^0-9X]/g, '');
-  if (s.length === 10) return { kind: 'ISBN-10', isbn13: to13(s), isbn10: s, valid: isbn10ok(s) };
-  if (s.length === 13 && /^97[89]/.test(s)) return { kind: 'ISBN-13', isbn13: s, isbn10: to10(s), valid: ean13ok(s) };
-  if (s.length === 12 || s.length === 13 || s.length === 8) return { kind: 'UPC/EAN', code: s, valid: true };
+/* palette keyframes by hour: skyTop, skyBottom, far mountains, hills, castle, castle light, haze */
+const K=[
+ [0,  '#0c0422','#2e1150','#241047','#161430','#26103f','#3a1d5c','#3a1a60'],
+ [4.6,'#130631','#3b1a5e','#2a1450','#1a0c34','#2a1244','#40205f','#432068'],
+ [5.8,'#2d1652','#b4527c','#4b2a6c','#2c2a46','#3c2258','#9a4c78','#a04c7c'],
+ [6.6,'#45418e','#f5a46a','#7a5a92','#4a5240','#5b4478','#f0a070','#e9a27c'],
+ [8,  '#4f84cc','#f2d8b4','#8d9cc4','#5a8c46','#7d78a8','#f4dcb8','#d9d4e6'],
+ [12, '#3f8ad6','#bfe2f6','#93acd2','#62a04a','#8a86b6','#ffffff','#cfe2f2'],
+ [16.6,'#5384c6','#f1d2a6','#8f9cc2','#5a8e44','#7f76a6','#f8d8a8','#e4d2c4'],
+ [18, '#6a4b9c','#ff9b58','#7a5a90','#5a6038','#5e4274','#ffa060','#f0a070'],
+ [19, '#381c66','#c54e7a','#4d2c70','#2a2a40','#3a1f56','#a64a74','#a24a78'],
+ [20.2,'#190a3a','#4a2369','#2c1652','#1b0d36','#2a1344','#432262','#43226a'],
+ [22, '#0d0524','#30124f','#241047','#170a2e','#26103f','#3a1d5c','#3a1a60'],
+ [24, '#0c0422','#2e1150','#241047','#170a2e','#26103f','#3a1d5c','#3a1a60']
+].map(r=>[r[0],...r.slice(1).map(hex)]);
+function pal(h){
+  let i=0;while(K[i+1][0]<=h)i++;
+  const a=K[i],b=K[i+1],t=ss(0,1,(h-a[0])/(b[0]-a[0]));
+  return a.slice(1).map((c,j)=>mix(c,b[j+1],t));
+}
+const PH=[[0,'Midnight'],[4.6,'Before dawn'],[5.8,'Dawn'],[7.5,'Morning'],[11.5,'Noon'],[13.5,'Afternoon'],[17.4,'Sunset'],[19.2,'Dusk'],[21,'Night']];
+const phaseName=h=>{let n='';for(const p of PH)if(h>=p[0])n=p[1];return n};
+
+/* ---------- static scene data ---------- */
+const stars=[];for(let i=0;i<150;i++)stars.push({x:rnd()*W,y:rnd()*330,r:rnd()*1.3+.3,p:rnd()*6.3,s:.6+rnd()*2,g:rnd()<.12});
+const clouds=[];for(let i=0;i<6;i++){const c={x:rnd()*1100-120,y:40+rnd()*140,v:3+rnd()*5,p:[]};const n=4+(rnd()*4|0);for(let j=0;j<n;j++)c.p.push([j*22-n*11+rnd()*10,rnd()*12-6,18+rnd()*20]);clouds.push(c)}
+const ridge=(y0,amp,step,seedv)=>{seed=seedv;const p=[];for(let x=-20;x<=W+20;x+=step)p.push([x,y0-rnd()*amp]);return p};
+const far=ridge(250,80,46,31);
+// near hills: low in the middle so the castle stays clear, rising toward the right edge
+const mid=[[-20,250],[100,256],[300,270],[420,281],[470,289],[520,295],[600,297],[680,292],[740,278],[800,264],[872,256]];
+const ridgeY=x=>{for(let i=1;i<mid.length;i++)if(x<=mid[i][0]){const a=mid[i-1],b=mid[i],k=(x-a[0])/(b[0]-a[0]);return a[1]+(b[1]-a[1])*(k*k*(3-2*k))}return mid[mid.length-1][1]};
+seed=91;const blades=[];for(let x=-10;x<=W+10;x+=2.2)blades.push({x:x+rnd()*1.5,h:4+rnd()*7,l:(rnd()-.5)*3,p:rnd()*6,d:rnd()<.5});
+// castle: towers [x, width, top, roofHeight]
+const towers=[[455,16,205,40],[488,24,150,58],[530,60,120,80],[612,26,140,58],[662,20,190,42],[702,15,215,34],[420,12,240,26]];
+const wins=[[552,165],[568,165],[560,205],[497,190],[621,182],[505,230],[620,235],[560,245],[669,222],[462,232],[588,262],[532,262],[706,240]];
+seed=11;const winP=wins.map(()=>rnd()*9);
+
+/* ---------- painted castle (falls back to the drawn one until loaded) ---------- */
+const CX=401,CY=28,CW=328,CH=320;
+const img=src=>{const i=new Image();i.src=src;return i};
+const cShape=img('img/castle_shape.png'),cDay=img('img/castle_day.png'),cLa=img('img/castle_lights_a.png'),cLb=img('img/castle_lights_b.png');
+const ready=i=>i.complete&&i.naturalWidth>0;
+const oc=document.createElement('canvas');oc.width=CW*2;oc.height=CH*2;const o=oc.getContext('2d');
+function drawCastleImg(c,P,day,night,warm,t){
+  const w=oc.width,h=oc.height;
+  o.globalAlpha=1;o.globalCompositeOperation='source-over';o.clearRect(0,0,w,h);
+  o.drawImage(cShape,0,0,w,h);o.globalCompositeOperation='source-in';o.fillStyle=rgb(P[4]);o.fillRect(0,0,w,h); // night silhouette in scene colour
+  o.globalCompositeOperation='source-over';
+  if(day>0&&ready(cDay)){o.globalAlpha=day;o.drawImage(cDay,0,0,w,h);o.globalAlpha=1}
+  o.globalCompositeOperation='source-atop';
+  if(day>0){o.fillStyle=rgb(P[5],.38*warm*day);o.fillRect(0,0,w,h)} // golden-hour warmth
+  o.fillStyle=rgb(P[6],.16);o.fillRect(0,0,w,h);                      // a touch of distance haze
+  o.globalCompositeOperation='source-over';
+  c.drawImage(oc,CX,CY,CW,CH);
+  if(night>.01){
+    c.globalAlpha=night*clamp(.78+.22*noise(t*2.1));if(ready(cLa))c.drawImage(cLa,CX,CY,CW,CH);
+    c.globalAlpha=night*clamp(.78+.22*noise(t*2.6+5));if(ready(cLb))c.drawImage(cLb,CX,CY,CW,CH);
+    c.globalAlpha=1;
+  }
+}
+/* ---------- drawing ---------- */
+function poly(c,pts,base){c.beginPath();c.moveTo(pts[0][0],base);for(const p of pts)c.lineTo(p[0],p[1]);c.lineTo(pts[pts.length-1][0],base);c.closePath()}
+function smoothRidge(c,pts,base){c.beginPath();c.moveTo(pts[0][0],base);c.lineTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i];c.quadraticCurveTo(a[0],a[1],(a[0]+b[0])/2,(a[1]+b[1])/2)}
+  c.lineTo(pts[pts.length-1][0],base);c.closePath()}
+function body(c,y,col,litCol,lit){
+  const g=c.createLinearGradient(0,40,0,300);g.addColorStop(0,rgb(mix(col,litCol,lit*.55)));g.addColorStop(1,rgb(col));return g;
+}
+function drawCastle(c,P,lit,night,t){
+  const col=P[4],lc=P[5];c.fillStyle=body(c,0,col,lc,lit);
+  // walls with crenellations
+  c.beginPath();c.rect(415,250,315,80);
+  for(let x=417;x<728;x+=12)c.rect(x,243,7,8);
+  c.rect(520,210,100,45);for(let x=522;x<618;x+=11)c.rect(x,203,6,8);
+  c.fill();
+  for(const [x,w,top,rh] of towers){
+    c.beginPath();c.rect(x,top,w,330-top);c.fill();
+    c.beginPath();c.moveTo(x-4,top+2);c.lineTo(x+w/2,top-rh);c.lineTo(x+w+4,top+2);c.closePath();c.fill();
+    c.fillRect(x+w/2-.6,top-rh-12,1.2,12);
+    // little pennant
+    const f=Math.sin(t*3+x)*2;c.beginPath();c.moveTo(x+w/2,top-rh-12);c.lineTo(x+w/2+9,top-rh-9+f*.3);c.lineTo(x+w/2,top-rh-6);c.fill();
+  }
+  // shaded side of towers
+  c.fillStyle=rgb([10,2,24],.18+.1*night);
+  for(const [x,w,top] of towers)c.fillRect(x+w*.62,top,w*.38,330-top);
+  // windows
+  for(let i=0;i<wins.length;i++){
+    const [x,y]=wins[i],on=night*clamp(.75+.25*noise(t*2+winP[i]));
+    c.fillStyle=on>.05?rgb([255,205,110],on):rgb(mix(col,[0,0,0],.4));
+    c.beginPath();c.moveTo(x-2.5,y+8);c.lineTo(x-2.5,y+2);c.arc(x,y+2,2.5,Math.PI,0);c.lineTo(x+2.5,y+8);c.fill();
+    if(on>.05){const g=c.createRadialGradient(x,y+4,0,x,y+4,12);g.addColorStop(0,rgb([255,190,90],.35*on));g.addColorStop(1,'rgba(255,190,90,0)');c.fillStyle=g;c.fillRect(x-12,y-8,24,24)}
+  }
+}
+function drawMoon(c,x,y,a){
+  if(a<=0)return;c.save();c.globalAlpha=a;c.translate(x,y);c.scale(1.25,1.25);c.translate(-x,-y);
+  let g=c.createRadialGradient(x,y,40,x,y,150);g.addColorStop(0,'rgba(255,220,150,.35)');g.addColorStop(1,'rgba(255,220,150,0)');c.fillStyle=g;c.fillRect(x-150,y-150,300,300);
+  g=c.createRadialGradient(x-14,y-14,6,x,y,52);g.addColorStop(0,'#fff3c4');g.addColorStop(.7,'#f6d58c');g.addColorStop(1,'#e2b265');
+  c.fillStyle=g;c.beginPath();c.arc(x,y,50,0,7);c.fill();
+  c.fillStyle='rgba(190,140,80,.28)';for(const [dx,dy,r] of [[-14,-10,9],[12,6,12],[-4,20,6],[20,-18,5],[-24,12,5]]){c.beginPath();c.arc(x+dx,y+dy,r,0,7);c.fill()}
+  c.restore();
+}
+function drawSun(c,x,y,a,warm,t){
+  if(a<=0)return;c.save();c.globalAlpha=a;c.translate(x,y);c.scale(1.25,1.25);
+  const core=mix([255,250,225],[255,170,90],warm),ray=mix([255,240,190],[255,150,70],warm);
+  let g=c.createRadialGradient(0,0,10,0,0,170);g.addColorStop(0,rgb(core,.55));g.addColorStop(1,rgb(core,0));c.fillStyle=g;c.fillRect(-170,-170,340,340);
+  // slowly turning rays, two layers turning opposite ways, gently pulsing
+  c.globalCompositeOperation='lighter';
+  for(const [n,len,wid,spd,al0] of [[12,150,.13,.13,.085],[8,110,.2,-.19,.07]]){
+    c.save();c.rotate(t*spd);
+    for(let i=0;i<n;i++){const L=len*(.72+.28*Math.sin(t*1.5+i*1.7)),al=al0*(.55+.45*Math.sin(t*1.9+i*2.3));
+      const rg=c.createRadialGradient(0,0,0,0,0,L);rg.addColorStop(0,rgb(ray,0));const r0=Math.min(.4,42/L),r1=Math.min(.6,78/L);rg.addColorStop(r0,rgb(ray,0));rg.addColorStop(r1,rgb(ray,al));rg.addColorStop(Math.max(r1+.05,.75),rgb(ray,al*.4));rg.addColorStop(1,rgb(ray,0));c.fillStyle=rg;
+      for(const k of [1,.62,.3]){c.beginPath();c.moveTo(0,0);c.arc(0,0,L*(.85+.15*k),-wid*k,wid*k);c.closePath();c.fill()} // stacked wedges = feathered edges
+      c.rotate(Math.PI*2/n)}
+    c.restore()}
+  // soft corona over the ray roots so nothing sharp meets the disc
+  const br=1+.08*Math.sin(t*1.3);g=c.createRadialGradient(0,0,30,0,0,85*br);g.addColorStop(0,rgb(core,.5+.08*Math.sin(t*1.3)));g.addColorStop(.45,rgb(core,.22));g.addColorStop(1,rgb(core,0));c.fillStyle=g;c.beginPath();c.arc(0,0,85*br,0,7);c.fill();
+  c.globalCompositeOperation='source-over';
+  g=c.createRadialGradient(-8,-8,4,0,0,32);g.addColorStop(0,'#ffffff');g.addColorStop(.6,rgb(mix([255,250,220],[255,205,130],warm)));g.addColorStop(1,rgb(mix([255,225,150],[255,150,70],warm)));
+  c.fillStyle=g;c.beginPath();c.arc(0,0,32,0,7);c.fill();
+  c.strokeStyle=rgb(mix([255,255,235],[255,190,110],warm),.25);c.lineWidth=4;c.beginPath();c.arc(0,0,36,0,7);c.stroke();
+  c.restore();
+}
+function drawHills(c,P,t,day){
+  c.beginPath();c.moveTo(-20,H);for(let x=-20;x<=W+20;x+=6)c.lineTo(x,ridgeY(x));c.lineTo(W+20,H);c.closePath();
+  const g=c.createLinearGradient(0,255,0,330);g.addColorStop(0,rgb(mix(P[3],[190,255,140],.22*day+.05)));g.addColorStop(.3,rgb(P[3]));g.addColorStop(1,rgb(mix(P[3],[8,4,16],.92)));
+  c.fillStyle=g;c.fill();
+  const dk=rgb(mix(P[3],[0,0,0],.3)),lt=rgb(mix(P[3],[230,255,180],.18*day+.04));
+  c.lineWidth=1.1;c.lineCap='round';
+  for(const b of blades){const y=ridgeY(b.x)+2.5,sw=Math.sin(t*1.3+b.p)*1.2;
+    c.strokeStyle=b.d?dk:lt;c.beginPath();c.moveTo(b.x,y);c.quadraticCurveTo(b.x+b.l*.5,y-b.h*.6,b.x+b.l+sw,y-b.h);c.stroke()}
+  // shadow toward the edges so the grass sinks into the dark frame
+  c.save();c.beginPath();c.moveTo(-20,H);for(let x=-20;x<=W+20;x+=6)c.lineTo(x,ridgeY(x)-14);c.lineTo(W+20,H);c.closePath();c.clip();
+  const sh=c.createLinearGradient(0,0,W,0);sh.addColorStop(0,'rgba(8,4,16,.7)');sh.addColorStop(.35,'rgba(8,4,16,0)');sh.addColorStop(.72,'rgba(8,4,16,0)');sh.addColorStop(.9,'rgba(8,4,16,.6)');sh.addColorStop(1,'rgba(8,4,16,.8)');
+  c.fillStyle=sh;c.fillRect(0,200,W,H);c.restore();
+}
+/* flyers */
+const fly=[];let nextSpawn=2;
+function spawn(night,day,now){
+  if(day>.5){const n=3+(Math.random()*4|0),dir=Math.random()<.5?1:-1,y=50+Math.random()*150,v=(45+Math.random()*25)*dir;
+    for(let i=0;i<n;i++)fly.push({k:'b',x:dir>0?-30-i*18-Math.random()*20:W+30+i*18+Math.random()*20,y:y+(i%2?1:-1)*i*7,v,s:.8+Math.random()*.4,ph:Math.random()*6});
+  }else if(night>.6){const dir=Math.random()<.5?1:-1,s=.55+Math.random()*.6;
+    fly.push({k:'d',x:dir>0?-80:W+80,y:40+Math.random()*170,v:(22+Math.random()*22)*dir*s,s,ph:Math.random()*6,fire:Math.random()<.45?.3+Math.random()*.4:-1,ft:0});
+  }
+  nextSpawn=now+(day>.5?5+Math.random()*7:8+Math.random()*10);
+}
+function drawBird(c,b,t,col){
+  const f=Math.sin(t*11+b.ph);c.save();c.translate(b.x,b.y+Math.sin(t*1.5+b.ph)*3);c.scale(b.s,b.s);
+  c.strokeStyle=col;c.lineWidth=1.6;c.lineCap='round';c.beginPath();
+  c.moveTo(-8,-f*4);c.quadraticCurveTo(-3,-3-f*2,0,0);c.quadraticCurveTo(3,-3-f*2,8,-f*4);c.stroke();c.restore();
+}
+function wing(c,f,shade){
+  c.fillStyle=shade;c.beginPath();c.moveTo(4,-3);
+  c.quadraticCurveTo(0,-14*f,-6,-26*f);c.lineTo(-30,-20*f);
+  c.quadraticCurveTo(-24,-12*f,-26,-8*f);c.quadraticCurveTo(-18,-6*f,-18,-3*f);c.quadraticCurveTo(-10,-3,-8,0);c.closePath();c.fill();
+}
+function drawDragon(c,d,t,dt,P){
+  const f=Math.sin(t*4.2+d.ph),wf=.25+.95*(f*.5+.5);
+  const y=d.y+Math.sin(t*1.1+d.ph)*6-f*2;
+  c.save();c.translate(d.x,y);c.scale(d.s*(d.v>0?1:-1),d.s);
+  const dark='#0f0420',rim=rgb(mix(P[6],[0,0,0],.4));
+  wing(c,-wf*.8+.25,rim);                   // far wing
+  c.fillStyle=dark;c.beginPath();           // tail, body, neck, head
+  c.moveTo(-46,6+Math.sin(t*2+d.ph)*4);c.quadraticCurveTo(-30,-2,-14,-2);
+  c.quadraticCurveTo(0,-6,10,-4);c.quadraticCurveTo(16,-8,20,-13);
+  c.lineTo(28,-14);c.lineTo(33,-11);c.lineTo(27,-9);c.lineTo(22,-8);
+  c.quadraticCurveTo(16,0,10,4);c.quadraticCurveTo(-4,7,-14,4);c.quadraticCurveTo(-30,6,-46,6+Math.sin(t*2+d.ph)*4);c.fill();
+  c.beginPath();c.moveTo(-46,6+Math.sin(t*2+d.ph)*4);c.lineTo(-54,2);c.lineTo(-50,9);c.fill();     // tail spade
+  c.beginPath();c.moveTo(22,-13);c.lineTo(18,-19);c.lineTo(24,-14);c.fill();                       // horn
+  c.fillRect(0,2,3,6);c.fillRect(-10,3,3,6);                                                        // legs
+  wing(c,wf,dark);                                                                                  // near wing
+  // fire breath
+  if(d.fire>0){const pos=d.v>0?d.x/W:1-d.x/W;
+    if(Math.abs(pos-d.fire)<.06){d.ft=Math.min(1,d.ft+dt*3)}else d.ft=Math.max(0,d.ft-dt*2);
+    if(d.ft>0){c.globalCompositeOperation='lighter';
+      for(let i=0;i<9;i++){const k=i/9,r=(3+k*9)*d.ft,xx=34+k*38*d.ft,yy=-10+Math.sin(t*20+i)*2*k+k*6;
+        const g=c.createRadialGradient(xx,yy,0,xx,yy,r);g.addColorStop(0,`rgba(255,${230-k*120|0},120,${.9*(1-k)*d.ft})`);g.addColorStop(1,'rgba(255,80,20,0)');
+        c.fillStyle=g;c.beginPath();c.arc(xx,yy,r,0,7);c.fill()}}
+  }
+  c.restore();
+}
+
+/* ---------- candle ---------- */
+let lit=0,want=0,smoke=[],override=null,autoPrev=null,pkLit=0,pkWant=0,pkOverride=null;
+function drawFlame(t,dt){
+  fx.clearRect(0,0,FW,FH);
+  for(const s of smoke){s.y-=dt*18;s.x+=Math.sin(t*2+s.p)*dt*8;s.a-=dt*.28;s.r+=dt*5}
+  smoke=smoke.filter(s=>s.a>0);
+  for(const s of smoke){const g=fx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r);g.addColorStop(0,`rgba(200,190,210,${s.a*.35})`);g.addColorStop(1,'rgba(200,190,210,0)');fx.fillStyle=g;fx.beginPath();fx.arc(s.x,s.y,s.r,0,7);fx.fill()}
+  if(lit<=.01)return 0;
+  const n=noise(t*6),n2=noise(t*9+4),h=(42+n*5+n2*3)*lit,w=(9+n2*1.2)*Math.min(1,lit*1.4),sw=noise(t*2.4+9)*4*lit;
+  const x=WICK.x,y=WICK.y;
+  fx.globalCompositeOperation='lighter';
+  let g=fx.createRadialGradient(x,y-h*.45,0,x,y-h*.45,h*1.4);g.addColorStop(0,`rgba(255,180,80,${.45*lit})`);g.addColorStop(1,'rgba(255,120,40,0)');
+  fx.fillStyle=g;fx.fillRect(0,0,FW,FH);
+  const shape=(sc,col)=>{fx.fillStyle=col;fx.beginPath();fx.moveTo(x,y+2);
+    fx.bezierCurveTo(x-w*sc*1.3,y-h*sc*.15,x-w*sc*.7,y-h*sc*.7,x+sw*sc,y-h*sc);
+    fx.bezierCurveTo(x+w*sc*.7,y-h*sc*.7,x+w*sc*1.3,y-h*sc*.15,x,y+2);fx.fill()};
+  g=fx.createLinearGradient(0,y-h,0,y);g.addColorStop(0,'rgba(255,110,30,.0)');g.addColorStop(.3,'rgba(255,140,40,.85)');g.addColorStop(1,'rgba(255,190,80,.9)');
+  shape(1,g);
+  g=fx.createLinearGradient(0,y-h*.7,0,y);g.addColorStop(0,'rgba(255,230,150,.6)');g.addColorStop(1,'rgba(255,250,220,1)');
+  shape(.62,g);
+  fx.fillStyle='rgba(120,160,255,.45)';fx.beginPath();fx.ellipse(x,y-1,w*.45,4,0,0,7);fx.fill();
+  fx.globalCompositeOperation='source-over';
+  return .78+.22*clamp(n*.6+n2*.4+.5);
+}
+
+/* ---------- magic wand ---------- */
+const fxc=document.getElementById('fx'),gx=fxc.getContext('2d'),FXW=852,FXH=620;
+window.__fxResize=d=>{fxc.width=Math.round(FXW*d);fxc.height=Math.round(FXH*d);gx.setTransform(d,0,0,d,0,0)};window.__fxResize(Math.min(devicePixelRatio||1,3)*S);
+const wAnim=document.getElementById('wandAnim'),wShadow=document.getElementById('wandShadow');
+const wGlows=[...document.querySelectorAll('#wandAnim circle')].filter(c=>c.getAttribute('fill')==='url(#glowP)');
+const wGlowR=wGlows.map(c=>+c.getAttribute('r'));
+const PIV=[640,441];                       // grip, near the handle
+const C4=Math.cos(4*Math.PI/180),S4=Math.sin(4*Math.PI/180);
+const TIP0=[680-226*C4,441-226*S4];        // crystal in stage coords at rest
+let wand=null,parts=[],wandCycle=false,cycleLeft=0,lastNight=0,lastAlt=1,ghost=null,boo=null;
+const gEl=document.getElementById('ghost'),gHeart=document.getElementById('gHeart'),gHeartGlow=document.getElementById('gHeartGlow');
+const easeOut=u=>1-(1-u)**3,easeInOut=u=>u<.5?4*u*u*u:1-(-2*u+2)**3/2;
+const easeBack=u=>{const c=2.2;return 1+(c+1)*(u-1)**3+c*(u-1)**2};
+// pose over time: [angle deg (clockwise lifts the tip), dx, dy, glow boost]
+function pose(t){
+  const T1=.45,T2=1.45,T3=1.68,T4=2.45;
+  if(t<T1){const u=easeOut(t/T1);return [38*u,-18*u,-74*u,1+.6*u]}
+  if(t<T2){const u=(t-T1)/(T2-T1),th=u*Math.PI*2*1.5,k=Math.sin(Math.PI*u);       // one and a half loops
+    return [38+14*Math.sin(th)*k,-18+16*Math.cos(th)*k-16*k*0,-74-14*Math.sin(th+1.2)*k,1.6+.5*k]}
+  if(t<T3){const u=easeBack((t-T2)/(T3-T2));return [38-30*u,-18-30*u,-74+26*u,2.1]}    // swift flick
+  if(t<T4){const u=easeInOut((t-T3)/(T4-T3));return [8*(1-u),-48*(1-u),-48*(1-u),1+1.1*(1-u)]}
   return null;
 }
-
-/* ---------- Lookup ---------- */
-async function getJSON(url) { const r = await fetch(url); if (!r.ok) throw new Error(r.status); return r.json(); }
-async function fromOpenLibrary(isbn) {
-  const d = await getJSON(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&jscmd=data&format=json`);
-  const b = d['ISBN:' + isbn]; if (!b) return null;
-  return { title: b.title, subtitle: b.subtitle, authors: (b.authors || []).map(a => a.name),
-    publisher: (b.publishers || []).map(p => p.name).join(', '), published: b.publish_date, pages: b.number_of_pages,
-    subjects: (b.subjects || []).map(s => s.name).slice(0, 8), cover: b.cover && (b.cover.large || b.cover.medium), link: b.url };
+function tipAt(p){const a=p[0]*Math.PI/180,x=TIP0[0]-PIV[0],y=TIP0[1]-PIV[1];
+  return [PIV[0]+x*Math.cos(a)-y*Math.sin(a)+p[1],PIV[1]+x*Math.sin(a)+y*Math.cos(a)+p[2]]}
+function sparkle(x,y,big){const a=Math.random()*6.28,v=big?60+Math.random()*120:8+Math.random()*28;
+  parts.push({k:'s',x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-(big?10:14),life:0,max:big?.7+Math.random()*.5:.5+Math.random()*.5,r:big?4+Math.random()*5:2.6+Math.random()*3,c:Math.random()<.55?[255,222,120]:[214,160,255],tw:Math.random()*6})}
+function ghostPuff(x,y){   // a softer lilac puff where the ghost appears
+  for(let i=0;i<9;i++){const a=Math.random()*6.28,v=18+Math.random()*30;parts.push({k:'p',x:x+Math.cos(a)*10,y:y+Math.sin(a)*10,vx:Math.cos(a)*v,vy:Math.sin(a)*v-10,life:0,max:.7+Math.random()*.5,r:10+Math.random()*8})}
+  for(let i=0;i<14;i++)sparkle(x,y,true);
 }
-async function fromGoogle(q) {
-  const d = await getJSON(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=1`);
-  const v = d.items && d.items[0] && d.items[0].volumeInfo; if (!v) return null;
-  const ids = v.industryIdentifiers || [];
-  const img = v.imageLinks && (v.imageLinks.thumbnail || v.imageLinks.smallThumbnail);
-  return { title: v.title, subtitle: v.subtitle, authors: v.authors || [], publisher: v.publisher, published: v.publishedDate,
-    pages: v.pageCount, description: v.description, subjects: v.categories || [], language: v.language,
-    cover: img && img.replace('http://', 'https://'), link: v.infoLink,
-    isbn13: (ids.find(i => i.type === 'ISBN_13') || {}).identifier, isbn10: (ids.find(i => i.type === 'ISBN_10') || {}).identifier };
+function poof(x,y){
+  for(let i=0;i<14;i++){const a=Math.random()*6.28,v=25+Math.random()*45;parts.push({k:'p',x:x+Math.cos(a)*6,y:y+Math.sin(a)*6,vx:Math.cos(a)*v,vy:Math.sin(a)*v-14,life:0,max:.9+Math.random()*.6,r:12+Math.random()*9})}
+  for(let i=0;i<34;i++)sparkle(x,y,true);
+  parts.push({k:'f',x,y,life:0,max:.45});
 }
-function merge(a, b) { // a = Open Library (preferred for core facts), b = Google
-  if (!a) return b; if (!b) return a;
-  const out = { ...b };
-  for (const k in a) { const v = a[k]; if (v && (!Array.isArray(v) || v.length)) out[k] = v; }
-  out.description = b.description || a.description;
-  out.subjects = [...new Set([...(a.subjects || []), ...(b.subjects || [])])].slice(0, 10);
-  out.cover = a.cover || b.cover;
-  return out;
-}
-function olCover(isbn) { return new Promise(res => { const i = new Image(); const u = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`; i.onload = () => res(i.naturalWidth > 1 ? u : ''); i.onerror = () => res(''); i.src = u; setTimeout(() => res(''), 6000); }); }
-async function lookup(raw) {
-  const p = parseCode(raw);
-  if (!p) { status('That doesn’t look like an ISBN or barcode. ISBNs have 10 or 13 digits.', true); return; }
-  if (p.kind === 'UPC/EAN' && !p.valid) { status('Unrecognised code.', true); return; }
-  if (p.isbn13 && !p.valid) status('Checksum doesn’t match — check the digits. Trying anyway…');
-  else status('Looking up ' + (p.isbn13 || p.code) + '…');
-  $('result').classList.add('hidden');
-  const [ol, gb] = await Promise.allSettled(p.isbn13
-    ? [fromOpenLibrary(p.isbn13), fromGoogle('isbn:' + p.isbn13)]
-    : [Promise.resolve(null), fromGoogle(p.code)]);
-  if (ol.status === 'rejected' && gb.status === 'rejected') { status('No connection to the book databases. Check your internet and try again.', true); return; }
-  const info = merge(ol.value, gb.value);
-  const base = { isbn13: p.isbn13 || '', isbn10: p.isbn10 || '', code: p.code || '' };
-  current = info ? { ...info, ...base, isbn13: base.isbn13 || info.isbn13 || '', isbn10: base.isbn10 || info.isbn10 || '',
-    source: [ol.value && 'Open Library', gb.value && 'Google Books'].filter(Boolean).join(' + ') } : null;
-  if (current && !current.cover && current.isbn13) current.cover = await olCover(current.isbn13);
-  status('');
-  current ? showBook(current, false) : showNotFound(base);
-}
-
-/* ---------- Rendering ---------- */
-function coverHTML(b, cls) { return b.cover ? `<img class="${cls}" src="${esc(b.cover)}" alt="" onerror="this.outerHTML='<div class=&quot;${cls}&quot;>No cover</div>'">` : `<div class="${cls}">No cover</div>`; }
-function showBook(b, saved) {
-  const dup = !saved && books.some(x => x.isbn13 && x.isbn13 === b.isbn13);
-  const facts = [['ISBN-13', b.isbn13], ['ISBN-10', b.isbn10], ['Code', !b.isbn13 && b.code], ['Publisher', b.publisher], ['Published', b.published],
-    ['Pages', b.pages], ['Language', b.language], ['Source', b.source], ['Added', b.added && new Date(b.added).toLocaleDateString()]].filter(f => f[1]);
-  const r = $('result');
-  r.innerHTML = `
-    <div class="book">${coverHTML(b, 'cover')}
-      <div><h3>${esc(b.title || 'Untitled')}</h3>${b.subtitle ? `<div class="sub">${esc(b.subtitle)}</div>` : ''}
-      <div class="by">${esc((b.authors || []).join(', ') || 'Unknown author')}</div></div></div>
-    <dl>${facts.map(f => `<dt>${f[0]}</dt><dd>${esc(f[1])}</dd>`).join('')}</dl>
-    ${b.subjects && b.subjects.length ? `<div class="tags">${b.subjects.map(s => `<span>${esc(s)}</span>`).join('')}</div>` : ''}
-    ${b.description ? `<div class="desc">${esc(b.description)}</div>` : ''}
-    ${b.link ? `<p style="font-size:14px;margin:10px 0 0"><a href="${esc(b.link)}" target="_blank" rel="noopener">More details</a></p>` : ''}
-    <div class="row" style="margin-top:14px">
-      ${saved ? `<button class="warn grow" id="delBtn">Remove from catalog</button><button class="grow" id="closeBtn">Close</button>`
-              : `<button class="primary grow" id="addBtn" ${dup ? 'disabled' : ''}>${dup ? 'Already in catalog' : 'Add to catalog'}</button><button class="grow" id="closeBtn">Discard</button>`}
-    </div>`;
-  r.classList.remove('hidden');
-  r.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  $('closeBtn').onclick = () => r.classList.add('hidden');
-  if ($('addBtn')) $('addBtn').onclick = () => addBook(b);
-  if ($('delBtn')) $('delBtn').onclick = e => {
-    if (e.target.dataset.sure) { books = books.filter(x => x.id !== b.id); save(); render(); r.classList.add('hidden'); }
-    else { e.target.dataset.sure = 1; e.target.textContent = 'Tap again to remove'; }
-  };
-}
-function showNotFound(base) {
-  const r = $('result');
-  r.innerHTML = `<h2>Not found in the book databases</h2>
-    <p style="margin:0;color:var(--mute);font-size:14px">${esc(base.isbn13 || base.code)} — you can still add it by hand.</p>
-    <form class="form" id="nf"><input type="text" id="nfT" placeholder="Title" required><input type="text" id="nfA" placeholder="Author">
-    <div class="row"><button class="primary grow" type="submit">Add to catalog</button><button class="grow" type="button" id="closeBtn">Cancel</button></div></form>`;
-  r.classList.remove('hidden');
-  $('closeBtn').onclick = () => r.classList.add('hidden');
-  $('nf').onsubmit = e => { e.preventDefault(); addBook({ ...base, title: $('nfT').value.trim(), authors: $('nfA').value.trim() ? [$('nfA').value.trim()] : [], source: 'Manual' }); };
-}
-function addBook(b) {
-  books.unshift({ ...b, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: Date.now() });
-  save(); render(); $('result').classList.add('hidden'); $('code').value = '';
-  status('Added “' + (b.title || 'book') + '”.');
-}
-function render() {
-  const q = $('q').value.trim().toLowerCase();
-  const shown = books.filter(b => !q || [b.title, b.subtitle, (b.authors || []).join(' '), b.isbn13, b.isbn10].join(' ').toLowerCase().includes(q));
-  $('count').textContent = books.length ? `${books.length} book${books.length > 1 ? 's' : ''} in your catalog` : 'Your book catalog';
-  $('list').innerHTML = shown.map(b => `<li data-id="${b.id}">${b.cover ? `<img src="${esc(b.cover)}" alt="" loading="lazy">` : '<div class="ph"></div>'}
-    <div><b>${esc(b.title || 'Untitled')}</b><small>${esc((b.authors || []).join(', ') || 'Unknown author')}</small></div></li>`).join('')
-    || `<li class="empty" style="display:block;cursor:default">${books.length ? 'No matches.' : 'No books yet — scan your first one above.'}</li>`;
-}
-$('list').onclick = e => { const li = e.target.closest('li[data-id]'); if (li) showBook(books.find(b => b.id === li.dataset.id), true); };
-$('q').oninput = render;
-
-/* ---------- Scanning ---------- */
-let reader = null, scanning = false, lastRead = '', hits = 0;
-// Book barcodes are EAN-13 (978/979 = ISBN) or 12-digit UPC; reject anything that fails its checksum
-function goodCode(t) { const s = String(t).replace(/\D/g, ''); return (s.length === 13 && ean13ok(s)) || (s.length === 12 && ean13ok('0' + s)); }
-function makeReader() {
-  if (!window.ZXing) { status('Scanner library didn’t load — check your connection, or type the ISBN.', true); return null; }
-  const Z = window.ZXing, hints = new Map();
-  hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.UPC_A]);
-  hints.set(Z.DecodeHintType.TRY_HARDER, true);
-  return new Z.BrowserMultiFormatReader(hints, 250);
-}
-let stream = null, timer = 0, frameNo = 0, core = null;
-const cvs = document.createElement('canvas'), cx = cvs.getContext('2d', { willReadFrequently: true });
-// Keep the camera open for a while after a scan, so iOS doesn't ask permission again for the next book
-let releaseTimer = 0;
-function releaseCamera() {
-  clearTimeout(releaseTimer);
-  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-  $('video').srcObject = null;
-}
-function stopScan() {
-  scanning = false; clearTimeout(timer);
-  $('cam').classList.remove('on'); $('scanBtn').textContent = 'Scan barcode';
-  clearTimeout(releaseTimer); releaseTimer = setTimeout(releaseCamera, 3 * 60 * 1000);
-}
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { stopScan(); releaseCamera(); } });
-function scanFrame() {
-  if (!scanning) return;
-  const v = $('video'), vw = v.videoWidth, vh = v.videoHeight;
-  if (vw && vh) {
-    const Z = window.ZXing;
-    // even frames: centre band (under the yellow box); odd frames: whole picture
-    const crop = frameNo % 4 !== 3; // mostly the centre band, every 4th frame the whole picture
-    const sw = crop ? Math.round(vw * 0.9) : vw, sh = crop ? Math.round(vh * 0.5) : vh;
-    const sx = (vw - sw) >> 1, sy = (vh - sh) >> 1;
-    const k = Math.min(1, 960 / sw), w = Math.round(sw * k), h = Math.round(sh * k);
-    cvs.width = w; cvs.height = h;
-    cx.drawImage(v, sx, sy, sw, sh, 0, 0, w, h);
-    try {
-      // grayscale ourselves (same path that decodes photos)
-      const px = cx.getImageData(0, 0, w, h).data, lum = new Uint8ClampedArray(w * h);
-      for (let i = 0, j = 0; j < lum.length; i += 4, j++) lum[j] = (px[i] * 77 + px[i + 1] * 150 + px[i + 2] * 29) >> 8;
-      const src = new Z.RGBLuminanceSource(lum, w, h);
-      const bin = frameNo % 2 ? new Z.GlobalHistogramBinarizer(src) : new Z.HybridBinarizer(src);
-      const t = core.decodeWithState(new Z.BinaryBitmap(bin)).getText();
-      if (goodCode(t)) {
-        if (t === lastRead) hits++; else { lastRead = t; hits = 1; }
-        // ISBN barcodes (978/979 + valid checksum) are accepted at once; other codes must read twice
-        if (/^97[89]/.test(t) || hits >= 2) { stopScan(); lastRead = ''; $('code').value = t; lookup(t); return; }
-      }
-    } catch (e) { /* no barcode in this frame */ }
-    frameNo++;
-  }
-  timer = setTimeout(scanFrame, 30);
-}
-$('scanBtn').onclick = async () => {
-  if (scanning) return stopScan();
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { status('Live camera needs the app opened over https. Use “Use a photo” instead.', true); return; }
-  if (!window.ZXing) { status('Scanner library didn’t load — check your connection, or type the ISBN.', true); return; }
-  if (!core) {
-    const Z = window.ZXing, hints = new Map();
-    hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.UPC_A]);
-    hints.set(Z.DecodeHintType.TRY_HARDER, true);
-    core = new Z.MultiFormatReader(); core.setHints(hints);
-  }
-  status(''); clearTimeout(releaseTimer);
-  const live = stream && stream.getVideoTracks().some(t => t.readyState === 'live');
-  if (live) {
-    lastRead = ''; hits = 0; frameNo = 0; scanning = true;
-    $('cam').classList.add('on'); $('scanBtn').textContent = 'Stop scanning';
-    try { await $('video').play(); } catch (e) {}
-    scanFrame(); return;
-  }
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } });
-  } catch (e) {
-    status(e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow it in Settings › Safari › Camera, or use \u201cUse a photo\u201d.' : 'Couldn’t start the camera. Try “Use a photo”.', true); return;
-  }
-  const track = stream.getVideoTracks()[0];
-  // zoom in so you can hold the phone further away, where the camera can focus
-  try {
-    const cap = track.getCapabilities ? track.getCapabilities() : {};
-    const adv = {};
-    if (cap.zoom) adv.zoom = Math.min(cap.zoom.max, Math.max(cap.zoom.min, 2));
-    if (cap.focusMode && cap.focusMode.includes('continuous')) adv.focusMode = 'continuous';
-    if (Object.keys(adv).length) await track.applyConstraints({ advanced: [adv] });
-  } catch (e) { /* zoom/focus not supported — fine */ }
-  const v = $('video'); v.srcObject = stream;
-  try { await v.play(); } catch (e) {}
-  lastRead = ''; hits = 0; frameNo = 0; scanning = true;
-  $('cam').classList.add('on'); $('scanBtn').textContent = 'Stop scanning';
-  scanFrame();
-};
-$('photo').onchange = async e => {
-  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-  reader = reader || makeReader(); if (!reader) return;
-  status('Reading barcode from photo…');
-  const url = URL.createObjectURL(f);
-  try { const res = await reader.decodeFromImageUrl(url); if (!goodCode(res.getText())) throw 0; $('code').value = res.getText(); lookup(res.getText()); }
-  catch (err) { status('No barcode found in that photo. Get closer, keep it sharp and well lit, or type the ISBN.', true); }
-  finally { URL.revokeObjectURL(url); }
-};
-$('manual').onsubmit = e => { e.preventDefault(); stopScan(); lookup($('code').value); };
-
-/* ---------- Backup ---------- */
-$('exportBtn').onclick = () => {
-  const blob = new Blob([JSON.stringify(books, null, 2)], { type: 'application/json' });
-  const file = new File([blob], `shelf-backup-${new Date().toISOString().slice(0, 10)}.json`, { type: 'application/json' });
-  if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file] }).catch(() => {}); return; }
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click();
-};
-$('importFile').onchange = async e => {
-  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-  try {
-    const data = JSON.parse(await f.text()); if (!Array.isArray(data)) throw 0;
-    const have = new Set(books.map(b => b.id)); const fresh = data.filter(b => b && b.id && !have.has(b.id));
-    books = [...fresh, ...books]; save(); render(); status(`Imported ${fresh.length} book${fresh.length === 1 ? '' : 's'}.`);
-  } catch (err) { status('That file isn’t a Shelf backup.', true); }
-};
-
-render();
-
-/* ---------- Auto-update ---------- */
-const VERSION = 'v11';
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
-// When the app comes back to the front, check for a newer version and reload into it
-async function checkUpdate() {
-  if (scanning) return;
-  try {
-    const html = await (await fetch('./?check=' + Date.now(), { cache: 'no-store' })).text();
-    const m = html.match(/name="app-version" content="([^"]+)"/);
-    if (m && m[1] !== VERSION) {
-      // reload at most once per new version, so a stale cache can't cause a reload loop
-      let tried = ''; try { tried = sessionStorage.getItem('shelf.reloadFor') || ''; } catch (e) {}
-      if (tried !== m[1]) { try { sessionStorage.setItem('shelf.reloadFor', m[1]); } catch (e) {} location.reload(); }
+function starPath(c,x,y,r){c.beginPath();c.moveTo(x,y-r);c.quadraticCurveTo(x+r*.15,y-r*.15,x+r,y);c.quadraticCurveTo(x+r*.15,y+r*.15,x,y+r);c.quadraticCurveTo(x-r*.15,y+r*.15,x-r,y);c.quadraticCurveTo(x-r*.15,y-r*.15,x,y-r);c.fill()}
+let emitAcc=0,fxDirty=false;
+function wandFrame(dt){
+  if(wand){
+    wand.t+=dt;const p=pose(wand.t);
+    if(!p){wand=null;wAnim.removeAttribute('transform');wShadow.setAttribute('opacity','.7');wGlows.forEach((c,i)=>c.setAttribute('r',wGlowR[i]))}
+    else{
+      wAnim.setAttribute('transform',`translate(${p[1].toFixed(2)} ${p[2].toFixed(2)}) rotate(${p[0].toFixed(2)} ${PIV[0]} ${PIV[1]})`);
+      wShadow.setAttribute('opacity',(.7*Math.max(.15,1+p[2]/60)).toFixed(3));
+      wGlows.forEach((c,i)=>c.setAttribute('r',(wGlowR[i]*p[3]).toFixed(1)));
+      const tip=tipAt(p);
+      if(wand.t>.3&&wand.t<1.68){emitAcc+=dt*70;while(emitAcc>1){emitAcc--;sparkle(tip[0]+(Math.random()-.5)*6,tip[1]+(Math.random()-.5)*6,false)}}
+      if(!wand.poofed&&wand.t>=1.68){wand.poofed=true;poof(tip[0],tip[1]);
+        if(wand.ghost){ghost={t:0,x:510,y:346,booed:false};ghostPuff(510,262)}
+        if(!wandCycle){setMode('demo');wandCycle=true;cycleLeft=24}}   // a running cycle just carries on to its end
     }
-  } catch (e) { /* offline — keep the current version */ }
+  }
+  ghostFrame(dt);catFrame(dt);
+  if(parts.length||fxDirty||boo){
+    gx.clearRect(0,0,FXW,FXH);fxDirty=parts.length>0;
+    for(const q of parts){q.life+=dt;if(q.k!=='f'){q.x+=q.vx*dt;q.y+=q.vy*dt;q.vx*=1-dt*2.2;q.vy=q.vy*(1-dt*2.2)+(q.k==='s'?14:-10)*dt}}
+    parts=parts.filter(q=>q.life<q.max);fxDirty=fxDirty||!!boo;
+    if(boo)drawBoo(dt);
+    gx.globalCompositeOperation='lighter';
+    for(const q of parts){const u=q.life/q.max;
+      if(q.k==='f'){const r=25+95*Math.sqrt(u),g=gx.createRadialGradient(q.x,q.y,0,q.x,q.y,r);g.addColorStop(0,`rgba(255,245,255,${1-u})`);g.addColorStop(.35,`rgba(210,150,255,${.7*(1-u)})`);g.addColorStop(1,'rgba(160,90,255,0)');gx.fillStyle=g;gx.beginPath();gx.arc(q.x,q.y,r,0,7);gx.fill()}
+      else if(q.k==='s'){const tw=.6+.4*Math.sin(q.life*22+q.tw),a=(1-u)*tw;gx.fillStyle=`rgba(${q.c[0]},${q.c[1]},${q.c[2]},${a})`;starPath(gx,q.x,q.y,q.r*(1-u*.4));
+        gx.fillStyle=`rgba(255,255,255,${a*.8})`;gx.beginPath();gx.arc(q.x,q.y,q.r*.25,0,7);gx.fill()}}
+    gx.globalCompositeOperation='source-over';
+    for(const q of parts)if(q.k==='p'){const u=q.life/q.max,r=q.r*(1+2.2*u),g=gx.createRadialGradient(q.x,q.y,0,q.x,q.y,r);
+      g.addColorStop(0,`rgba(240,228,255,${.8*(1-u)})`);g.addColorStop(.6,`rgba(180,150,225,${.45*(1-u)})`);g.addColorStop(1,'rgba(150,120,200,0)');gx.fillStyle=g;gx.beginPath();gx.arc(q.x,q.y,r,0,7);gx.fill()}
+  }
 }
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkUpdate(); });
+document.getElementById('wandHit').addEventListener('click',()=>{if(!wand){wand={t:0,poofed:false,ghost:lastAlt<0}/* ghost from sunset to sunrise */;emitAcc=0}});
+
+/* ghost: pops out of the poof at night, then leaves a smoky "Boo!" */
+function startBoo(x,y){
+  const oc=document.createElement('canvas'),W2=220,H2=90;oc.width=W2;oc.height=H2;const o=oc.getContext('2d');
+  o.fillStyle='#fff';o.font='italic 64px "IM Fell English SC", Georgia, serif';o.textAlign='center';o.textBaseline='middle';o.fillText('Boo!',W2/2,H2/2+4);
+  const px=o.getImageData(0,0,W2,H2).data,pts=[];
+  for(let yy=0;yy<H2;yy+=2)for(let xx=0;xx<W2;xx+=2)if(px[(yy*W2+xx)*4+3]>128&&Math.random()<.75)pts.push({x:x-W2/2+xx,y:y-H2/2+yy,ox:0,oy:0,r:1.5+Math.random()*1.1,d:.4+Math.random()*1.4,p:Math.random()*6.28,vx:(Math.random()-.5)*16,vy:-(8+Math.random()*18)});
+  boo={t:0,pts,x,y};
+}
+function drawBoo(dt){
+  boo.t+=dt;const t=boo.t;if(t>3.4){boo=null;return}
+  gx.save();
+  for(const q of boo.pts){
+    const k=Math.max(0,t-q.d*.5);                     // each wisp starts drifting a little later
+    q.oy+=dt*q.vy*k*1.4;q.ox+=dt*(q.vx*k+Math.sin(t*1.8+q.p+q.y*.06)*(3+k*8));
+    const a=Math.max(0,1-Math.max(0,t-.6-q.d*.5)/1.3)/(1+k*1.8),r=q.r*(1+k*1.5);if(a<=.01)continue;
+    const g=gx.createRadialGradient(q.x+q.ox,q.y+q.oy,0,q.x+q.ox,q.y+q.oy,r*2.2);
+    g.addColorStop(0,`rgba(232,222,255,${.5*a})`);g.addColorStop(1,'rgba(200,180,255,0)');gx.fillStyle=g;
+    gx.beginPath();gx.arc(q.x+q.ox,q.y+q.oy,r*2.2,0,7);gx.fill();
+  }
+  gx.restore();
+}
+const gBodyImg=img('img/ghost_body.png'),gBc=document.getElementById('gBody'),gb=gBc.getContext('2d');
+function drawSheet(t){
+  if(!ready(gBodyImg))return;const W2=324,H2=312,y0=H2*.5;
+  gb.clearRect(0,0,W2,H2);gb.drawImage(gBodyImg,0,0,W2,y0,0,0,W2,y0);
+  for(let y=y0;y<H2;y+=2){
+    const k=((y-y0)/(H2-y0))**1.6;                            // more movement toward the hem
+    const off=k*(9*Math.sin(t*3.2-y*.045)+4*Math.sin(t*5.1-y*.09+1.3));
+    const st=1+k*.04*Math.sin(t*2.6-y*.03);                     // slight billow
+    gb.drawImage(gBodyImg,0,y,W2,2,off-(st-1)*W2/2,y,W2*st,2.2);
+  }
+}
+// mouth: closed "B" -> round "oo", as if saying Boo
+function drawMouth(t){
+  let o;
+  if(t<.3)o=0;else if(t<.42)o=easeOut((t-.3)/.12)*1.1;else if(t<.55)o=1.1-.1*((t-.42)/.13);
+  else if(t<1.05)o=1+.06*Math.sin((t-.55)*14);else o=Math.max(.55,1-(t-1.05)*1.2);
+  const cx=152.4,cy=93,w=4+5.2*o,h=.9+11.5*o;
+  gb.save();
+  // soft puckered shading around the lips
+  let g=gb.createRadialGradient(cx,cy,0,cx,cy,w*2.2+4);g.addColorStop(0,'rgba(60,80,120,.35)');g.addColorStop(1,'rgba(60,80,120,0)');
+  gb.fillStyle=g;gb.beginPath();gb.ellipse(cx,cy,w*1.9+4,h*1.5+4,0,0,7);gb.fill();
+  if(o<.05){gb.strokeStyle='#3a1a34';gb.lineWidth=1.8;gb.lineCap='round';gb.beginPath();gb.moveTo(cx-5,cy);gb.quadraticCurveTo(cx,cy+1.2,cx+5,cy);gb.stroke()}
+  else{gb.fillStyle='#26101f';gb.beginPath();gb.ellipse(cx,cy,w,h,0,0,7);gb.fill();
+    g=gb.createRadialGradient(cx,cy+h*.55,0,cx,cy+h*.55,w*1.1);g.addColorStop(0,'rgba(170,60,90,.95)');g.addColorStop(1,'rgba(120,40,62,0)');
+    gb.fillStyle=g;gb.beginPath();gb.ellipse(cx,cy,w*.92,h*.94,0,0,7);gb.fill();
+    gb.strokeStyle='rgba(255,255,255,.35)';gb.lineWidth=1;gb.beginPath();gb.ellipse(cx,cy,w+.6,h+.6,0,3.6,4.4);gb.stroke()}
+  gb.restore();
+}
+/* ---------- the cat: startled by the Boo, then back to sleep ---------- */
+const catImg=img('img/cat.png'),catC=document.getElementById('catC'),cx2=catC.getContext('2d');
+let cat=null,catDrawn=false;
+function drawCat(eye,look){
+  cx2.setTransform(2,0,0,2,0,0);cx2.clearRect(0,0,264,108);
+  if(ready(catImg))cx2.drawImage(catImg,0,0,264,108);
+  if(eye<=.02)return;
+  for(const [ex,ey] of [[54.3,74.8],[88.2,74]]){
+    cx2.save();cx2.translate(ex,ey);
+    const r=7.4,ry=r*eye;                                   // big round eyes
+    cx2.fillStyle='#160a0a';cx2.beginPath();cx2.ellipse(0,0,r+1.3,ry+1.3,0,0,7);cx2.fill();
+    cx2.save();cx2.beginPath();cx2.ellipse(0,0,r,ry,0,0,7);cx2.clip();
+    const g=cx2.createRadialGradient(0,2,1,0,0,r);g.addColorStop(0,'#c8f08a');g.addColorStop(.7,'#8cc850');g.addColorStop(1,'#4f8a2a');
+    cx2.fillStyle=g;cx2.fillRect(-r,-r,2*r,2*r);
+    cx2.fillStyle='#120a10';cx2.beginPath();cx2.arc(look,.6,5.2,0,7);cx2.fill();          // large round pupil
+    cx2.fillStyle='#fff';cx2.beginPath();cx2.arc(look-2.3,-2.4,2.3,0,7);cx2.fill();        // sparkles
+    cx2.beginPath();cx2.arc(look+2,2,1,0,7);cx2.fill();
+    cx2.restore();cx2.restore();
+  }
+}
+function catFrame(dt){
+  if(!cat){if(!catDrawn&&ready(catImg)){drawCat(0,0);catDrawn=true}return}
+  cat.t+=dt;const t=cat.t;
+  if(t>2.4){cat=null;catC.style.transform='';drawCat(0,0);return}
+  let dy=0,sx=1,sy=1,rot=0;
+  if(t<.14){const u=easeOut(t/.14);dy=-16*u;sy=1+.08*u;sx=1-.04*u}
+  else if(t<.26){const u=(t-.14)/.12;dy=-16*(1-u*u);sy=1.08-.08*u;sx=.96+.04*u}
+  else if(t<.4){const u=(t-.26)/.14,k=Math.sin(u*Math.PI);sy=1-.07*k;sx=1+.05*k}
+  if(t>.26&&t<.7)rot=1.6*Math.sin(t*48)*(1-(t-.26)/.44);          // a little shiver
+  const eye=t<.06?t/.06*1.15:t<1.85?1.15-.15*Math.min(1,(t-.06)/.2):Math.max(0,1-(t-1.85)/.45);
+  const L0=cat.look,look=t<1.5?L0:L0*(1-(t-1.5)/.35);
+  catC.style.transform=`translate(0,${dy.toFixed(2)}px) rotate(${rot.toFixed(2)}deg) scale(${sx.toFixed(3)},${sy.toFixed(3)})`;
+  drawCat(eye,L0<0?Math.max(L0,look):look);
+}
+document.getElementById('catHit').addEventListener('click',()=>{if(!cat)cat={t:0,look:0}});
+function ghostFrame(dt){
+  if(!ghost)return;ghost.t+=dt;const t=ghost.t;
+  const B=1;let sc,op,dy;
+  if(t<.32){const u=t/.32;dy=60*(1-easeBack(u));sc=B*(.85+.15*u);op=Math.min(1,u*2.5)}          // pops up from behind the books
+  else if(t<1.15){dy=-4*Math.sin((t-.32)*4);sc=B;op=1}
+  else if(t<1.5){const u=(t-1.15)/.35;dy=-6*u;sc=B*(1+.12*u);op=1-u}
+  else{gEl.style.opacity=0;ghost=null;return}
+  if(!ghost.booed&&t>=.4){ghost.booed=true;startBoo(ghost.x+2,ghost.y-218)}
+  if(!ghost.cat&&t>=.52){ghost.cat=true;cat={t:0,look:-1.8}}      // the word appears as her mouth opens
+  const wob=Math.sin(t*4.5)*3;
+  gEl.style.opacity=op.toFixed(3);drawSheet(t);drawMouth(t);
+  gEl.style.transform=`translate(${(ghost.x-105).toFixed(1)}px,${(ghost.y-203+dy).toFixed(1)}px) rotate(${wob.toFixed(1)}deg) scale(${sc.toFixed(3)})`;
+  const hb=`scale(${(1+.12*Math.max(0,Math.sin(t*9))).toFixed(3)})`;gHeart.style.transform=hb;gHeartGlow.style.transform=hb;
+  const cp=.5+.5*Math.sin(t*5);   // colour pulse: soft pink -> bright rose
+  gHeart.style.filter=`brightness(${(.85+.5*cp).toFixed(2)}) saturate(${(.8+.7*cp).toFixed(2)}) hue-rotate(${(-12*cp).toFixed(1)}deg)`;
+  gHeartGlow.style.opacity=(.4+.6*cp).toFixed(2);
+}
+
+/* ---------- real sunrise & sunset (Bucharest), SunCalc-style maths ---------- */
+const LAT=44.43,LON=26.10;
+function sunTimes(date){
+  const rad=Math.PI/180,dayMs=864e5,J1970=2440588,J2000=2451545,J0=.0009,e=rad*23.4397;
+  const noon=new Date(date.getFullYear(),date.getMonth(),date.getDate(),12);
+  const d=noon/dayMs-.5+J1970-J2000,lw=rad*-LON,phi=rad*LAT;
+  const n=Math.round(d-J0-lw/(2*Math.PI)),ds=J0+lw/(2*Math.PI)+n;
+  const M=rad*(357.5291+.98560028*ds),C=rad*(1.9148*Math.sin(M)+.02*Math.sin(2*M)+.0003*Math.sin(3*M));
+  const L=M+C+rad*102.9372+Math.PI,dec=Math.asin(Math.sin(L)*Math.sin(e));
+  const Jnoon=J2000+ds+.0053*Math.sin(M)-.0069*Math.sin(2*L);
+  const w=Math.acos((Math.sin(-.833*rad)-Math.sin(phi)*Math.sin(dec))/(Math.cos(phi)*Math.cos(dec)));
+  const Jset=J2000+J0+(w+lw)/(2*Math.PI)+n+.0053*Math.sin(M)-.0069*Math.sin(2*L),Jrise=Jnoon-(Jset-Jnoon);
+  const hrs=j=>{const t=new Date((j+.5-J1970)*dayMs);return t.getHours()+t.getMinutes()/60+t.getSeconds()/3600};
+  return [hrs(Jrise),hrs(Jset)];
+}
+let sunKey='',RISE=6.5,SET=18.5;
+// maps the real time of day onto the scene's 6:30-sunrise / 18:30-sunset timeline
+function toScene(h){
+  const now=new Date(),k=now.toDateString();
+  if(k!==sunKey){sunKey=k;[RISE,SET]=sunTimes(now)}
+  if(h>=RISE&&h<=SET)return 6.5+(h-RISE)/(SET-RISE)*12;
+  const since=(h-SET+24)%24;return (18.5+since/(24-(SET-RISE))*12)%24;
+}
+window.__sun=()=>[RISE,SET];
+
+/* ---------- clock ---------- */
+let mode='live',demoH=17.5,last=performance.now()/1000;
+function setMode(m){const was=mode;mode=m;scrubbing=false;if(m==='demo'&&was!=='demo'){const d=new Date();demoH=d.getHours()+d.getMinutes()/60}}
+let scrubbing=false;
+window.__preview=(h,freeze=true)=>{mode='demo';demoH=h;scrubbing=freeze}; // for screenshots only
+const DEMO_SPEED=24/60; // a full day in 1 minute
+
+let lastFrame=0,raf=0;
+function frame(){
+  lastFrame=Date.now();
+  try{draw()}catch(e){console.error(e)}
+  raf=requestAnimationFrame(frame);
+}
+function draw(){
+  const t=performance.now()/1000,dt=Math.max(0,Math.min(.1,t-last));last=t;
+  let h;
+  if(mode==='live'){const d=new Date();h=d.getHours()+d.getMinutes()/60+d.getSeconds()/3600}
+  else{const run=!scrubbing;if(run)demoH=(demoH+dt*DEMO_SPEED)%24;h=demoH;
+    if(wandCycle&&run){cycleLeft-=dt*DEMO_SPEED;if(cycleLeft<=0){wandCycle=false;setMode('live')}}}
+  wandFrame(dt);
+  const vh=toScene(h);
+  const P=pal(vh),alt=Math.sin(2*Math.PI*(vh-6.5)/24); // sun altitude, -1..1
+  const day=ss(-.05,.15,alt),night=1-ss(-.2,.02,alt),warm=1-ss(.08,.45,Math.abs(alt));lastNight=night;lastAlt=alt;
+  const c=sx;
+  // sky
+  let g=c.createLinearGradient(0,0,0,330);g.addColorStop(0,rgb(P[0]));g.addColorStop(1,rgb(P[1]));c.fillStyle=g;c.fillRect(0,0,W,H);
+  // stars
+  if(night>0)for(const s of stars){const a=night*(.45+.55*Math.sin(t*s.s+s.p));if(a<=0)continue;
+    c.fillStyle=s.g?`rgba(255,215,130,${a})`:`rgba(255,245,225,${a*.85})`;
+    if(s.g){const r=s.r*2.6;c.beginPath();c.moveTo(s.x,s.y-r);c.lineTo(s.x+r*.25,s.y);c.lineTo(s.x,s.y+r);c.lineTo(s.x-r*.25,s.y);c.closePath();c.moveTo(s.x-r,s.y);c.lineTo(s.x,s.y+r*.25);c.lineTo(s.x+r,s.y);c.lineTo(s.x,s.y-r*.25);c.fill()}
+    else{c.fillRect(s.x,s.y,s.r,s.r)}}
+  // sun & moon on an arc; x 200→880, peak above the castle
+  const sp=(vh-6.5)/12,mp=((vh+5.5)%24)/12;
+  if(sp>-.1&&sp<1.1)drawSun(c,200+680*sp,320-275*Math.sin(Math.PI*clamp(sp,-.1,1.1)),ss(-.08,.02,alt),warm,t);
+  if(mp>-.1&&mp<1.1)drawMoon(c,200+680*mp,320-260*Math.sin(Math.PI*clamp(mp,-.1,1.1)),ss(-.02,.12,-alt)*.98+.02*0);
+  // clouds
+  const cc=mix(mix([255,255,255],[255,180,170],warm),[90,60,130],night);
+  for(const cl of clouds){cl.x+=cl.v*dt;if(cl.x>W+160)cl.x=-160;
+    for(const [dx,dy,r] of cl.p){const gg=c.createRadialGradient(cl.x+dx,cl.y+dy,0,cl.x+dx,cl.y+dy,r);gg.addColorStop(0,rgb(cc,.5-.3*night));gg.addColorStop(1,rgb(cc,0));c.fillStyle=gg;c.beginPath();c.arc(cl.x+dx,cl.y+dy,r,0,7);c.fill()}}
+  // far mountains + haze
+  smoothRidge(c,far,H);c.fillStyle=rgb(P[2]);c.fill();
+  g=c.createLinearGradient(0,170,0,330);g.addColorStop(0,rgb(P[6],0));g.addColorStop(1,rgb(P[6],.45));c.fillStyle=g;c.fillRect(0,170,W,H);
+  // flyers (behind castle for depth)
+  if(t>nextSpawn&&fly.length<9)spawn(night,day,t);
+  for(const f of fly){f.x+=f.v*dt}
+  for(let i=fly.length-1;i>=0;i--)if(fly[i].x<-140||fly[i].x>W+140)fly.splice(i,1);
+  const birdCol=rgb(mix([40,30,60],[20,10,35],warm));
+  for(const f of fly){if(f.k==='b')drawBird(c,f,t,birdCol);else drawDragon(c,f,t,dt,P)}
+  // castle and hills
+  if(ready(cShape))drawCastleImg(c,P,day,night,warm,t);else drawCastle(c,P,day*(.5+.5*warm)+.15,night,t);
+  drawHills(c,P,t,day);
+  // candle
+  const auto=alt<.06?1:0;
+  if(auto!==autoPrev){override=null;pkOverride=null;autoPrev=auto} // a manual choice lasts until the next sunset or sunrise
+  want=override===null?auto:override;
+  pkWant=pkOverride===null?auto:pkOverride;
+  pkLit=pkWant?Math.min(1,pkLit+dt*.8):Math.max(0,pkLit-dt*1.4);
+  if(want&&lit<1)lit=Math.min(1,lit+dt*.9);
+  if(!want&&lit>0){lit=Math.max(0,lit-dt*1.6);if(lit===0)for(let i=0;i<10;i++)smoke.push({x:WICK.x+(Math.random()-.5)*3,y:WICK.y-4-i*6,r:3+i*.6,a:.9-i*.05,p:Math.random()*6})}
+  const fk=drawFlame(t,dt);glow.style.opacity=(lit*fk).toFixed(3);
+  // jack-o'-lantern: its own candle, lit together with the big one, flickering on its own rhythm
+  const fl=clamp(noise(t*3.1+11)*.6+noise(t*5.3+3)*.4+.5),pulse=.5+.5*Math.sin(t*.9)*Math.sin(t*.31+1);
+  pkLight.style.opacity=(pkLit*(.62+.25*pulse+.13*fl)).toFixed(3);pkGlow.style.opacity=(pkLit*(.12+.38*pulse)*(.85+.15*fl)).toFixed(3);
+  // clock text
+  const hh=Math.floor(h),mm=Math.floor((h-hh)*60);
+  tEl.textContent=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');pEl.textContent=phaseName(vh);
+}
+// keep the loop alive when the page is reopened, restored or woken
+function kick(){if(Date.now()-lastFrame>700){last=performance.now()/1000;fit();cancelAnimationFrame(raf);raf=requestAnimationFrame(frame)}}
+addEventListener('pageshow',kick);addEventListener('focus',kick);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)kick()});
+setInterval(kick,1000);
+document.getElementById('pumpkinHit').addEventListener('click',()=>{const v=pkWant?0:1;pkOverride=(v===autoPrev)?null:v});
+document.getElementById('candleHit').addEventListener('click',()=>{const v=want?0:1;override=(v===autoPrev)?null:v});
+raf=requestAnimationFrame(frame);
+
+/* ---------- offline + auto-update ---------- */
+const APP_VERSION='home-1';
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+async function checkUpdate(){
+  try{
+    const html=await (await fetch('./?check='+Date.now(),{cache:'no-store'})).text();
+    const m=html.match(/name="app-version" content="([^"]+)"/);
+    if(m&&m[1]!==APP_VERSION){let tried='';try{tried=sessionStorage.getItem('home.reloadFor')||''}catch(e){}
+      if(tried!==m[1]){try{sessionStorage.setItem('home.reloadFor',m[1])}catch(e){}location.reload()}}
+  }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 checkUpdate();
 }
 </script>

@@ -1,6 +1,6 @@
 // Shelf service worker: always try the network first for the app itself,
 // so every launch gets the newest version; fall back to the saved copy offline.
-const CACHE = 'shelf-v1';
+const CACHE = 'shelf-v2';
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
