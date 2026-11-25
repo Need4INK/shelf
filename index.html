@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-1">
+<meta name="app-version" content="home-2">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -23,8 +23,8 @@
    LAYOUT: full-screen stage, scaled to cover, anchored to the top */
 :root{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
-html,body{margin:0;height:100%;background:#12051f;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
-#stage{position:absolute;left:50%;top:0;width:852px;height:1810px;transform-origin:50% 0;overflow:hidden}
+html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#stage{position:absolute;left:50%;top:env(safe-area-inset-top,0px);width:852px;height:1810px;transform-origin:50% 0;overflow:hidden}
 #stage>*{position:absolute;left:0;top:0}
 #sky{width:852px;height:400px}
 #frame{width:852px;height:1810px;pointer-events:none}
@@ -48,6 +48,7 @@ html,body{margin:0;height:100%;background:#12051f;overflow:hidden;-webkit-user-s
  background:linear-gradient(#3a1656,#24093a);border:3px solid #c9a24e;box-shadow:0 0 24px rgba(180,110,255,.35),inset 0 2px 0 rgba(255,230,160,.25);
  font-family:"IM Fell English SC",Georgia,serif;font-size:40px;color:#f1cf7c;text-decoration:none;text-shadow:0 2px 2px #000;z-index:3}
 #openShelf:active{transform:scale(.97)}
+#topFade{width:852px;height:46px;pointer-events:none;background:linear-gradient(var(--skyTop,#12051f),transparent);z-index:1}
 #clock{top:452px;left:60px;width:732px;height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;
  font-family:"IM Fell English SC",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.35),0 2px 2px #000;pointer-events:none}
 #time{font-size:46px;line-height:1}
@@ -93,6 +94,7 @@ html,body{margin:0;height:100%;background:#12051f;overflow:hidden;-webkit-user-s
   <div id="pumpkinHit" role="button" aria-label="Light or put out the pumpkin"></div>
   <div id="candleHit" role="button" aria-label="Light or put out the candle"></div>
   <a id="openShelf" href="shelf.html">Open my shelf</a>
+  <div id="topFade"></div>
   <div id="clock"><div id="time">--:--</div><div id="phase"></div></div>
 </div>
 <script>
@@ -103,8 +105,10 @@ const pkLight=document.getElementById('pkLight'),pkGlow=document.getElementById(
 const glow=document.getElementById('glow'),tEl=document.getElementById('time'),pEl=document.getElementById('phase');
 const sx=sky.getContext('2d'),fx=fl.getContext('2d');
 let S=1;
+// the stage starts below the iPhone's notch / Dynamic Island; the sky colour fills the strip above it
+const probe=document.createElement('div');probe.style.cssText='position:fixed;top:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden';document.body.appendChild(probe);
 function fit(){
-  const vw=innerWidth,vh=innerHeight;S=Math.max(vw/852,vh/1810);
+  const top=probe.offsetHeight||0,vw=innerWidth,vh=innerHeight-top;S=Math.max(vw/852,vh/1810);
   stage.style.transform=`translateX(-50%) scale(${S})`;
   const d=Math.min(devicePixelRatio||1,3)*S;
   sky.width=Math.round(W*d);sky.height=Math.round(H*d);sx.setTransform(d,0,0,d,0,0);
@@ -533,7 +537,7 @@ let scrubbing=false;
 window.__preview=(h,freeze=true)=>{mode='demo';demoH=h;scrubbing=freeze}; // for screenshots only
 const DEMO_SPEED=24/60; // a full day in 1 minute
 
-let lastFrame=0,raf=0;
+let lastFrame=0,raf=0,lastSkyTop='';
 function frame(){
   lastFrame=Date.now();
   try{draw()}catch(e){console.error(e)}
@@ -547,7 +551,8 @@ function draw(){
     if(wandCycle&&run){cycleLeft-=dt*DEMO_SPEED;if(cycleLeft<=0){wandCycle=false;setMode('live')}}}
   wandFrame(dt);
   const vh=toScene(h);
-  const P=pal(vh),alt=Math.sin(2*Math.PI*(vh-6.5)/24); // sun altitude, -1..1
+  const P=pal(vh),skyTop=rgb(P[0]);if(skyTop!==lastSkyTop){lastSkyTop=skyTop;document.documentElement.style.setProperty('--skyTop',skyTop)}
+  const alt=Math.sin(2*Math.PI*(vh-6.5)/24); // sun altitude, -1..1
   const day=ss(-.05,.15,alt),night=1-ss(-.2,.02,alt),warm=1-ss(.08,.45,Math.abs(alt));lastNight=night;lastAlt=alt;
   const c=sx;
   // sky
@@ -603,7 +608,7 @@ document.getElementById('candleHit').addEventListener('click',()=>{const v=want?
 raf=requestAnimationFrame(frame);
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-1';
+const APP_VERSION='home-2';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
