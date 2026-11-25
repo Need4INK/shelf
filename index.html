@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-26">
+<meta name="app-version" content="home-27">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -68,13 +68,13 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 #reading{left:0!important;top:706px!important;width:852px;height:259px;background:url(img/reading_bg.png) center/100% 100% no-repeat;z-index:3;
  font-family:"EB Garamond",Georgia,serif;color:#2a1410}
 #reading>*{position:absolute}
-.cr-title{left:232px;top:106px;width:300px;font-size:27px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cr-author{left:233px;top:141px;width:300px;font-size:22px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-title{left:232px;top:93px;width:340px;font-size:35px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-author{left:233px;top:138px;width:340px;font-size:29px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .la-head{left:130px;top:24px;font-size:33px;font-weight:600;letter-spacing:.2px;color:#2a1410}
-.la-when{left:233px;top:180px;width:300px;font-size:21px;font-style:italic;color:#6a3a2a}
+.la-when{left:233px;top:178px;width:340px;font-size:26px;font-style:italic;color:#6a3a2a}
 #reading .bk{position:absolute;left:61px;top:66px}
 
-#genres{left:14px!important;top:963px!important;width:824px;height:219px;background:url(img/genres_bg.webp) center/100% 100% no-repeat;z-index:3;
+#genres{left:24.1px!important;top:963px!important;width:824px;height:219px;transform:scale(.9738);transform-origin:0 0;background:url(img/genres_bg.webp) center/100% 100% no-repeat;z-index:3;
  font-family:"EB Garamond",Georgia,serif;color:#fbf1da}
 #genres .gc{position:absolute;top:60px;width:123.5px;height:150.7px;padding:0;border:0;border-radius:10px;background:center/100% 100% no-repeat;color:inherit;font:inherit;cursor:pointer;
  box-shadow:0 5px 12px rgba(0,0,0,.65),0 0 3px rgba(0,0,0,.6)}
@@ -768,7 +768,8 @@ async function loadBooks(){
 function renderLatest(){
   const b=newestBook();
   const title=b?(b.title||'Untitled'):'No books yet';
-  document.getElementById('laTitle').textContent=title;
+  const tEl=document.getElementById('laTitle');tEl.textContent=title;
+  tEl.style.fontSize='';let fs=35;while(tEl.scrollWidth>tEl.clientWidth&&fs>27){tEl.style.fontSize=--fs+'px'}   // long titles shrink a little, then …
   document.getElementById('laAuthor').textContent=b?((b.authors||[]).join(', ')||'Unknown author'):'Add your first book';
   document.getElementById('laWhen').textContent=b?whenText(b.added):'';
   setBook(document.getElementById('laBook'),b?{...b,title}:null);
@@ -776,11 +777,11 @@ function renderLatest(){
 document.querySelectorAll('#reading .cr-title,#reading .cr-author,#reading .la-when,#laBook').forEach(e=>{e.style.cursor='pointer';e.addEventListener('click',()=>{
   const b=newestBook();if(b&&b.id)location.href='book.html?id='+encodeURIComponent(b.id)})});
 loadBooks().then(()=>Store.fetchMissingCovers());   // keep a copy of every cover on the phone
-Store.onChange(loadBooks);if(document.fonts)document.fonts.ready.then(renderGenres);addEventListener('pageshow',loadBooks);
+Store.onChange(loadBooks);if(document.fonts)document.fonts.ready.then(()=>{renderGenres();renderLatest()});addEventListener('pageshow',loadBooks);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadBooks()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-26';
+const APP_VERSION='home-27';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
