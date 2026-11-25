@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-2">
+<meta name="app-version" content="book-3">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -52,7 +52,7 @@ h1{font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:32px
 @keyframes bob{40%{transform:translateY(-4px) scale(1.12)}}
 .pk.on{opacity:1;filter:none}
 .pk:active{transform:scale(.9)}
-.pk svg{width:100%;height:100%;display:block}
+.pk img{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 1px 1px rgba(60,20,5,.35))}
 
 dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:0}
 dd{padding-left:14px!important}
@@ -109,14 +109,7 @@ let id=new URLSearchParams(location.search).get('id');
 if(document.referrer&&new URL(document.referrer).origin===location.origin)document.getElementById('back').onclick=e=>{e.preventDefault();history.back()};
 
 const LANG={en:'English',ro:'Romanian',fr:'French',de:'German',es:'Spanish',it:'Italian',hu:'Hungarian',ru:'Russian',pt:'Portuguese',nl:'Dutch',pl:'Polish',ja:'Japanese'};
-const pumpkin='<svg viewBox="0 0 48 48" aria-hidden="true"><defs><radialGradient id="pg" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#ffb45a"/><stop offset=".6" stop-color="#f07f24"/><stop offset="1" stop-color="#c85612"/></radialGradient></defs>'+
- '<path d="M24 12c0-4 2-6.5 5-7.5" stroke="#5b7a2c" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M27 8.5c3.5-1.5 7 0 8 3-3.5 1.2-6.5.2-8-3z" fill="#7aa03a"/>'+
- '<path d="M24 13c-4-2.5-11-2-15 3-4 5-4 15 0 21 4 5.5 11 6.5 15 5 4 1.5 11 .5 15-5 4-6 4-16 0-21-4-5-11-5.5-15-3z" fill="url(#pg)"/>'+
- '<path d="M24 13c-3 4-3.5 24 0 29M24 13c3 4 3.5 24 0 29M16 14c-4 5-4 21 1 27M32 14c4 5 4 21-1 27" stroke="#c8561a" stroke-width="1.3" fill="none" opacity=".55"/>'+
- '<ellipse cx="18" cy="26" rx="2.6" ry="3.2" fill="#3a1408"/><ellipse cx="30" cy="26" rx="2.6" ry="3.2" fill="#3a1408"/><circle cx="18.9" cy="24.9" r=".9" fill="#fff"/><circle cx="30.9" cy="24.9" r=".9" fill="#fff"/>'+
- '<path d="M20.5 31.5q3.5 3 7 0" stroke="#3a1408" stroke-width="1.8" fill="none" stroke-linecap="round"/>'+
- '<ellipse cx="13.5" cy="30.5" rx="2.8" ry="1.7" fill="#ff6f6a" opacity=".55"/><ellipse cx="34.5" cy="30.5" rx="2.8" ry="1.7" fill="#ff6f6a" opacity=".55"/>'+
- '<ellipse cx="15" cy="18" rx="3" ry="1.6" fill="#fff" opacity=".35" transform="rotate(-30 15 18)"/></svg>';
+const pumpkin='<img src="img/pumpkin_icon.png" alt="">';
 
 function save(mut){
   const all=load(),b=all.find(x=>x.id===id);if(!b)return;mut(b);
