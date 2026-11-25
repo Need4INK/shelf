@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-7">
+<meta name="app-version" content="home-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -28,6 +28,9 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 #stage>*{position:absolute;left:0;top:0}
 #sky{width:852px;height:400px}
 #frame{width:852px;height:1810px;pointer-events:none}
+#bpC{left:90px!important;top:0!important;width:360px;height:260px;pointer-events:none}
+#faceGlow{left:110px!important;top:70px!important;width:340px;height:250px;pointer-events:none;mix-blend-mode:screen;opacity:0;background:radial-gradient(closest-side at 42% 55%,rgba(255,170,80,.5),rgba(255,130,50,.16) 55%,rgba(255,120,40,0) 100%)}
+#bigPkHit{left:150px;top:25px;width:270px;height:190px;cursor:pointer;z-index:2}
 #catC{left:548px!important;top:176px!important;width:264px;height:108px;pointer-events:none;transform-origin:132px 104px}
 #flame{width:150px;height:170px;left:-15px;top:80px}
 #glow{width:852px;height:900px;pointer-events:none;mix-blend-mode:screen;opacity:0;
@@ -60,6 +63,8 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
   <canvas id="sky"></canvas>
   <div id="ghost" aria-hidden="true"><img id="gHeart" src="img/ghost_heart.png" alt=""><canvas id="gBody" width="324" height="312"></canvas><img id="gHeartGlow" src="img/ghost_heart_glow.png" alt=""></div>
   <img id="frame" src="img/frame.png" alt="">
+  <canvas id="bpC" width="720" height="520"></canvas>
+  <div id="faceGlow"></div>
   <canvas id="catC" width="528" height="216"></canvas>
   <div id="glow"></div>
   <svg id="wand" aria-hidden="true" width="852" height="600" viewBox="0 0 852 600"><defs>
@@ -90,6 +95,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
   <canvas id="flame"></canvas>
   <canvas id="fx"></canvas>
   <div id="wandHit" role="button" aria-label="Wave the wand: play a whole day in one minute"></div>
+  <div id="bigPkHit" role="button" aria-label="Tickle the pumpkin"></div>
   <div id="catHit" role="button" aria-label="Poke the cat"></div>
   <div id="pumpkinHit" role="button" aria-label="Light or put out the pumpkin"></div>
   <div id="candleHit" role="button" aria-label="Light or put out the candle"></div>
@@ -401,7 +407,7 @@ function wandFrame(dt){
       wAnim.setAttribute('transform',`translate(${p[1].toFixed(2)} ${p[2].toFixed(2)}) rotate(${p[0].toFixed(2)} ${PIV[0]} ${PIV[1]})`);
       wShadow.setAttribute('opacity',(.7*Math.max(.15,1+p[2]/60)).toFixed(3));
       wGlows.forEach((c,i)=>c.setAttribute('r',(wGlowR[i]*p[3]).toFixed(1)));
-      const tip=tipAt(p);
+      const tip=tipAt(p);wandTip=tip;
       if(wand.t>.3&&wand.t<1.68){emitAcc+=dt*70;while(emitAcc>1){emitAcc--;sparkle(tip[0]+(Math.random()-.5)*6,tip[1]+(Math.random()-.5)*6,false)}}
       if(!wand.poofed&&wand.t>=1.68){wand.poofed=true;poof(tip[0],tip[1]);
         if(wand.ghost){ghost={t:0,x:510,y:346,booed:false};ghostPuff(510,262)}
@@ -475,6 +481,48 @@ function drawMouth(t){
     gb.strokeStyle='rgba(255,255,255,.35)';gb.lineWidth=1;gb.beginPath();gb.ellipse(cx,cy,w+.6,h+.6,0,3.6,4.4);gb.stroke()}
   gb.restore();
 }
+/* ---------- the big pumpkin in the witch hat ---------- */
+const bpC=document.getElementById('bpC'),bp=bpC.getContext('2d'),faceGlow=document.getElementById('faceGlow');
+const EYE=[[197.5,163.5],[270,166.5]],CHEEK=[[180,177],[281,183]],HPIV=[190,150],BUCKLE=[218,80];
+let bk={hop:-1,startle:-1,blush:9,wink:-1,winkEye:0,nextWink:5+Math.random()*6,glint:-1,nextGlint:3,eyeO:0,look:[0,0]};
+let wandTip=null;
+function bpFrame(dt,t){
+  bk.hop>=0&&(bk.hop+=dt);bk.startle>=0&&(bk.startle+=dt);bk.blush+=dt;bk.wink>=0&&(bk.wink+=dt);bk.glint>=0&&(bk.glint+=dt);
+  if(bk.hop>=0&&bk.hop>1.2)bk.hop=-1;if(bk.startle>=0&&bk.startle>1.6)bk.startle=-1;
+  // eyes: open while the wand works, wide on Boo, an occasional wink
+  let target=0,look=[0,0];
+  const wandOn=wand&&wand.t<2.45,boo=bk.startle>=0&&bk.startle<1.5;
+  if(boo){target=1.25;look=[2.6,1.2]}
+  else if(wandOn&&wandTip){target=1;const ex=(EYE[0][0]+EYE[1][0])/2+90,ey=EYE[0][1];const vx=wandTip[0]-ex,vy=wandTip[1]-ey,l=Math.hypot(vx,vy)||1;look=[vx/l*2.6,vy/l*2.4]}
+  if(t>bk.nextWink&&bk.wink<0&&!wandOn&&!boo){bk.wink=0;bk.winkEye=Math.random()<.5?0:1;bk.nextWink=t+7+Math.random()*9}
+  let wo=0;if(bk.wink>=0){const u=bk.wink;wo=u<.12?u/.12:u<.55?1:u<.7?1-(u-.55)/.15:0;if(u>.7)bk.wink=-1}
+  bk.eyeO+=(target-bk.eyeO)*Math.min(1,dt*14);bk.look[0]+=(look[0]-bk.look[0])*Math.min(1,dt*10);bk.look[1]+=(look[1]-bk.look[1])*Math.min(1,dt*10);
+  if(t>bk.nextGlint&&bk.glint<0){bk.glint=0;bk.nextGlint=t+5+Math.random()*5}
+  // ---- draw ----
+  bp.setTransform(2,0,0,2,0,0);bp.clearRect(0,0,360,260);
+  // blush
+  const bl=bk.blush<1.4?.55*Math.sin(Math.PI*Math.min(1,bk.blush/1.4)):0;
+  if(bl>.01)for(const [x,y] of CHEEK){const g=bp.createRadialGradient(x,y,0,x,y,17);g.addColorStop(0,`rgba(255,70,90,${bl})`);g.addColorStop(1,'rgba(255,70,90,0)');bp.fillStyle=g;bp.beginPath();bp.arc(x,y,17,0,7);bp.fill()}
+  // eyes: dark and glossy with sparkles
+  for(let i=0;i<2;i++){const o=Math.max(bk.eyeO,i===bk.winkEye?wo:0);if(o<.03)continue;
+    const [x,y]=EYE[i],lk=bk.eyeO>wo?bk.look:[0,0],k=Math.min(1,o);
+    let g=bp.createRadialGradient(x,y,0,x,y,17);g.addColorStop(0,`rgba(232,114,33,${k})`);g.addColorStop(.72,`rgba(230,112,32,${.95*k})`);g.addColorStop(1,'rgba(230,112,32,0)');
+    bp.fillStyle=g;bp.beginPath();bp.ellipse(x,y,17,13,0,0,7);bp.fill();                        // cover the closed-eye line
+    const rx=Math.max(.2,10.5*Math.min(1.12,o)),ry=Math.max(.2,12.5*o),cy=y-1;
+    bp.fillStyle='#2b0f08';bp.beginPath();bp.ellipse(x,cy,rx,ry,0,0,7);bp.fill();
+    bp.save();bp.beginPath();bp.ellipse(x,cy,rx,ry,0,0,7);bp.clip();
+    bp.fillStyle='#140604';bp.beginPath();bp.ellipse(x+lk[0],cy+lk[1],rx*.62,ry*.62,0,0,7);bp.fill();
+    bp.fillStyle='#fff';bp.beginPath();bp.arc(x-3.3+lk[0]*.6,cy-5.6*k+lk[1]*.6,3.4*k,0,7);bp.fill();
+    bp.beginPath();bp.arc(x+3+lk[0]*.6,cy+2.3*k+lk[1]*.6,1.5*k,0,7);bp.fill();
+    bp.restore();
+  }
+  // buckle glint (the hat itself stays painted in the picture)
+  if(bk.glint>=0){const u=bk.glint/.6;if(u>=1)bk.glint=-1;else{const r=9*Math.sin(Math.PI*u),[gx2,gy2]=BUCKLE;
+    bp.globalCompositeOperation='lighter';const gg=bp.createRadialGradient(gx2,gy2,0,gx2,gy2,r*1.6);gg.addColorStop(0,'rgba(255,250,210,.9)');gg.addColorStop(1,'rgba(255,220,120,0)');bp.fillStyle=gg;bp.beginPath();bp.arc(gx2,gy2,r*1.6,0,7);bp.fill();
+    bp.fillStyle='rgba(255,255,235,.95)';starPath(bp,gx2,gy2,r);bp.globalCompositeOperation='source-over'}}
+}
+document.getElementById('bigPkHit').addEventListener('click',()=>{if(bk.hop<0&&bk.startle<0){bk.hop=0;bk.blush=0;if(bk.wink<0){bk.wink=0;bk.winkEye=Math.random()<.5?0:1}}});
+
 /* ---------- the cat: startled by the Boo, then back to sleep ---------- */
 const catImg=img('img/cat.png'),catC=document.getElementById('catC'),cx2=catC.getContext('2d');
 let cat=null,catDrawn=false;
@@ -518,7 +566,7 @@ function ghostFrame(dt){
   else if(t<1.5){const u=(t-1.15)/.35;dy=-6*u;sc=B*(1+.12*u);op=1-u}
   else{gEl.style.opacity=0;ghost=null;return}
   if(!ghost.booed&&t>=.4){ghost.booed=true;startBoo(ghost.x+2,ghost.y-218)}
-  if(!ghost.cat&&t>=.52){ghost.cat=true;cat={t:0,look:-1.8}}      // the word appears as her mouth opens
+  if(!ghost.cat&&t>=.52){ghost.cat=true;cat={t:0,look:-1.8};bk.startle=0;bk.blush=0}      // the word appears as her mouth opens
   const wob=Math.sin(t*4.5)*3;
   gEl.style.opacity=op.toFixed(3);drawSheet(t);drawMouth(t);
   gEl.style.transform=`translate(${(ghost.x-105).toFixed(1)}px,${(ghost.y-203+dy).toFixed(1)}px) rotate(${wob.toFixed(1)}deg) scale(${sc.toFixed(3)})`;
@@ -613,7 +661,7 @@ function draw(){
   pkLit=pkWant?Math.min(1,pkLit+dt*.8):Math.max(0,pkLit-dt*1.4);
   if(want&&lit<1)lit=Math.min(1,lit+dt*.9);
   if(!want&&lit>0){lit=Math.max(0,lit-dt*1.6);if(lit===0)for(let i=0;i<10;i++)smoke.push({x:WICK.x+(Math.random()-.5)*3,y:WICK.y-4-i*6,r:3+i*.6,a:.9-i*.05,p:Math.random()*6})}
-  const fk=drawFlame(t,dt);glow.style.opacity=(lit*fk).toFixed(3);
+  const fk=drawFlame(t,dt);glow.style.opacity=(lit*fk).toFixed(3);faceGlow.style.opacity=(lit*fk*.55).toFixed(3);bpFrame(dt,t);
   // jack-o'-lantern: its own candle, lit together with the big one, flickering on its own rhythm
   const fl=clamp(noise(t*3.1+11)*.6+noise(t*5.3+3)*.4+.5),pulse=.5+.5*Math.sin(t*.9)*Math.sin(t*.31+1);
   pkLight.style.opacity=(pkLit*(.62+.25*pulse+.13*fl)).toFixed(3);pkGlow.style.opacity=(pkLit*(.12+.38*pulse)*(.85+.15*fl)).toFixed(3);
@@ -631,7 +679,7 @@ document.getElementById('candleHit').addEventListener('click',()=>{const v=want?
 raf=requestAnimationFrame(frame);
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-7';
+const APP_VERSION='home-8';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
