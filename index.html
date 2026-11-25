@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-6">
+<meta name="app-version" content="home-7">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -231,12 +231,22 @@ function drawMoon(c,x,y,a,P){
   c.fillStyle=g;c.beginPath();c.arc(x,y,50,0,7);c.fill();
   c.fillStyle='rgba(190,140,80,.28)';for(const [dx,dy,r] of [[-14,-10,9],[12,6,12],[-4,20,6],[20,-18,5],[-24,12,5]]){c.beginPath();c.arc(x+dx,y+dy,r,0,7);c.fill()}
   // shadow over the unlit part (lit on the right while waxing, on the left while waning)
-  const R=50.5,cp=Math.cos(m.ph),wax=m.ph<Math.PI,N=48,L=[],Rt=[];
-  for(let i=0;i<=N;i++){const yy=-R+2*R*i/N,w=Math.sqrt(Math.max(0,R*R-yy*yy));
-    if(wax){L.push([-w,yy]);Rt.push([cp*w,yy])}else{L.push([-cp*w,yy]);Rt.push([w,yy])}}
+  // the terminator is never drawn as a straight line: near a half moon it keeps a gentle curve,
+  // and its edge is softened by layering a few slightly different shadows
+  const R=50.5,wax=m.ph<Math.PI,N=40;let k=Math.cos(m.ph);
+  const crescentSide=wax?m.ph<Math.PI/2:m.ph>Math.PI*1.5;           // less than half lit
+  if(Math.abs(k)<.28)k=crescentSide?.28:-.28;
   if(m.lit<.995){
-    c.beginPath();L.forEach(([px,py],i)=>i?c.lineTo(x+px,y+py):c.moveTo(x+px,y+py));for(let i=N;i>=0;i--)c.lineTo(x+Rt[i][0],y+Rt[i][1]);c.closePath();
-    c.fillStyle=rgb(mix(P[0],[20,10,40],.35),.9);c.fill();     // a faint earthshine still shows through
+    c.save();c.beginPath();c.arc(x,y,R,0,7);c.clip();
+    const col=mix(P[0],[20,10,40],.35);
+    for(let j=0;j<9;j++){
+      const kk=k+(j-4)*.035,L=[],Rt=[];
+      for(let i=0;i<=N;i++){const yy=-R+2*R*i/N,w=Math.sqrt(Math.max(0,R*R-yy*yy));
+        if(wax){L.push([-w-2,yy]);Rt.push([kk*w,yy])}else{L.push([-kk*w,yy]);Rt.push([w+2,yy])}}
+      c.beginPath();L.forEach(([px,py],i)=>i?c.lineTo(x+px,y+py):c.moveTo(x+px,y+py));for(let i=N;i>=0;i--)c.lineTo(x+Rt[i][0],y+Rt[i][1]);c.closePath();
+      c.fillStyle=rgb(col,.23);c.fill();            // nine layers build up to a soft, faintly see-through shadow
+    }
+    c.restore();
   }
   c.restore();
 }
@@ -621,7 +631,7 @@ document.getElementById('candleHit').addEventListener('click',()=>{const v=want?
 raf=requestAnimationFrame(frame);
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-6';
+const APP_VERSION='home-7';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
