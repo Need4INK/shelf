@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-31">
+<meta name="app-version" content="home-32">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -155,7 +155,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
     <button class="gc" style="left:488.1px;background-image:url(img/genre_classic.webp)" data-g="Classic"><span class="gl" style="top:77px">Classic</span><span class="gn"></span></button>
     <button class="gc" style="left:634.4px;background-image:url(img/genre_other.webp)" data-g="Other"><span class="gl" style="top:77px">Other</span><span class="gn"></span></button>
   </section>
-  <div id="clock" role="button" aria-label="Tap for another saying"><div id="quote" aria-live="polite"></div></div>
+  <div id="clock" aria-label="Magical saying (tap anywhere for another)"><div id="quote" aria-live="polite"></div></div>
 </div>
 <nav id="tabbar" aria-label="Sections">
   <div class="in">
@@ -212,7 +212,9 @@ function fit(){
   layoutCards();
   const cn=document.getElementById('canopy');if(cn){const hh=Math.max(60,top/S);cn.style.top=(-hh)+'px';cn.style.height=(hh+80)+'px'}   // arch fills exactly the strip above the scene
 }
-addEventListener('resize',fit);fit();
+addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,300));addEventListener('pageshow',()=>{fit();setTimeout(fit,400)});
+if(window.visualViewport)visualViewport.addEventListener('resize',fit);
+fit();setTimeout(fit,500);setTimeout(fit,1500);   // iOS can settle the screen size a moment after launch
 
 /* ---------- helpers ---------- */
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
@@ -820,12 +822,21 @@ function showQuote(){
   setTimeout(()=>{q.textContent=QUOTES[i];fitQuote(q);q.style.opacity=1},q.textContent?350:0);
 }
 setTimeout(()=>fetch('quotes.json').then(r=>r.json()).then(a=>{QUOTES=a;showQuote()}).catch(()=>{}),300);   // after the scene is up
-document.getElementById('clock').addEventListener('click',showQuote);
+// any tap on Home brings a new saying (taps only, not swipes; at most one change every 1.2 s)
+let qDown=null,qLast=0;
+document.addEventListener('pointerdown',e=>{qDown=[e.clientX,e.clientY]},true);
+document.addEventListener('pointerup',e=>{
+  if(!qDown||Math.hypot(e.clientX-qDown[0],e.clientY-qDown[1])>12)return;qDown=null;
+  const now=Date.now();if(now-qLast<1200)return;qLast=now;showQuote()},true);
 addEventListener('pageshow',e=>{if(e.persisted)showQuote()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)showQuote()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-31';
+const APP_VERSION='home-32';
+// a new version arrived: drop the saved pictures once so new art shows straight away
+try{const v=localStorage.getItem('home.ver');
+  if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);
+    if(v&&'caches' in window)caches.open('shelf-v3').then(c=>c.keys().then(ks=>Promise.all(ks.filter(k=>/\.(png|jpe?g|webp|gif|svg)$/i.test(new URL(k.url).pathname)).map(k=>c.delete(k))))).then(d=>{if(d.length)location.reload()}).catch(()=>{})}}catch(e){}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
