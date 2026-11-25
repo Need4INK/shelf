@@ -3,6 +3,20 @@
    Store.all() · get(id) · put(book) · replaceAll(books) · remove(id)
    Store.saveCover(book) · coverURL(id) · fetchMissingCovers() · onChange(fn)
    First run copies the old list (localStorage 'shelf.books.v1') in; the old copy is left untouched. */
+/* the only genres (Home "Collections by Genre"); anything else counts as Other */
+const GENRES = ['Wiccan Fantasy', 'Fantasy', 'Romance', 'Classic', 'Other'];
+/* best guess from the book's online info (subjects, title, description, year) */
+function guessGenre(b) {
+  const subj = [].concat(b.subjects || [], b.categories || []).join(' ').toLowerCase();
+  const t = [subj, b.title, b.subtitle, b.description].join(' ').toLowerCase();
+  const yr = +(String(b.published || '').match(/\d{4}/) || [0])[0];
+  if (/\b(witch|witches|witchcraft|wicca|wiccan|coven|grimoire|pagan|hex|hexes)\b/.test(t)) return 'Wiccan Fantasy';
+  if (/\bclassics?\b/.test(subj) || (yr && yr < 1930)) return 'Classic';
+  if (/\b(romance|romantic|love stor)/.test(t)) return 'Romance';
+  if (/\b(fantasy|fantastic fiction|dragons?|magic|wizards?|fairies|faeries|fae|elves|sorcer\w*|mythical|fairy tales?)\b/.test(t)) return 'Fantasy';
+  return 'Other';
+}
+
 const Store = (() => {
   const OLD = 'shelf.books.v1', DONE = 'shelf.idb.migrated';
   const chan = 'BroadcastChannel' in self ? new BroadcastChannel('shelf') : null;

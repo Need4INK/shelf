@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-25">
+<meta name="app-version" content="home-26">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -74,6 +74,16 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 .la-when{left:233px;top:180px;width:300px;font-size:21px;font-style:italic;color:#6a3a2a}
 #reading .bk{position:absolute;left:61px;top:66px}
 
+#genres{left:14px!important;top:963px!important;width:824px;height:219px;background:url(img/genres_bg.webp) center/100% 100% no-repeat;z-index:3;
+ font-family:"EB Garamond",Georgia,serif;color:#fbf1da}
+#genres .gc{position:absolute;top:60px;width:123.5px;height:150.7px;padding:0;border:0;border-radius:10px;background:center/100% 100% no-repeat;color:inherit;font:inherit;cursor:pointer;
+ box-shadow:0 5px 12px rgba(0,0,0,.65),0 0 3px rgba(0,0,0,.6)}
+#genres .gc:active{filter:brightness(1.15);transform:scale(.97)}
+#genres .gl,#genres .gn{position:absolute;left:0;right:0;text-align:center;white-space:nowrap;
+ text-shadow:0 2px 3px rgba(0,0,0,.85),0 0 8px rgba(30,0,30,.6),0 0 2px #000}
+#genres .gl{transform:translateY(-50%);font-size:41px;font-weight:400;line-height:.95;letter-spacing:-.3px}
+#genres .gn{top:117px;font-size:32px;font-weight:400;line-height:1}
+
 #clock{top:452px;left:60px;width:732px;height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;
  font-family:"IM Fell English SC",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.35),0 2px 2px #000;pointer-events:none}
 #time{font-size:46px;line-height:1}
@@ -132,6 +142,13 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
     <div class="cr-title" id="laTitle"></div>
     <div class="cr-author" id="laAuthor"></div>
     <div class="la-when" id="laWhen"></div>
+  </section>
+  <section id="genres" aria-label="Collections by genre">
+    <button class="gc" style="left:50.4px;background-image:url(img/genre_wiccan.webp)" data-g="Wiccan Fantasy"><span class="gl" style="top:80px">Wiccan<br>Fantasy</span><span class="gn"></span></button>
+    <button class="gc" style="left:200.5px;background-image:url(img/genre_fantasy.webp)" data-g="Fantasy"><span class="gl" style="top:79px">Fantasy</span><span class="gn"></span></button>
+    <button class="gc" style="left:350.6px;background-image:url(img/genre_romance.webp)" data-g="Romance"><span class="gl" style="top:79px">Romance</span><span class="gn"></span></button>
+    <button class="gc" style="left:500.7px;background-image:url(img/genre_classic.webp)" data-g="Classic"><span class="gl" style="top:79px">Classic</span><span class="gn"></span></button>
+    <button class="gc" style="left:650.8px;background-image:url(img/genre_other.webp)" data-g="Other"><span class="gl" style="top:79px">Other</span><span class="gn"></span></button>
   </section>
   <div id="clock"><div id="time">--:--</div><div id="phase"></div></div>
 </div>
@@ -735,7 +752,19 @@ function whenText(ms){
   if(diff<=0)return 'Added today';if(diff===1)return 'Added yesterday';
   return 'Added '+d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:d.getFullYear()===n.getFullYear()?undefined:'numeric'});
 }
-async function loadBooks(){BOOKS=await Store.all();renderLatest()}
+function renderGenres(){
+  const n={};BOOKS.forEach(b=>{if(b.status==='wishlist')return;const g=GENRES.includes(b.genre)?b.genre:'Other';n[g]=(n[g]||0)+1});   // owned books only
+  document.querySelectorAll('#genres .gc').forEach(c=>{const k=n[c.dataset.g]||0;c.querySelector('.gn').textContent=k;
+    c.setAttribute('aria-label',c.dataset.g+', '+k+' book'+(k===1?'':'s'));
+    const l=c.querySelector('.gl');l.style.fontSize='';let f=41;while(l.scrollWidth>114&&f>26){l.style.fontSize=--f+'px'}});
+}
+async function loadBooks(){
+  BOOKS=await Store.all();
+  // books from before genres: guess one once (she can change it on the book page)
+  const todo=BOOKS.filter(b=>!GENRES.includes(b.genre));todo.forEach(b=>{b.genre=guessGenre(b)});
+  renderLatest();renderGenres();
+  for(const b of todo)await Store.put(b).catch(()=>{});
+}
 function renderLatest(){
   const b=newestBook();
   const title=b?(b.title||'Untitled'):'No books yet';
@@ -747,11 +776,11 @@ function renderLatest(){
 document.querySelectorAll('#reading .cr-title,#reading .cr-author,#reading .la-when,#laBook').forEach(e=>{e.style.cursor='pointer';e.addEventListener('click',()=>{
   const b=newestBook();if(b&&b.id)location.href='book.html?id='+encodeURIComponent(b.id)})});
 loadBooks().then(()=>Store.fetchMissingCovers());   // keep a copy of every cover on the phone
-Store.onChange(loadBooks);addEventListener('pageshow',loadBooks);
+Store.onChange(loadBooks);if(document.fonts)document.fonts.ready.then(renderGenres);addEventListener('pageshow',loadBooks);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadBooks()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-25';
+const APP_VERSION='home-26';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{

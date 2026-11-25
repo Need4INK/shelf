@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-11">
+<meta name="app-version" content="book-12">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -64,7 +64,9 @@ dt:first-of-type,dd:first-of-type{border-top:0}
 dt{color:var(--mute);font-size:15px;white-space:nowrap;padding-top:11px}
 dd{margin:0;text-align:right;overflow-wrap:anywhere}
 dd input{width:100%;min-height:36px;border:0;border-bottom:1px dashed rgba(233,200,115,.45);background:transparent;color:var(--ink);font:16px "EB Garamond",Georgia,serif;text-align:right;padding:2px 0}
-dd input:focus{outline:none;border-bottom:2px solid #e9c873}
+dd select{width:100%;min-height:36px;border:0;border-bottom:1px dashed rgba(233,200,115,.45);background:transparent;color:var(--ink);font:16px "EB Garamond",Georgia,serif;text-align:right;text-align-last:right;padding:2px 0;-webkit-appearance:none;appearance:none}
+dd select option{color:#000}
+dd select:focus,dd input:focus{outline:none;border-bottom:2px solid #e9c873}
 dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
 .ser{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:8px}
 .desc p{margin:0;white-space:pre-line}
@@ -155,6 +157,7 @@ function render(){
   <section class="card" aria-label="Details">
     <h2>Details</h2>
     <dl>
+      <dt>Genre</dt><dd><select id="fGenre" aria-label="Genre">${GENRES.map(g=>`<option${g===(GENRES.includes(b.genre)?b.genre:'Other')?' selected':''}>${g}</option>`).join('')}</select></dd>
       <dt>Series</dt><dd><div class="ser"><input id="fSeries" placeholder="Series name" value="${esc(b.series)}"><input id="fSeriesNo" inputmode="decimal" placeholder="No." value="${esc(b.seriesNo)}"></div></dd>
       <dt>Edition</dt><dd><input id="fEdition" placeholder="e.g. Hardback, signed" value="${esc(b.edition)}"></dd>
       ${rows.map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}
@@ -182,6 +185,7 @@ function render(){
   field(document.getElementById('fSeries'),'series');
   field(document.getElementById('fSeriesNo'),'seriesNo');
   field(document.getElementById('fEdition'),'edition');
+  document.getElementById('fGenre').addEventListener('change',e=>save(x=>{x.genre=e.target.value}));
 }
 const reload=()=>Store.all().then(a=>{ALL=a;render()});
 reload();
