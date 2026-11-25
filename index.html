@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-11">
+<meta name="app-version" content="home-12">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -47,6 +47,12 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 #wandHit{left:430px;top:405px;width:270px;height:70px;cursor:pointer;z-index:2}
 #pkGlow,#pkLight{left:700px;top:340px;width:130px;height:110px;pointer-events:none;opacity:0}
 #pkGlow{mix-blend-mode:screen}
+#tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom,0px);
+ background:linear-gradient(transparent,#0d0310 calc(100% - env(safe-area-inset-bottom,0px)))}
+#tabbar .in{position:relative;width:min(100vw,640px);margin:0 auto}
+#tabbar img{display:block;width:100%;height:auto;pointer-events:none}
+#tabbar .tb{position:absolute;top:12%;width:18%;height:76%;border-radius:22px;-webkit-tap-highlight-color:transparent}
+#tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.25),transparent)}
 #bar{left:0!important;top:552px!important;width:852px;height:154px;background:url(img/bar_bg.png) center/100% 100% no-repeat;z-index:3}
 .tab{position:absolute;top:13px;width:114px;height:114px;padding:0;border:0;border-radius:50%;cursor:pointer;
  background:radial-gradient(circle at 50% 38%,#64305f 0%,#4a1c44 55%,#2f0f2c 100%);
@@ -115,6 +121,16 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
   <div id="topFade"></div>
   <div id="clock"><div id="time">--:--</div><div id="phase"></div></div>
 </div>
+<nav id="tabbar" aria-label="Sections">
+  <div class="in">
+    <img src="img/tabbar.png" alt="">
+    <a class="tb" style="left:4%" aria-label="Home" aria-current="page"></a>
+    <a class="tb" style="left:22.5%" href="shelf.html" aria-label="Library"></a>
+    <a class="tb" style="left:41%" aria-label="Goals"></a>
+    <a class="tb" style="left:59.5%" aria-label="Discover"></a>
+    <a class="tb" style="left:78%" aria-label="More"></a>
+  </div>
+</nav>
 <script>
 {
 const W=852,H=400,FW=150,FH=170,WICK={x:75,y:156}; // wick in flame-canvas coords
@@ -691,7 +707,7 @@ document.getElementById('candleHit').addEventListener('click',()=>{const v=want?
 raf=requestAnimationFrame(frame);
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-11';
+const APP_VERSION='home-12';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
