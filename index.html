@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-2">
+<meta name="app-version" content="home-3">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -564,8 +564,8 @@ function draw(){
     else{c.fillRect(s.x,s.y,s.r,s.r)}}
   // sun & moon on an arc; x 200→880, peak above the castle
   const sp=(vh-6.5)/12,mp=((vh+5.5)%24)/12;
-  if(sp>-.1&&sp<1.1)drawSun(c,200+680*sp,320-275*Math.sin(Math.PI*clamp(sp,-.1,1.1)),ss(-.08,.02,alt),warm,t);
-  if(mp>-.1&&mp<1.1)drawMoon(c,200+680*mp,320-260*Math.sin(Math.PI*clamp(mp,-.1,1.1)),ss(-.02,.12,-alt)*.98+.02*0);
+  if(sp>-.1&&sp<1.1)drawSun(c,200+680*sp,320-192*Math.sin(Math.PI*clamp(sp,-.1,1.1)),ss(-.08,.02,alt),warm,t);
+  if(mp>-.1&&mp<1.1)drawMoon(c,200+680*mp,320-182*Math.sin(Math.PI*clamp(mp,-.1,1.1)),ss(-.02,.12,-alt)*.98+.02*0);
   // clouds
   const cc=mix(mix([255,255,255],[255,180,170],warm),[90,60,130],night);
   for(const cl of clouds){cl.x+=cl.v*dt;if(cl.x>W+160)cl.x=-160;
@@ -608,7 +608,7 @@ document.getElementById('candleHit').addEventListener('click',()=>{const v=want?
 raf=requestAnimationFrame(frame);
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-2';
+const APP_VERSION='home-3';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
