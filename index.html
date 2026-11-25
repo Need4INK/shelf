@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-17">
+<meta name="app-version" content="home-18">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -70,10 +70,12 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 .la-head{left:130px;top:24px;font-size:33px;font-weight:600;letter-spacing:.2px;color:#2a1410}
 .la-when{left:233px;top:180px;width:300px;font-size:21px;font-style:italic;color:#6a3a2a}
 /* framed book: reusable anywhere (home card now, library later); size it by width */
-.bk{position:relative;width:151px;aspect-ratio:151/179;cursor:pointer;--m1:#f6dc96;--m2:#c9a24e;--m3:#8a6420;--m4:#e9c873;--m5:#a07a2c}
+.bk{position:relative;width:151px;aspect-ratio:151/179;cursor:pointer;isolation:isolate;--tint:#24465a;--m1:#f6dc96;--m2:#c9a24e;--m3:#8a6420;--m4:#e9c873;--m5:#a07a2c}
 #reading .bk{position:absolute;left:61px;top:66px}
-.bk-shell{position:absolute;inset:0;width:100%;height:100%}
-.bk-frame{position:absolute;left:15.9%;top:6.1%;width:76.8%;height:87.7%;box-sizing:border-box;padding:3px;border-radius:3px;
+.bk-shadow,.bk-tint,.bk-shade,.bk-gold{position:absolute;inset:0;width:100%;height:100%}
+.bk-tint{background:var(--tint);-webkit-mask:url(img/book_shade.png) center/100% 100%;mask:url(img/book_shade.png) center/100% 100%;transition:background .5s}
+.bk-shade{mix-blend-mode:multiply}
+.bk-frame{position:absolute;left:24%;top:12%;width:63%;height:74%;box-sizing:border-box;padding:3px;border-radius:3px;
  background:linear-gradient(135deg,var(--m1),var(--m2) 30%,var(--m3) 55%,var(--m4) 75%,var(--m5));
  box-shadow:0 0 0 1px rgba(20,8,4,.9),0 2px 5px rgba(0,0,0,.5);transition:background .4s}
 .bk-frame::before{content:"";position:absolute;inset:3px;box-shadow:inset 0 0 0 1px rgba(20,10,5,.75),inset 0 0 6px rgba(0,0,0,.45);z-index:2;pointer-events:none}
@@ -137,7 +139,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
   </nav>
   <section id="reading" aria-label="Latest addition">
     <div class="la-head">Latest Addition</div>
-    <div class="bk" id="laBook"><img class="bk-shell" src="img/book.png" alt=""><div class="bk-frame"><img class="bk-cover" alt="" hidden><div class="bk-ph"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M24 6a14 14 0 1 0 10 24A11 11 0 1 1 24 6z" fill="#e9c873"/><path d="M31 9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#f6dc96"/></svg><span></span></div></div></div>
+    <div class="bk" id="laBook"><img class="bk-shadow" src="img/book.png" alt=""><div class="bk-tint"></div><img class="bk-shade" src="img/book_shade.png" alt=""><img class="bk-gold" src="img/book_gold.png" alt=""><div class="bk-frame"><img class="bk-cover" alt="" hidden><div class="bk-ph"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M24 6a14 14 0 1 0 10 24A11 11 0 1 1 24 6z" fill="#e9c873"/><path d="M31 9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#f6dc96"/></svg><span></span></div></div></div>
     <div class="cr-title" id="laTitle"></div>
     <div class="cr-author" id="laAuthor"></div>
     <div class="la-when" id="laWhen"></div>
@@ -758,22 +760,16 @@ function coverColor(img){
   if(vivid<n*.12||!best.w)return hex(gr/n,gg/n,gb/n);         // mostly grey / black / white
   return hex(best.r/best.w,best.g/best.w,best.b/best.w);
 }
-/* a metallic frame in the cover's own colour: five shades of its hue, like polished metal */
-function frameShades(hex){
+/* the book's own colour: a deep, leather-like version of the cover's main colour */
+function bookTint(hex){
   if(!hex)return null;
   const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
   const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2;let h=0,s=0;
   if(mx!==mn){const d=mx-mn;s=l>.5?d/(2-mx-mn):d/(mx+mn);h=mx===r?((g-b)/d+(g<b?6:0)):mx===g?(b-r)/d+2:(r-g)/d+4;h*=60}
-  if(s<.12)s=0;else s=Math.min(.85,.45+s*.4);              // greys/black/white get a silver frame
-  const base=l>.55?.3:.66;                                  // stand out from the cover: darker frame on light covers, lighter on dark
-  const c=(dl,ds=1)=>`hsl(${Math.round(h)} ${Math.round(s*ds*100)}% ${Math.round(Math.max(.08,Math.min(.95,base+dl))*100)}%)`;
-  return [c(.36,.7),c(.08),c(-.2),c(.24,.85),c(-.06)];
+  if(s<.12)return l>.6?'hsl(30 12% 70%)':'hsl(260 8% 24%)';      // white covers: pale cloth; grey/black: charcoal
+  return `hsl(${Math.round(h)} ${Math.round(Math.min(.7,.3+s*.45)*100)}% ${l>.7?50:40}%)`;
 }
-function paintFrame(el,hex){
-  const sh=frameShades(hex);
-  if(!sh){['--m1','--m2','--m3','--m4','--m5'].forEach(k=>el.style.removeProperty(k));return}
-  sh.forEach((v,i)=>el.style.setProperty('--m'+(i+1),v));
-}
+function paintBook(el,hex){const t=bookTint(hex);if(t)el.style.setProperty('--tint',t);else el.style.removeProperty('--tint')}
 /* store colour + metal on the book the first time we can read its cover */
 function rememberLook(b,look){
   try{const all=JSON.parse(localStorage.getItem('shelf.books.v1')||'[]');const k=all.find(x=>x.id===b.id||(x.added===b.added&&x.title===b.title));
@@ -782,7 +778,7 @@ function rememberLook(b,look){
 function setBook(el,b){
   const im=el.querySelector('.bk-cover'),ph=el.querySelector('.bk-ph');
   ph.querySelector('span').textContent=b?(b.title||''):'';
-  const look=c=>paintFrame(el,c);
+  const look=c=>paintBook(el,c);
   const showPh=()=>{im.hidden=true;ph.hidden=false;look(null)};
   if(!(b&&b.cover)){im.removeAttribute('src');showPh();return}
   const url=b.cover;el.dataset.cover=url;
@@ -809,7 +805,7 @@ addEventListener('pageshow',renderLatest);addEventListener('storage',renderLates
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderLatest()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-17';
+const APP_VERSION='home-18';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
