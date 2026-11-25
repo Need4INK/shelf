@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-4">
+<meta name="app-version" content="book-5">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,9 +15,10 @@
 <style>
 /* Book page: a witchy library page. Dark purple room, the framed book as the hero,
    a parchment card of details, the tab bar at the bottom like every page. */
-:root{color-scheme:dark;--ink:#2a1410;--gold:#e9c873;--gold2:#c9a24e;--mute:#7a4a3a}
+:root{color-scheme:dark;--ink:#f3e3c3;--gold:#e9c873;--gold2:#c9a24e;--mute:#c8a6c8}
 *{box-sizing:border-box;min-width:0}
 html,body{margin:0}
+html{background:#14051c}
 body{min-height:100vh;color:#f3e3c3;font:17px/1.5 "EB Garamond",Georgia,serif;-webkit-tap-highlight-color:transparent;
  background:radial-gradient(120% 60% at 50% 0%,#4a1a5e 0%,#2a0b38 45%,#14051c 100%) fixed;
  padding:calc(env(safe-area-inset-top,0px) + 10px) 16px calc(env(safe-area-inset-bottom,0px) + 120px)}
@@ -35,38 +36,37 @@ h1{font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:32px
 .by{font-size:19px;color:#f3e3c3;margin:0}
 .series{margin:8px 0 0;font-size:15px;color:var(--gold);letter-spacing:.2px}
 
-.card{position:relative;margin:14px 0;padding:18px 18px 16px;border-radius:22px;color:var(--ink);
- background:radial-gradient(130% 90% at 30% 20%,#f8e6c6 0%,#efd2a8 55%,#e2b98a 100%);
- box-shadow:0 0 0 2px #3a1a10,0 0 0 4px rgba(201,162,78,.65),0 10px 22px rgba(0,0,0,.5),inset 0 0 40px rgba(150,80,30,.25)}
-.card::after{content:"";position:absolute;inset:0;border-radius:22px;pointer-events:none;opacity:.35;mix-blend-mode:multiply;
- background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .35 0 0 0 0 .2 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
-.card h2{margin:0 0 10px;font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:22px;color:#3a1a10}
+.card{position:relative;margin:14px 0;padding:18px 18px 16px;border-radius:22px;color:#f3e3c3;
+ background:linear-gradient(rgba(40,8,46,.25),rgba(20,4,26,.45)),url(img/panel.jpg) center/cover;
+ box-shadow:0 0 0 2px #1a0510,0 0 0 4px rgba(201,162,78,.75),0 10px 22px rgba(0,0,0,.55),inset 0 0 40px rgba(0,0,0,.45)}
+.card h2{margin:0 0 10px;font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:22px;color:#f1cf7c}
 
-.status{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border-radius:999px;background:#3a1a2e;box-shadow:inset 0 2px 5px rgba(0,0,0,.5)}
+.status{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border-radius:999px;background:#14041c;box-shadow:inset 0 2px 5px rgba(0,0,0,.5)}
 .status button{min-height:44px;border:0;border-radius:999px;background:transparent;color:#e7cfa6;font:600 17px "EB Garamond",Georgia,serif;cursor:pointer}
 .status button[aria-pressed=true]{background:linear-gradient(#f6dc96,#c9a24e);color:#2a1408;box-shadow:0 2px 4px rgba(0,0,0,.4),inset 0 1px 0 #fff4c8}
 .rate{display:flex;align-items:center;gap:4px;margin-top:14px}
 .rate span{font-size:16px;margin-right:6px;color:var(--mute);position:relative;top:4px}
-.pk{width:46px;height:46px;border:0;padding:3px;background:transparent;cursor:pointer;opacity:.35;filter:grayscale(.9) brightness(1.1);transition:opacity .15s,transform .2s,filter .15s}
+.pk{width:46px;height:46px;border:0;padding:3px;background:transparent;cursor:pointer;opacity:.3;filter:grayscale(1) brightness(.9);transition:opacity .15s,transform .2s,filter .15s}
 .pk.on{animation:bob .35s ease-out}
 @keyframes bob{40%{transform:translateY(-4px) scale(1.12)}}
 .pk.on{opacity:1;filter:none}
 .pk:active{transform:scale(.9)}
-.pk img{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 1px 1px rgba(60,20,5,.35))}
+.pk img{width:100%;height:100%;object-fit:contain;display:block}
+.pk.on img{filter:drop-shadow(0 0 6px rgba(255,150,50,.45))}
 
 dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:0}
 dd{padding-left:14px!important}
-dt,dd{padding:9px 0;border-top:1px solid rgba(90,45,25,.22)}
+dt,dd{padding:9px 0;border-top:1px solid rgba(201,162,78,.22)}
 dt:first-of-type,dd:first-of-type{border-top:0}
 dt{color:var(--mute);font-size:15px;white-space:nowrap;padding-top:11px}
 dd{margin:0;text-align:right;overflow-wrap:anywhere}
-dd input{width:100%;min-height:36px;border:0;border-bottom:1px dashed rgba(90,45,25,.45);background:transparent;color:var(--ink);font:16px "EB Garamond",Georgia,serif;text-align:right;padding:2px 0}
-dd input:focus{outline:none;border-bottom:2px solid #7a3fae}
-dd input::placeholder{color:rgba(90,45,25,.45);font-style:italic}
+dd input{width:100%;min-height:36px;border:0;border-bottom:1px dashed rgba(233,200,115,.45);background:transparent;color:var(--ink);font:16px "EB Garamond",Georgia,serif;text-align:right;padding:2px 0}
+dd input:focus{outline:none;border-bottom:2px solid #e9c873}
+dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
 .ser{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:8px}
 .desc p{margin:0;white-space:pre-line}
 .desc.clamp p{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
-.more{margin-top:6px;min-height:40px;border:0;background:transparent;color:#6a2f9a;font:600 16px "EB Garamond",Georgia,serif;padding:0;cursor:pointer}
+.more{margin-top:6px;min-height:40px;border:0;background:transparent;color:#e9c873;font:600 16px "EB Garamond",Georgia,serif;padding:0;cursor:pointer}
 .empty{text-align:center;padding:80px 10px;color:#e0c79e}
 .empty a{color:var(--gold)}
 .saved{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 110px);transform:translateX(-50%);padding:6px 14px;border-radius:999px;
