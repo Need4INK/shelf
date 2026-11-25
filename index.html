@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-14">
+<meta name="app-version" content="home-15">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -69,12 +69,13 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 .cr-author{left:233px;top:141px;width:300px;font-size:22px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .la-head{left:130px;top:24px;font-size:33px;font-weight:600;letter-spacing:.2px;color:#2a1410}
 .la-when{left:233px;top:180px;width:300px;font-size:21px;font-style:italic;color:#6a3a2a}
-.la-cover{left:69px;top:74px;width:134px;height:162px;border-radius:6px;overflow:hidden;background:#140a1c;box-shadow:0 4px 10px rgba(40,10,10,.55),0 0 0 1px rgba(20,5,5,.6)}
-.la-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.la-cover::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:6px;
- background:linear-gradient(90deg,rgba(0,0,0,.45),rgba(255,255,255,.18) 5%,rgba(0,0,0,.12) 9%,transparent 14%),linear-gradient(transparent 70%,rgba(0,0,0,.18))}
-.la-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px 12px 10px 18px;
- background:radial-gradient(circle at 50% 30%,#3c2a5c,#1e1232 70%);box-shadow:inset 0 0 0 5px #1e1232,inset 0 0 0 6px #c9a24e,inset 0 0 0 9px #1e1232,inset 0 0 0 10px rgba(201,162,78,.6)}
+.la-cover{left:85px;top:77px;width:116px;height:157px;padding:3px;border-radius:3px;cursor:pointer;
+ background:linear-gradient(135deg,#f6dc96,#c9a24e 30%,#8a6420 55%,#e9c873 75%,#a07a2c);
+ box-shadow:0 0 0 1px #2a1408,0 2px 5px rgba(0,0,0,.5)}
+.la-cover::before{content:"";position:absolute;inset:3px;box-shadow:inset 0 0 0 1px rgba(40,20,5,.8),inset 0 0 6px rgba(0,0,0,.45);z-index:2;pointer-events:none}
+.la-cover img{position:absolute;inset:3px;width:calc(100% - 6px);height:calc(100% - 6px);object-fit:cover;display:block}
+.la-ph{position:absolute;inset:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:10px 8px;
+ background:radial-gradient(circle at 50% 30%,#3c2a5c,#1e1232 70%)}
 .la-ph[hidden]{display:none}
 .la-ph svg{width:44px;height:44px}
 .la-ph span{font-size:15px;line-height:1.1;color:#e9c873;text-align:center;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
@@ -736,8 +737,10 @@ function whenText(ms){
   if(diff<=0)return 'Added today';if(diff===1)return 'Added yesterday';
   return 'Added '+d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:d.getFullYear()===n.getFullYear()?undefined:'numeric'});
 }
+let previewIdx=-1;
+function allBooks(){let a=[];try{a=JSON.parse(localStorage.getItem('shelf.books.v1')||'[]')}catch(e){}return Array.isArray(a)?a.slice().sort((x,y)=>(y.added||0)-(x.added||0)):[]}
 function renderLatest(){
-  const b=newestBook(),im=document.getElementById('laImg'),ph=document.getElementById('laPh');
+  const all=allBooks(),b=previewIdx>=0&&all.length?all[previewIdx%all.length]:newestBook(),im=document.getElementById('laImg'),ph=document.getElementById('laPh');
   const title=b?(b.title||'Untitled'):'No books yet';
   document.getElementById('laTitle').textContent=title;
   document.getElementById('laAuthor').textContent=b?((b.authors||[]).join(', ')||'Unknown author'):'Add your first book';
@@ -747,12 +750,13 @@ function renderLatest(){
   if(b&&b.cover){im.onload=()=>{im.hidden=false;ph.hidden=true};im.onerror=showPh;if(im.getAttribute('src')!==b.cover)im.src=b.cover;else if(im.complete&&im.naturalWidth){im.hidden=false;ph.hidden=true}}
   else{im.removeAttribute('src');showPh()}
 }
+document.querySelector('.la-cover').addEventListener('click',()=>{const n=allBooks().length;if(n){previewIdx=(previewIdx+1)%n;renderLatest()}});
 renderLatest();
 addEventListener('pageshow',renderLatest);addEventListener('storage',renderLatest);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderLatest()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-14';
+const APP_VERSION='home-15';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
