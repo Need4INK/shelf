@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-13">
+<meta name="app-version" content="home-14">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -67,10 +67,17 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 #reading>*{position:absolute}
 .cr-title{left:232px;top:106px;width:300px;font-size:27px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cr-author{left:233px;top:141px;width:300px;font-size:22px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cr-bar{left:231px;top:186px;width:267px;height:23px;border-radius:12px;background:linear-gradient(#fbead2,#ecd0ae);
- box-shadow:0 0 0 2px #4a2a22,inset 0 2px 3px rgba(0,0,0,.25),0 3px 5px rgba(60,20,10,.35);overflow:hidden}
-.cr-bar i{display:block;height:100%;border-radius:12px;background:linear-gradient(#b27ad8,#7a3fae 45%,#4e2180);box-shadow:inset 0 2px 1px rgba(255,255,255,.35),inset 0 -2px 2px rgba(0,0,0,.3),1px 0 0 #3a1460}
-.cr-pct{left:512px;top:182px;font-size:28px;font-weight:600}
+.la-head{left:130px;top:24px;font-size:33px;font-weight:600;letter-spacing:.2px;color:#2a1410}
+.la-when{left:233px;top:180px;width:300px;font-size:21px;font-style:italic;color:#6a3a2a}
+.la-cover{left:69px;top:74px;width:134px;height:162px;border-radius:6px;overflow:hidden;background:#140a1c;box-shadow:0 4px 10px rgba(40,10,10,.55),0 0 0 1px rgba(20,5,5,.6)}
+.la-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.la-cover::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:6px;
+ background:linear-gradient(90deg,rgba(0,0,0,.45),rgba(255,255,255,.18) 5%,rgba(0,0,0,.12) 9%,transparent 14%),linear-gradient(transparent 70%,rgba(0,0,0,.18))}
+.la-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px 12px 10px 18px;
+ background:radial-gradient(circle at 50% 30%,#3c2a5c,#1e1232 70%);box-shadow:inset 0 0 0 5px #1e1232,inset 0 0 0 6px #c9a24e,inset 0 0 0 9px #1e1232,inset 0 0 0 10px rgba(201,162,78,.6)}
+.la-ph[hidden]{display:none}
+.la-ph svg{width:44px;height:44px}
+.la-ph span{font-size:15px;line-height:1.1;color:#e9c873;text-align:center;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 #topFade{width:852px;height:46px;pointer-events:none;background:linear-gradient(var(--skyTop,#12051f),transparent);z-index:1}
 #clock{top:452px;left:60px;width:732px;height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;
  font-family:"IM Fell English SC",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.35),0 2px 2px #000;pointer-events:none}
@@ -122,11 +129,12 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
   <nav id="bar" aria-label="Main">
     <button class="tab" aria-label="Button 1"></button><button class="tab" aria-label="Button 2"></button><button class="tab" aria-label="Button 3"></button><button class="tab" aria-label="Button 4"></button>
   </nav>
-  <section id="reading" aria-label="Currently reading">
-    <div class="cr-title">The Witches of Thornvale</div>
-    <div class="cr-author">Elise Hartman</div>
-    <div class="cr-bar" role="progressbar" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"><i style="width:68%"></i></div>
-    <div class="cr-pct">68%</div>
+  <section id="reading" aria-label="Latest addition">
+    <div class="la-head">Latest Addition</div>
+    <div class="la-cover"><img id="laImg" alt="" hidden><div id="laPh" class="la-ph"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M24 6a14 14 0 1 0 10 24A11 11 0 1 1 24 6z" fill="#e9c873"/><path d="M31 9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#f6dc96"/></svg><span id="laPhTitle"></span></div></div>
+    <div class="cr-title" id="laTitle"></div>
+    <div class="cr-author" id="laAuthor"></div>
+    <div class="la-when" id="laWhen"></div>
   </section>
   <div id="topFade"></div>
   <div id="clock"><div id="time">--:--</div><div id="phase"></div></div>
@@ -716,8 +724,35 @@ document.getElementById('pumpkinHit').addEventListener('click',()=>{const v=pkWa
 document.getElementById('candleHit').addEventListener('click',()=>{const v=want?0:1;override=(v===autoPrev)?null:v});
 raf=requestAnimationFrame(frame);
 
+/* ---------- latest addition card ---------- */
+function newestBook(){
+  let books=[];try{books=JSON.parse(localStorage.getItem('shelf.books.v1')||'[]')}catch(e){}
+  if(!Array.isArray(books))return null;
+  return books.reduce((a,b)=>b&&(!a||(b.added||0)>(a.added||0))?b:a,null);
+}
+function whenText(ms){
+  if(!ms)return '';const d=new Date(ms),n=new Date(),day=864e5;
+  const diff=Math.floor((new Date(n.getFullYear(),n.getMonth(),n.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/day);
+  if(diff<=0)return 'Added today';if(diff===1)return 'Added yesterday';
+  return 'Added '+d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:d.getFullYear()===n.getFullYear()?undefined:'numeric'});
+}
+function renderLatest(){
+  const b=newestBook(),im=document.getElementById('laImg'),ph=document.getElementById('laPh');
+  const title=b?(b.title||'Untitled'):'No books yet';
+  document.getElementById('laTitle').textContent=title;
+  document.getElementById('laAuthor').textContent=b?((b.authors||[]).join(', ')||'Unknown author'):'Add your first book';
+  document.getElementById('laWhen').textContent=b?whenText(b.added):'';
+  document.getElementById('laPhTitle').textContent=b?title:'';
+  const showPh=()=>{im.hidden=true;ph.hidden=false};
+  if(b&&b.cover){im.onload=()=>{im.hidden=false;ph.hidden=true};im.onerror=showPh;if(im.getAttribute('src')!==b.cover)im.src=b.cover;else if(im.complete&&im.naturalWidth){im.hidden=false;ph.hidden=true}}
+  else{im.removeAttribute('src');showPh()}
+}
+renderLatest();
+addEventListener('pageshow',renderLatest);addEventListener('storage',renderLatest);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderLatest()});
+
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-13';
+const APP_VERSION='home-14';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
