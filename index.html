@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-24">
+<meta name="app-version" content="home-25">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -735,26 +735,23 @@ function whenText(ms){
   if(diff<=0)return 'Added today';if(diff===1)return 'Added yesterday';
   return 'Added '+d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:d.getFullYear()===n.getFullYear()?undefined:'numeric'});
 }
-let previewIdx=-1;
-function allBooks(){return BOOKS.slice().sort((x,y)=>(y.added||0)-(x.added||0))}
 async function loadBooks(){BOOKS=await Store.all();renderLatest()}
 function renderLatest(){
-  const all=allBooks(),b=previewIdx>=0&&all.length?all[previewIdx%all.length]:newestBook();
+  const b=newestBook();
   const title=b?(b.title||'Untitled'):'No books yet';
   document.getElementById('laTitle').textContent=title;
   document.getElementById('laAuthor').textContent=b?((b.authors||[]).join(', ')||'Unknown author'):'Add your first book';
   document.getElementById('laWhen').textContent=b?whenText(b.added):'';
   setBook(document.getElementById('laBook'),b?{...b,title}:null);
 }
-document.querySelectorAll('#reading .cr-title,#reading .cr-author,#reading .la-when').forEach(e=>{e.style.cursor='pointer';e.addEventListener('click',()=>{
-  const all=allBooks(),b=previewIdx>=0&&all.length?all[previewIdx%all.length]:newestBook();if(b&&b.id)location.href='book.html?id='+encodeURIComponent(b.id)})});
-document.getElementById('laBook').addEventListener('click',()=>{const n=allBooks().length;if(n){previewIdx=(previewIdx+1)%n;renderLatest()}});
+document.querySelectorAll('#reading .cr-title,#reading .cr-author,#reading .la-when,#laBook').forEach(e=>{e.style.cursor='pointer';e.addEventListener('click',()=>{
+  const b=newestBook();if(b&&b.id)location.href='book.html?id='+encodeURIComponent(b.id)})});
 loadBooks().then(()=>Store.fetchMissingCovers());   // keep a copy of every cover on the phone
 Store.onChange(loadBooks);addEventListener('pageshow',loadBooks);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadBooks()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-24';
+const APP_VERSION='home-25';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
