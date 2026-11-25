@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-9">
+<meta name="app-version" content="book-10">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,7 +21,7 @@ html,body{margin:0}
 html{background:#14051c}
 body{min-height:100vh;color:#f3e3c3;font:17px/1.5 "EB Garamond",Georgia,serif;-webkit-tap-highlight-color:transparent;
  background:radial-gradient(120% 60% at 50% 0%,#4a1a5e 0%,#2a0b38 45%,#14051c 100%) fixed;
- padding:calc(env(safe-area-inset-top,0px) + 10px) 16px calc(env(safe-area-inset-bottom,0px) + 120px)}
+ padding:calc(env(safe-area-inset-top,0px) + 24px) 16px calc(env(safe-area-inset-bottom,0px) + 120px)}
 .wrap{max-width:560px;margin:0 auto}
 .top{display:flex;align-items:center;justify-content:space-between;height:44px}
 .back{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 6px;color:var(--gold);text-decoration:none;font-size:18px}
@@ -87,7 +87,6 @@ dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
 </head>
 <body>
 <div class="wrap">
-  <div class="top"><a class="back" id="back" href="./"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>Back</a></div>
   <main id="page"></main>
 </div>
 <div class="saved" id="saved" role="status">Saved</div>
@@ -109,7 +108,6 @@ const load=()=>{try{const a=JSON.parse(localStorage.getItem(KEY)||'[]');return A
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const page=document.getElementById('page');
 let id=new URLSearchParams(location.search).get('id');
-if(document.referrer&&new URL(document.referrer).origin===location.origin)document.getElementById('back').onclick=e=>{e.preventDefault();history.back()};
 
 const LANG={en:'English',ro:'Romanian',fr:'French',de:'German',es:'Spanish',it:'Italian',hu:'Hungarian',ru:'Russian',pt:'Portuguese',nl:'Dutch',pl:'Polish',ja:'Japanese'};
 const pumpkin='<img src="img/pumpkin_icon.png" alt="">';
