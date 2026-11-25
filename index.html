@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-28">
+<meta name="app-version" content="home-29">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -65,22 +65,24 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px))}
 .tab:active{transform:scale(.95);filter:brightness(1.15)}
 .tab:nth-child(1){left:107px}.tab:nth-child(2){left:283px}.tab:nth-child(3){left:459px}.tab:nth-child(4){left:635px}
-#reading{left:0!important;top:706px!important;width:852px;height:246px;background:url(img/reading_bg.png) center/100% 100% no-repeat;z-index:3;
+#reading{left:0!important;top:706px;width:852px;height:246px;background:url(img/reading_bg.png) center/100% 100% no-repeat;z-index:3;
  font-family:"EB Garamond",Georgia,serif;color:#2a1410}
 #reading>*{position:absolute}
-.cr-title{left:232px;top:88px;width:340px;font-size:35px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cr-author{left:233px;top:131px;width:340px;font-size:29px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.la-head{left:130px;top:23px;font-size:33px;font-weight:600;letter-spacing:.2px;color:#2a1410}
-.la-when{left:233px;top:169px;width:340px;font-size:26px;font-style:italic;color:#6a3a2a}
-#reading .bk{position:absolute;left:65px;top:62px;width:143px}
+.cr-title{left:232px;top:35.8%;width:340px;font-size:35px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-author{left:233px;top:53.3%;width:340px;font-size:29px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.la-head{left:130px;top:9.35%;font-size:33px;font-weight:600;letter-spacing:.2px;color:#2a1410}
+.la-when{left:233px;top:68.7%;width:340px;font-size:26px;font-style:italic;color:#6a3a2a}
+#reading .bk{position:absolute;left:65px;top:25.2%;width:var(--bk,143px)}
 
-#nook{left:27px!important;top:954.6px!important;width:796px;height:228px;background:url(img/nook_bg.webp) center/100% 100% no-repeat;z-index:3;
+#nook{left:27px!important;top:954.6px;width:796px;height:228px;border-radius:33px;overflow:hidden;z-index:3;
+ background:url(img/nook_fg.webp) right center/auto 100% no-repeat,url(img/nook_bg.webp) center/100% 100% no-repeat;
  filter:drop-shadow(0 4px 8px rgba(0,0,0,.55))}
-#genres{left:23.4px!important;top:1192.6px!important;width:803.2px;height:238.8px;background:url(img/genres_bg.webp) center/100% 100% no-repeat;z-index:3;
+#genres{left:23.4px!important;top:1192.6px;width:803.2px;height:238.8px;box-sizing:border-box;z-index:3;
+ border-style:solid;border-width:50.2px 0 20.1px;border-image:url(img/genres_bg.webp) 77 0 31 0 fill stretch;
  font-family:"EB Garamond",Georgia,serif;color:#fbf1da}
-#genres .gc{position:absolute;top:67.4px;width:120.4px;height:146.9px;padding:0;border:0;border-radius:10px;background:center/100% 100% no-repeat;color:inherit;font:inherit;cursor:pointer;
+#genres .gc{position:absolute;top:17.2px;width:120.4px;height:146.9px;padding:0;border:0;border-radius:10px;background:center/100% 100% no-repeat;color:inherit;font:inherit;cursor:pointer;
  box-shadow:0 5px 12px rgba(0,0,0,.65),0 0 3px rgba(0,0,0,.6)}
-#genres .gc:active{filter:brightness(1.15);transform:scale(.97)}
+#genres .gc:active{filter:brightness(1.15)}
 #genres .gl,#genres .gn{position:absolute;left:0;right:0;text-align:center;white-space:nowrap;
  text-shadow:0 2px 3px rgba(0,0,0,.85),0 0 8px rgba(30,0,30,.6),0 0 2px #000}
 #genres .gl{transform:translateY(-50%);font-size:40px;font-weight:400;line-height:.95;letter-spacing:-.3px}
@@ -129,7 +131,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
   <img id="pkLight" src="img/pumpkin_light.png" alt="">
   <canvas id="flame"></canvas>
   <canvas id="fx"></canvas>
-  <div id="wandHit" role="button" aria-label="Wave the wand: play a whole day in one minute"></div>
+  <div id="wandHit" role="button" aria-label="Wave the wand: play a whole day in one minute (tap again to pause or resume)"></div>
   <div id="bookHit" role="button" aria-label="Tap the book"></div>
   <div id="bigPkHit" role="button" aria-label="Tickle the pumpkin"></div>
   <div id="catHit" role="button" aria-label="Poke the cat"></div>
@@ -177,6 +179,27 @@ const sx=sky.getContext('2d'),fx=fl.getContext('2d');
 let S=1,SKYX=0;
 // the stage starts below the iPhone's notch / Dynamic Island; the sky colour fills the strip above it
 const probe=document.createElement('div');probe.style.cssText='position:fixed;top:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden';document.body.appendChild(probe);
+
+/* the three cards share the space between the round-button bar and the tab bar, on any phone */
+function layoutCards(){
+  const tb=document.getElementById('tabbar'),img=tb&&tb.querySelector('img');
+  if(!img||!img.offsetHeight||!S)return;
+  const safeTop=probe.offsetHeight||0;
+  const tabTop=img.getBoundingClientRect().top+img.offsetHeight*10/171;   // painted top edge of the tab bar
+  const avail=(tabTop-safeTop)/S;
+  const BAR=693;                                                          // bar's painted bottom
+  let G=14,H=(avail-BAR-4*G)/3;
+  if(H<210){G=8;H=(avail-BAR-4*G)/3}                                      // small phones (SE): tighter gaps
+  H=Math.max(185,Math.min(330,H));
+  const c1=BAR+G,c2=c1+H+G,c3=c2+H+G;
+  const r=document.getElementById('reading'),hb=H*259/240;
+  r.style.top=(c1-7*hb/259)+'px';r.style.height=hb+'px';r.style.setProperty('--bk',(143*hb/246)+'px');
+  const n=document.getElementById('nook');n.style.top=c2+'px';n.style.height=H+'px';
+  const g=document.getElementById('genres'),f=.4014,he=H+27*f;
+  g.style.top=(c3-10*f)+'px';g.style.height=he+'px';
+  const band=he-6.8-50.2,tt=(band-146.9)/2,sc=Math.min(1,(band-12)/146.9);   // centre tiles; shrink a little on small phones
+  g.querySelectorAll('.gc').forEach(c=>{c.style.top=tt+'px';c.style.transform=sc<1?`scale(${sc.toFixed(3)})`:''});
+}
 function fit(){
   const top=probe.offsetHeight||0,vw=innerWidth,vh=innerHeight-top;S=Math.max(vw/852,vh/1810);
   stage.style.transform=`translateX(-50%) scale(${S})`;document.documentElement.style.setProperty('--S',S);
@@ -186,6 +209,7 @@ function fit(){
   sky.width=Math.round(W*d);sky.height=Math.round((H+ext)*d);sx.setTransform(d,0,0,d,0,ext*d);
   fl.width=Math.round(FW*d);fl.height=Math.round(FH*d);fx.setTransform(d,0,0,d,0,0);
   if(window.__fxResize)window.__fxResize(d);
+  layoutCards();
   const cn=document.getElementById('canopy');if(cn){const hh=Math.max(60,top/S);cn.style.top=(-hh)+'px';cn.style.height=(hh+80)+'px'}   // arch fills exactly the strip above the scene
 }
 addEventListener('resize',fit);fit();
@@ -498,7 +522,13 @@ function wandFrame(dt){
 }
 // tapping the big "My Book Collection" book calls the ghost (sunset to sunrise)
 document.getElementById('bookHit').addEventListener('click',()=>{if(!ghost&&lastAlt<0){ghost={t:0,x:510,y:346,booed:false};ghostPuff(510,262)}});
-document.getElementById('wandHit').addEventListener('click',()=>{if(!wand){wand={t:0,poofed:false};emitAcc=0}});
+document.getElementById('wandHit').addEventListener('click',()=>{
+  if(wand)return;
+  if(wandCycle){                                   // day is fast-forwarding: tap pauses it, tap again carries on
+    scrubbing=!scrubbing;
+    const tp=wandTip||[690,441];for(let i=0;i<14;i++)sparkle(tp[0]+(Math.random()-.5)*16,tp[1]+(Math.random()-.5)*16,false);
+    return}
+  wand={t:0,poofed:false};emitAcc=0});
 
 /* ghost: pops out of the poof at night, then leaves a smoky "Boo!" */
 function startBoo(x,y){
@@ -735,7 +765,7 @@ function draw(){
   pkLight.style.opacity=(pkLit*(.62+.25*pulse+.13*fl)).toFixed(3);pkGlow.style.opacity=(pkLit*(.12+.38*pulse)*(.85+.15*fl)).toFixed(3);
   // clock text
   const hh=Math.floor(h),mm=Math.floor((h-hh)*60);
-  tEl.textContent=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');pEl.textContent=phaseName(vh);
+  tEl.textContent=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');pEl.textContent=phaseName(vh)+(wandCycle&&scrubbing?' · paused':'');
 }
 // keep the loop alive when the page is reopened, restored or woken
 function kick(){if(Date.now()-lastFrame>700){last=performance.now()/1000;fit();cancelAnimationFrame(raf);raf=requestAnimationFrame(frame)}}
@@ -780,11 +810,11 @@ function renderLatest(){
 document.querySelectorAll('#reading .cr-title,#reading .cr-author,#reading .la-when,#laBook').forEach(e=>{e.style.cursor='pointer';e.addEventListener('click',()=>{
   const b=newestBook();if(b&&b.id)location.href='book.html?id='+encodeURIComponent(b.id)})});
 loadBooks().then(()=>Store.fetchMissingCovers());   // keep a copy of every cover on the phone
-Store.onChange(loadBooks);if(document.fonts)document.fonts.ready.then(()=>{renderGenres();renderLatest()});addEventListener('pageshow',loadBooks);
+Store.onChange(loadBooks);{const ti=document.querySelector('#tabbar img');if(ti&&!ti.complete)ti.addEventListener('load',layoutCards);}layoutCards();if(document.fonts)document.fonts.ready.then(()=>{renderGenres();renderLatest()});addEventListener('pageshow',loadBooks);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadBooks()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-28';
+const APP_VERSION='home-29';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
