@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-21">
+<meta name="app-version" content="home-22">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -32,6 +32,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 #canopy{width:852px;pointer-events:none}
 #bpC{left:90px!important;top:0!important;width:360px;height:260px;pointer-events:none}
 #faceGlow{left:110px!important;top:70px!important;width:340px;height:250px;pointer-events:none;mix-blend-mode:screen;opacity:0;background:radial-gradient(closest-side at 42% 55%,rgba(255,170,80,.5),rgba(255,130,50,.16) 55%,rgba(255,120,40,0) 100%)}
+#bookHit{left:205px;top:218px;width:205px;height:190px;cursor:pointer;z-index:2;transform:rotate(-6deg)}
 #bigPkHit{left:150px;top:25px;width:270px;height:190px;cursor:pointer;z-index:2}
 #catC{left:548px!important;top:176px!important;width:264px;height:108px;pointer-events:none;transform-origin:132px 104px}
 #flame{width:150px;height:170px;left:-15px;top:80px}
@@ -118,6 +119,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
   <canvas id="flame"></canvas>
   <canvas id="fx"></canvas>
   <div id="wandHit" role="button" aria-label="Wave the wand: play a whole day in one minute"></div>
+  <div id="bookHit" role="button" aria-label="Tap the book"></div>
   <div id="bigPkHit" role="button" aria-label="Tickle the pumpkin"></div>
   <div id="catHit" role="button" aria-label="Poke the cat"></div>
   <div id="pumpkinHit" role="button" aria-label="Light or put out the pumpkin"></div>
@@ -455,7 +457,6 @@ function wandFrame(dt){
       const tip=tipAt(p);wandTip=tip;
       if(wand.t>.3&&wand.t<1.68){emitAcc+=dt*70;while(emitAcc>1){emitAcc--;sparkle(tip[0]+(Math.random()-.5)*6,tip[1]+(Math.random()-.5)*6,false)}}
       if(!wand.poofed&&wand.t>=1.68){wand.poofed=true;poof(tip[0],tip[1]);
-        if(wand.ghost){ghost={t:0,x:510,y:346,booed:false};ghostPuff(510,262)}
         if(!wandCycle){setMode('demo');wandCycle=true;cycleLeft=24}}   // a running cycle just carries on to its end
     }
   }
@@ -475,7 +476,9 @@ function wandFrame(dt){
       g.addColorStop(0,`rgba(240,228,255,${.8*(1-u)})`);g.addColorStop(.6,`rgba(180,150,225,${.45*(1-u)})`);g.addColorStop(1,'rgba(150,120,200,0)');gx.fillStyle=g;gx.beginPath();gx.arc(q.x,q.y,r,0,7);gx.fill()}
   }
 }
-document.getElementById('wandHit').addEventListener('click',()=>{if(!wand){wand={t:0,poofed:false,ghost:lastAlt<0}/* ghost from sunset to sunrise */;emitAcc=0}});
+// tapping the big "My Book Collection" book calls the ghost (sunset to sunrise)
+document.getElementById('bookHit').addEventListener('click',()=>{if(!ghost&&lastAlt<0){ghost={t:0,x:510,y:346,booed:false};ghostPuff(510,262)}});
+document.getElementById('wandHit').addEventListener('click',()=>{if(!wand){wand={t:0,poofed:false};emitAcc=0}});
 
 /* ghost: pops out of the poof at night, then leaves a smoky "Boo!" */
 function startBoo(x,y){
@@ -753,7 +756,7 @@ addEventListener('pageshow',renderLatest);addEventListener('storage',renderLates
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderLatest()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-21';
+const APP_VERSION='home-22';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
