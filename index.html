@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-23">
+<meta name="app-version" content="home-24">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -145,6 +145,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
     <a class="tb" style="left:78%" aria-label="More"></a>
   </div>
 </nav>
+<script src="store.js"></script>
 <script src="book-frame.js"></script>
 <script>
 {
@@ -726,11 +727,8 @@ document.getElementById('candleHit').addEventListener('click',()=>{const v=want?
 raf=requestAnimationFrame(frame);
 
 /* ---------- latest addition card ---------- */
-function newestBook(){
-  let books=[];try{books=JSON.parse(localStorage.getItem('shelf.books.v1')||'[]')}catch(e){}
-  if(!Array.isArray(books))return null;
-  return books.reduce((a,b)=>b&&(!a||(b.added||0)>(a.added||0))?b:a,null);
-}
+let BOOKS=[];
+function newestBook(){return BOOKS.reduce((a,b)=>b&&(!a||(b.added||0)>(a.added||0))?b:a,null)}
 function whenText(ms){
   if(!ms)return '';const d=new Date(ms),n=new Date(),day=864e5;
   const diff=Math.floor((new Date(n.getFullYear(),n.getMonth(),n.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/day);
@@ -738,7 +736,8 @@ function whenText(ms){
   return 'Added '+d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:d.getFullYear()===n.getFullYear()?undefined:'numeric'});
 }
 let previewIdx=-1;
-function allBooks(){let a=[];try{a=JSON.parse(localStorage.getItem('shelf.books.v1')||'[]')}catch(e){}return Array.isArray(a)?a.slice().sort((x,y)=>(y.added||0)-(x.added||0)):[]}
+function allBooks(){return BOOKS.slice().sort((x,y)=>(y.added||0)-(x.added||0))}
+async function loadBooks(){BOOKS=await Store.all();renderLatest()}
 function renderLatest(){
   const all=allBooks(),b=previewIdx>=0&&all.length?all[previewIdx%all.length]:newestBook();
   const title=b?(b.title||'Untitled'):'No books yet';
@@ -750,12 +749,12 @@ function renderLatest(){
 document.querySelectorAll('#reading .cr-title,#reading .cr-author,#reading .la-when').forEach(e=>{e.style.cursor='pointer';e.addEventListener('click',()=>{
   const all=allBooks(),b=previewIdx>=0&&all.length?all[previewIdx%all.length]:newestBook();if(b&&b.id)location.href='book.html?id='+encodeURIComponent(b.id)})});
 document.getElementById('laBook').addEventListener('click',()=>{const n=allBooks().length;if(n){previewIdx=(previewIdx+1)%n;renderLatest()}});
-renderLatest();
-addEventListener('pageshow',renderLatest);addEventListener('storage',renderLatest);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderLatest()});
+loadBooks().then(()=>Store.fetchMissingCovers());   // keep a copy of every cover on the phone
+Store.onChange(loadBooks);addEventListener('pageshow',loadBooks);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadBooks()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-23';
+const APP_VERSION='home-24';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{

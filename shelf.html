@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="v13">
+<meta name="app-version" content="v14">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shelf</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -68,7 +68,7 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
   <a href="./" style="display:inline-block;margin-bottom:6px;color:inherit;opacity:.8;text-decoration:none;font-size:15px">&larr; Home</a>
   <h1>Shelf</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">v13</p>
+  <p style="font-size:12px;opacity:.5">v14</p>
 </header>
 <main>
   <section class="panel">
@@ -104,15 +104,14 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
   </section>
 </main>
 
+<script src="store.js"></script>
 <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
 <script>
 {
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const KEY = 'shelf.books.v1';
-let books = [];
-try { books = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { books = []; }
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(books)); } catch (e) { status('Could not save — storage unavailable.', true); } };
+let books = [], loaded = false;
+const save = () => { if (loaded) Store.replaceAll(books).catch(() => status('Could not save — storage unavailable.', true)); };
 let current = null;
 
 function status(msg, err) { const s = $('status'); s.textContent = msg || ''; s.className = 'status' + (err ? ' err' : ''); }
@@ -218,11 +217,12 @@ function showNotFound(base) {
   $('nf').onsubmit = e => { e.preventDefault(); addBook({ ...base, title: $('nfT').value.trim(), authors: $('nfA').value.trim() ? [$('nfA').value.trim()] : [], source: 'Manual' }); };
 }
 function addBook(b) {
-  const nb = { ...b, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: Date.now() };
+  const nb = { status: 'owned', ...b, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: Date.now() };
   books.unshift(nb);
   save(); render(); $('result').classList.add('hidden'); $('code').value = '';
   status('Added “' + (b.title || 'book') + '”.');
   rememberCoverColour(nb);
+  Store.saveCover(nb);   // keep the cover picture on the phone
 }
 // Read the cover's main colour once, when the book is added, and keep it with the book
 // (the home screen tints the book around the cover with it). Needs the cover site to allow it.
@@ -374,14 +374,18 @@ $('importFile').onchange = async e => {
   try {
     const data = JSON.parse(await f.text()); if (!Array.isArray(data)) throw 0;
     const have = new Set(books.map(b => b.id)); const fresh = data.filter(b => b && b.id && !have.has(b.id));
+    fresh.forEach(b => { if (b.status !== 'wishlist') b.status = 'owned'; });
     books = [...fresh, ...books]; save(); render(); status(`Imported ${fresh.length} book${fresh.length === 1 ? '' : 's'}.`);
+    fresh.forEach(b => Store.saveCover(b));
   } catch (err) { status('That file isn’t a Shelf backup.', true); }
 };
 
 render();
+const loadBooks = () => Store.all().then(a => { books = a.sort((x, y) => (y.added || 0) - (x.added || 0)); loaded = true; render(); });
+loadBooks(); Store.onChange(loadBooks);
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'v13';
+const VERSION = 'v14';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {

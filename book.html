@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-10">
+<meta name="app-version" content="book-11">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -100,11 +100,12 @@ dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
     <a class="tb" style="left:78%" aria-label="More"></a>
   </div>
 </nav>
+<script src="store.js"></script>
 <script src="book-frame.js"></script>
 <script>
 {
-const KEY='shelf.books.v1';
-const load=()=>{try{const a=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(a)?a:[]}catch(e){return []}};
+let ALL=[];
+const load=()=>ALL;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const page=document.getElementById('page');
 let id=new URLSearchParams(location.search).get('id');
@@ -113,8 +114,8 @@ const LANG={en:'English',ro:'Romanian',fr:'French',de:'German',es:'Spanish',it:'
 const pumpkin='<img src="img/pumpkin_icon.png" alt="">';
 
 function save(mut){
-  const all=load(),b=all.find(x=>x.id===id);if(!b)return;mut(b);
-  try{localStorage.setItem(KEY,JSON.stringify(all));const s=document.getElementById('saved');s.classList.add('show');clearTimeout(save.t);save.t=setTimeout(()=>s.classList.remove('show'),1100)}catch(e){}
+  const b=ALL.find(x=>x.id===id);if(!b)return;mut(b);
+  Store.put(b).then(()=>{const s=document.getElementById('saved');s.classList.add('show');clearTimeout(save.t);save.t=setTimeout(()=>s.classList.remove('show'),1100)}).catch(()=>{});
   return b;
 }
 function year(p){const m=String(p||'').match(/\d{4}/);return m?m[0]:''}
@@ -182,8 +183,9 @@ function render(){
   field(document.getElementById('fSeriesNo'),'seriesNo');
   field(document.getElementById('fEdition'),'edition');
 }
-render();
-addEventListener('pageshow',e=>{if(e.persisted)render()});
+const reload=()=>Store.all().then(a=>{ALL=a;render()});
+reload();
+addEventListener('pageshow',e=>{if(e.persisted)reload()});
 }
 </script>
 </body>

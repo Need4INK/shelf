@@ -27,22 +27,29 @@ function bookTint(hex){
 function paintBook(el,hex){const t=bookTint(hex);if(t)el.style.setProperty('--tint',t);else el.style.removeProperty('--tint')}
 /* store colour + metal on the book the first time we can read its cover */
 function rememberLook(b,look){
-  try{const all=JSON.parse(localStorage.getItem('shelf.books.v1')||'[]');const k=all.find(x=>x.id===b.id||(x.added===b.added&&x.title===b.title));
-    if(k&&k.color!==look.color){k.color=look.color;localStorage.setItem('shelf.books.v1',JSON.stringify(all))}}catch(e){}
+  if(typeof Store==='undefined'||!b||!b.id)return;
+  Store.get(b.id).then(k=>{if(k&&k.color!==look.color){k.color=look.color;return Store.put(k)}}).catch(()=>{});
 }
 function setBook(el,b){
   const im=el.querySelector('.bk-cover'),ph=el.querySelector('.bk-ph');
   ph.querySelector('span').textContent=b?(b.title||''):'';
   const look=c=>paintBook(el,c);
   const showPh=()=>{im.hidden=true;ph.hidden=false;look(null)};
+  const key=b?(b.id||'')+'|'+(b.cover||''):'';el.dataset.cover=key;
   if(!(b&&b.cover)){im.removeAttribute('src');showPh();return}
-  const url=b.cover;el.dataset.cover=url;
-  // saved colour first (instant), then read the cover if we haven't yet
+  // saved colour first (instant)
   look(b.color||null);
-  im.onload=()=>{im.hidden=false;ph.hidden=true};im.onerror=showPh;
-  if(im.getAttribute('src')!==url)im.src=url;else if(im.complete&&im.naturalWidth){im.hidden=false;ph.hidden=true}
-  if(b.color)return;
-  const probe=new Image();probe.crossOrigin='anonymous';
-  probe.onload=()=>{if(el.dataset.cover!==url)return;try{const c=coverColor(probe);look(c);rememberLook(b,{color:c})}catch(e){}};
-  probe.src=url;
+  const show=url=>{
+    if(el.dataset.cover!==key)return;
+    im.onload=()=>{im.hidden=false;ph.hidden=true};
+    // the cover saved on the phone failed: try the web address once
+    im.onerror=()=>{if(url!==b.cover){show(b.cover)}else showPh()};
+    if(im.getAttribute('src')!==url)im.src=url;else if(im.complete&&im.naturalWidth){im.hidden=false;ph.hidden=true}
+    if(b.color)return;
+    const probe=new Image();if(url===b.cover)probe.crossOrigin='anonymous';
+    probe.onload=()=>{if(el.dataset.cover!==key)return;try{const c=coverColor(probe);look(c);rememberLook(b,{color:c})}catch(e){}};
+    probe.src=url;
+  };
+  // the cover saved on the phone (works offline), else the web address
+  if(typeof Store!=='undefined'&&b.id)Store.coverURL(b.id).then(u=>show(u||b.cover));else show(b.cover);
 }
