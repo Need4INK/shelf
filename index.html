@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-29">
+<meta name="app-version" content="home-30">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -500,6 +500,9 @@ function wandFrame(dt){
       wGlows.forEach((c,i)=>c.setAttribute('r',(wGlowR[i]*p[3]).toFixed(1)));
       const tip=tipAt(p);wandTip=tip;
       if(wand.t>.3&&wand.t<1.68){emitAcc+=dt*70;while(emitAcc>1){emitAcc--;sparkle(tip[0]+(Math.random()-.5)*6,tip[1]+(Math.random()-.5)*6,false)}}
+      if(!wand.poofed&&wand.t>=1.68&&wand.toggle){wand.poofed=true;
+        if(wandCycle)scrubbing=!scrubbing;
+        for(let i=0;i<26;i++)sparkle(tip[0]+(Math.random()-.5)*10,tip[1]+(Math.random()-.5)*10,i<10)}
       if(!wand.poofed&&wand.t>=1.68){wand.poofed=true;poof(tip[0],tip[1]);
         if(!wandCycle){setMode('demo');wandCycle=true;cycleLeft=24}}   // a running cycle just carries on to its end
     }
@@ -524,11 +527,8 @@ function wandFrame(dt){
 document.getElementById('bookHit').addEventListener('click',()=>{if(!ghost&&lastAlt<0){ghost={t:0,x:510,y:346,booed:false};ghostPuff(510,262)}});
 document.getElementById('wandHit').addEventListener('click',()=>{
   if(wand)return;
-  if(wandCycle){                                   // day is fast-forwarding: tap pauses it, tap again carries on
-    scrubbing=!scrubbing;
-    const tp=wandTip||[690,441];for(let i=0;i<14;i++)sparkle(tp[0]+(Math.random()-.5)*16,tp[1]+(Math.random()-.5)*16,false);
-    return}
-  wand={t:0,poofed:false};emitAcc=0});
+  // during the fast day the same lift-swirl-flick pauses it (or carries on) instead of poofing
+  wand={t:0,poofed:false,toggle:wandCycle};emitAcc=0});
 
 /* ghost: pops out of the poof at night, then leaves a smoky "Boo!" */
 function startBoo(x,y){
@@ -814,7 +814,7 @@ Store.onChange(loadBooks);{const ti=document.querySelector('#tabbar img');if(ti&
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadBooks()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-29';
+const APP_VERSION='home-30';
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 async function checkUpdate(){
   try{
