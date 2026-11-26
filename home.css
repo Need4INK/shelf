@@ -27,6 +27,7 @@ html.back #stage{transition:none}   /* coming back to Home: appears whole the mo
 #pumpkinHit{left:700px;top:305px;width:135px;height:135px;cursor:pointer;z-index:2}
 #candleHit{left:0;top:150px;width:120px;height:200px;cursor:pointer;z-index:2}
 #wand{pointer-events:none}
+#tclock{left:320px!important;top:240px!important;width:220px;height:210px;pointer-events:none}
 #fx{width:852px;height:620px;pointer-events:none}
 #ghost{width:211px;height:203px;pointer-events:none;opacity:0;transform-origin:105px 203px}
 #ghost img,#ghost canvas{position:absolute;inset:0;width:100%;height:100%}

@@ -37,7 +37,7 @@ function fit(){
   sky.style.top=(-ext)+'px';sky.style.height=(H+ext)+'px';
   sky.width=Math.round(W*d);sky.height=Math.round((H+ext)*d);sx.setTransform(d,0,0,d,0,ext*d);
   fl.width=Math.round(FW*d);fl.height=Math.round(FH*d);fx.setTransform(d,0,0,d,0,0);
-  if(window.__fxResize)window.__fxResize(d);
+  if(window.__fxResize)window.__fxResize(d);if(window.__tcResize)window.__tcResize(d);
   layoutCards();
   const cn=document.getElementById('canopy');if(cn){const hh=Math.max(60,top/S);cn.style.top=(-hh)+'px';cn.style.height=(hh+80)+'px'}   // arch fills exactly the strip above the scene
 }
@@ -318,6 +318,83 @@ function poof(x,y){
 }
 function starPath(c,x,y,r){c.beginPath();c.moveTo(x,y-r);c.quadraticCurveTo(x+r*.15,y-r*.15,x+r,y);c.quadraticCurveTo(x+r*.15,y+r*.15,x,y+r);c.quadraticCurveTo(x-r*.15,y+r*.15,x-r,y);c.quadraticCurveTo(x-r*.15,y-r*.15,x,y-r);c.fill()}
 let emitAcc=0,fxDirty=false;
+/* the wand's clock: a brass table clock that appears on the shelf in front of the big book (behind the wand);
+   its hands run with the fast day and it vanishes when the day stops. Drawn in the photo's own units (case radius 120). */
+const tcc=document.getElementById('tclock'),tc=tcc.getContext('2d'),TCX=320,TCY=240,TCW=220,TCH=210;
+let tcD=1;window.__tcResize=d=>{tcD=d;tcc.width=Math.round(TCW*d);tcc.height=Math.round(TCH*d)};window.__tcResize(Math.min(devicePixelRatio||1,3)*S);
+const CK=.39,FOOT=[425,439],CLK=[425,439-145*CK],CLR=46;   // feet on the shelf; centre of the case
+let clk={a:0,on:false,t:0,drawn:false};
+function clockFrame(dt){
+  const on=wandCycle&&mode==='demo'&&!scrubbing;
+  if(on!==clk.on){clk.on=on;
+    if(on){for(let i=0;i<20;i++)sparkle(CLK[0]+(Math.random()-.5)*60,CLK[1]+(Math.random()-.5)*60,i<10);parts.push({k:'f',x:CLK[0],y:CLK[1],life:0,max:.4})}
+    else if(clk.a>0){for(let i=0;i<22;i++)sparkle(CLK[0]+(Math.random()-.5)*CLR*1.6,CLK[1]+(Math.random()-.5)*CLR*1.6,i<12);parts.push({k:'f',x:CLK[0],y:CLK[1],life:0,max:.4})}}
+  clk.a=on?Math.min(1,clk.a+dt/.55):Math.max(0,clk.a-dt/.45);clk.t+=dt;
+  if(on&&clk.a>.6&&Math.random()<dt*4){const a=Math.random()*6.28;sparkle(CLK[0]+Math.cos(a)*CLR,CLK[1]+Math.sin(a)*CLR,false)}
+  if(clk.a>0||clk.drawn){tc.setTransform(tcD,0,0,tcD,0,0);tc.clearRect(0,0,TCW,TCH);clk.drawn=clk.a>0;
+    if(clk.a>0){tc.translate(-TCX,-TCY);drawClock(tc)}}
+}
+function drawClock(c){
+  const u=clk.a,k=clk.on?easeBack(u):u;
+  c.save();c.globalAlpha=Math.min(1,u*1.6);
+  // glow on the book behind
+  let g=c.createRadialGradient(CLK[0],CLK[1],10,CLK[0],CLK[1],90);g.addColorStop(0,`rgba(214,160,255,${(.3+.1*Math.sin(clk.t*3))*u})`);g.addColorStop(1,'rgba(160,90,255,0)');
+  c.fillStyle=g;c.fillRect(CLK[0]-90,CLK[1]-90,180,180);
+  // grows up from its feet; photo coords from here on (feet at 215,385)
+  c.translate(FOOT[0],FOOT[1]);c.scale(CK*k,CK*k);c.translate(-215,-385);
+  // soft contact shadow
+  c.fillStyle='rgba(12,3,20,.45)';c.beginPath();c.ellipse(232,384,105,7,0,0,7);c.fill();
+  const lin=(x0,y0,x1,y1,st)=>{const q=c.createLinearGradient(x0,y0,x1,y1);st.forEach(([o,col])=>q.addColorStop(o,col));return q};
+  const BR=[[0,'#f3c98a'],[.3,'#b97a3e'],[.65,'#6b3f1a'],[1,'#a8703a']];
+  const ball=(x,y,r)=>{const q=c.createRadialGradient(x-r*.4,y-r*.45,0,x,y,r);q.addColorStop(0,'#ffe0a8');q.addColorStop(.5,'#b07236');q.addColorStop(1,'#4a2a10');c.fillStyle=q;c.beginPath();c.arc(x,y,r,0,7);c.fill()};
+  // back foot
+  ball(213,371,8);
+  // legs: from under the case, curving out to ball feet
+  c.lineCap='round';c.strokeStyle='#7a4a20';c.lineWidth=7;
+  c.beginPath();c.moveTo(178,338);c.quadraticCurveTo(160,352,152,374);c.stroke();
+  c.beginPath();c.moveTo(270,336);c.quadraticCurveTo(300,348,314,366);c.stroke();
+  c.strokeStyle='rgba(255,220,160,.5)';c.lineWidth=2;
+  c.beginPath();c.moveTo(176,340);c.quadraticCurveTo(160,352,153,370);c.stroke();
+  c.beginPath();c.moveTo(270,338);c.quadraticCurveTo(298,349,311,364);c.stroke();
+  ball(150,380,9);ball(316,370,9);
+  // twin alarm bells on posts, with the hammer between them
+  const bell=(x,y,rot)=>{c.save();c.translate(x,y);c.rotate(rot);
+    c.fillStyle=lin(-6,0,6,0,BR);c.fillRect(-4,0,8,30);                 // post down to the case
+    const q=c.createRadialGradient(-12,-22,3,0,-10,46);q.addColorStop(0,'#fff0c4');q.addColorStop(.35,'#d29a52');q.addColorStop(.8,'#7a4a1e');q.addColorStop(1,'#4a2a10');
+    c.fillStyle=q;c.beginPath();c.moveTo(-50,4);c.bezierCurveTo(-50,-36,-28,-44,0,-44);c.bezierCurveTo(28,-44,50,-36,50,4);c.closePath();c.fill();
+    c.fillStyle='#5a3414';c.beginPath();c.ellipse(0,4,50,8,0,0,7);c.fill();
+    c.strokeStyle='rgba(255,236,190,.75)';c.lineWidth=2.5;c.beginPath();c.moveTo(-36,-4);c.bezierCurveTo(-36,-28,-20,-36,-4,-38);c.stroke();
+    ball(0,-47,6);c.restore()};
+  bell(170,122,-.55);bell(280,122,.55);
+  c.strokeStyle='#8a5624';c.lineWidth=5;c.lineCap='round';c.beginPath();c.moveTo(225,132);c.lineTo(225,96);c.stroke();
+  const hz=clk.on?Math.sin(clk.t*40)*3*(Math.sin(clk.t*1.3)>.92?1:0):0;   // now and then the hammer rattles
+  c.lineWidth=4;c.beginPath();c.moveTo(225,100);c.lineTo(225+hz,84);c.stroke();ball(225+hz,82,8);
+  // case drum (depth on the left), then the front rim
+  for(let i=0;i<=10;i++){const f=i/10,cx=203+22*f,cy=242-2*f;
+    c.fillStyle=`rgb(${Math.round(70+70*f)},${Math.round(40+44*f)},${Math.round(14+18*f)})`;c.beginPath();c.arc(cx,cy,112,0,7);c.fill()}
+  c.strokeStyle='rgba(255,215,150,.35)';c.lineWidth=2;c.beginPath();c.arc(203,242,112,1.9,4.4);c.stroke();
+  c.fillStyle=lin(125,140,335,345,BR);c.beginPath();c.arc(225,240,112,0,7);c.fill();
+  c.strokeStyle='rgba(255,238,200,.85)';c.lineWidth=3;c.beginPath();c.arc(225,240,109,3.5,5.2);c.stroke();
+  c.fillStyle='#3a210c';c.beginPath();c.arc(226,240,100,0,7);c.fill();
+  // face
+  const FX=227,FY=240,FR=97;
+  g=c.createRadialGradient(FX-30,FY-35,5,FX,FY,FR);g.addColorStop(0,'#ffffff');g.addColorStop(.82,'#f4f1ea');g.addColorStop(1,'#bdb5a6');
+  c.fillStyle=g;c.beginPath();c.arc(FX,FY,FR,0,7);c.fill();
+  c.fillStyle='#24201d';
+  for(let i=0;i<60;i++){const a=i*Math.PI/30;c.beginPath();c.arc(FX+Math.sin(a)*FR*.6,FY-Math.cos(a)*FR*.6,i%5?1.4:2.4,0,7);c.fill()}
+  c.font='600 30px "EB Garamond", Georgia, serif';c.textAlign='center';c.textBaseline='middle';
+  for(let i=1;i<=12;i++){const a=i*Math.PI/6;c.fillText(i,FX+Math.sin(a)*FR*.8,FY-Math.cos(a)*FR*.8+1)}
+  // hands follow the fast day
+  const h=demoH,ha=(h%12)/12*Math.PI*2,ma=(h%1)*Math.PI*2;
+  const hand=(a,len,w)=>{c.save();c.translate(FX,FY);c.rotate(a);c.fillStyle='#14100e';c.beginPath();
+    c.moveTo(-w*.5,14);c.lineTo(-w,0);c.lineTo(-w*.45,-len*.78);c.lineTo(-w*1.1,-len*.86);c.lineTo(0,-len);c.lineTo(w*1.1,-len*.86);c.lineTo(w*.45,-len*.78);c.lineTo(w,0);c.lineTo(w*.5,14);c.closePath();c.fill();c.restore()};
+  hand(ha,FR*.5,4.2);hand(ma,FR*.74,3.2);
+  ball(FX,FY,7);
+  // glass
+  g=c.createLinearGradient(FX-FR,FY-FR,FX+FR*.3,FY+FR*.3);g.addColorStop(0,'rgba(255,255,255,.38)');g.addColorStop(.45,'rgba(255,255,255,0)');
+  c.fillStyle=g;c.beginPath();c.arc(FX,FY,FR,0,7);c.fill();
+  c.restore();
+}
 function wandFrame(dt){
   if(wand){
     wand.t+=dt;const p=pose(wand.t);
@@ -335,7 +412,7 @@ function wandFrame(dt){
         if(!wandCycle){setMode('demo');wandCycle=true;cycleLeft=24}}   // a running cycle just carries on to its end
     }
   }
-  ghostFrame(dt);catFrame(dt);
+  ghostFrame(dt);catFrame(dt);clockFrame(dt);
   if(parts.length||fxDirty||boo){
     gx.clearRect(0,0,FXW,FXH);fxDirty=parts.length>0;
     for(const q of parts){q.life+=dt;if(q.k!=='f'){q.x+=q.vx*dt;q.y+=q.vy*dt;q.vx*=1-dt*2.2;q.vy=q.vy*(1-dt*2.2)+(q.k==='s'?14:-10)*dt}}
