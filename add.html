@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<style>html{background:#0e0416}</style>
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a6">
+<meta name="app-version" content="a7">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -65,14 +66,32 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 #tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.25),transparent)}
 main{padding-bottom:140px}
 </style>
-<script src="tabbar.js"></script>
-<link rel="stylesheet" href="fonts.css">
+<script>(function(){
+  const p=document.createElement('div');p.style.cssText='position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';
+  document.documentElement.appendChild(p);
+  const fit=()=>document.documentElement.style.setProperty('--S',Math.max(innerWidth/852,(innerHeight-(p.offsetHeight||0))/1810));
+  fit();addEventListener('resize',fit);
+  // tapping Home when we came from Home: go back, so the phone shows the Home it kept in memory (no rebuild)
+  document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#tabbar a[aria-label="Home"]');if(!a)return;
+    let r=null;try{r=new URL(document.referrer)}catch(err){}
+    if(r&&r.origin===location.origin&&/\/(index\.html)?$/.test(r.pathname)&&history.length>1){e.preventDefault();history.back()}});
+})();</script>
+<style>/* All app lettering, kept in the app (no Google Fonts) so text never swaps fonts when a page opens. OFL. */
+@font-face{font-family:"EB Garamond";font-weight:400;src:url(fonts/EBGaramond-400.woff2) format("woff2");font-display:block}
+@font-face{font-family:"EB Garamond";font-weight:500;src:url(fonts/EBGaramond-500.woff2) format("woff2");font-display:block}
+@font-face{font-family:"EB Garamond";font-weight:600;src:url(fonts/EBGaramond-600.woff2) format("woff2");font-display:block}
+@font-face{font-family:"EB Garamond";font-weight:700;src:url(fonts/EBGaramond-700.woff2) format("woff2");font-display:block}
+@font-face{font-family:"EB Garamond";font-weight:400;font-style:italic;src:url(fonts/EBGaramond-400i.woff2) format("woff2");font-display:block}
+@font-face{font-family:"IM Fell English";src:url(fonts/IMFellEnglish.woff2) format("woff2");font-display:block}
+@font-face{font-family:"IM Fell English";font-style:italic;src:url(fonts/IMFellEnglishItalic.woff2) format("woff2");font-display:block}
+@font-face{font-family:"IM Fell English SC";src:url(fonts/IMFellEnglishSC.woff2) format("woff2");font-display:block}
+</style>
 </head>
 <body>
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a6</p>
+  <p style="font-size:12px;opacity:.5">a7</p>
 </header>
 <main>
   <section class="panel">
@@ -386,7 +405,7 @@ const loadBooks = () => Store.all().then(a => { books = a.sort((x, y) => (y.adde
 loadBooks(); Store.onChange(loadBooks);
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a6';
+const VERSION = 'a7';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {

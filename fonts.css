@@ -1,9 +1,0 @@
-/* All app lettering, kept in the app (no Google Fonts) so text never swaps fonts when a page opens. OFL. */
-@font-face{font-family:"EB Garamond";font-weight:400;src:url(fonts/EBGaramond-400.woff2) format("woff2");font-display:block}
-@font-face{font-family:"EB Garamond";font-weight:500;src:url(fonts/EBGaramond-500.woff2) format("woff2");font-display:block}
-@font-face{font-family:"EB Garamond";font-weight:600;src:url(fonts/EBGaramond-600.woff2) format("woff2");font-display:block}
-@font-face{font-family:"EB Garamond";font-weight:700;src:url(fonts/EBGaramond-700.woff2) format("woff2");font-display:block}
-@font-face{font-family:"EB Garamond";font-weight:400;font-style:italic;src:url(fonts/EBGaramond-400i.woff2) format("woff2");font-display:block}
-@font-face{font-family:"IM Fell English";src:url(fonts/IMFellEnglish.woff2) format("woff2");font-display:block}
-@font-face{font-family:"IM Fell English";font-style:italic;src:url(fonts/IMFellEnglishItalic.woff2) format("woff2");font-display:block}
-@font-face{font-family:"IM Fell English SC";src:url(fonts/IMFellEnglishSC.woff2) format("woff2");font-display:block}

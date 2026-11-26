@@ -88,14 +88,15 @@ function showQuote(){
   const q=document.getElementById('quote');q.style.opacity=0;
   setTimeout(()=>{q.dataset.t=QUOTES[i];fitQuote(q);q.style.opacity=1},q.textContent?350:0);
 }
-setTimeout(()=>fetch('quotes.json').then(r=>r.json()).then(a=>{QUOTES=a;showQuote()}).catch(()=>{}),300);   // after the scene is up
+try{QUOTES=JSON.parse(localStorage.getItem('quotes.cache')||'null')}catch(e){}if(QUOTES)showQuote();   // saved copy: the saying is there at once
+setTimeout(()=>fetch('quotes.json').then(r=>r.json()).then(a=>{const first=!QUOTES;QUOTES=a;try{localStorage.setItem('quotes.cache',JSON.stringify(a))}catch(e){}if(first)showQuote()}).catch(()=>{}),300);   // after the scene is up
 // a new saying each time Home is entered: app opened, or back from another screen / app
 addEventListener('pageshow',e=>{if(e.persisted)showQuote()});
 if(document.fonts)document.fonts.ready.then(()=>{const q=document.getElementById('quote');if(q.dataset.t)fitQuote(q)});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)showQuote()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-62';
+const APP_VERSION='home-63';
 // a new version arrived: drop the saved pictures once so new art shows straight away
 try{const v=localStorage.getItem('home.ver');
   if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);
