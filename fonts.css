@@ -7,5 +7,3 @@
 @font-face{font-family:"IM Fell English";src:url(fonts/IMFellEnglish.woff2) format("woff2");font-display:block}
 @font-face{font-family:"IM Fell English";font-style:italic;src:url(fonts/IMFellEnglishItalic.woff2) format("woff2");font-display:block}
 @font-face{font-family:"IM Fell English SC";src:url(fonts/IMFellEnglishSC.woff2) format("woff2");font-display:block}
-/* the bottom bar is the same element on every page: the page fade keeps it still */
-#tabbar{view-transition-name:tabbar}
