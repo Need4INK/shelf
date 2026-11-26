@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-40">
+<meta name="app-version" content="home-41">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <link rel="preload" as="image" href="img/frame.webp" fetchpriority="high">
 <link rel="preload" as="image" href="img/canopy.webp">
@@ -144,20 +144,27 @@ html.intro-on,html.intro-on body{background:#0e0416!important}   /* dark behind 
   /* Each word is made like the ghost's "Boo!": only soft smoke specks (no solid letters) plus a faint hazy
      glow. The specks drift together into the word, hold briefly, then float up and apart. */
   // letters drawn one by one with a little extra space, so neighbours don't merge in the smoke
-  const GAP=.055;
+  const GAP=.085;
   function spaced(x,word,cx,cy,fs){const ws=[...word].map(ch=>x.measureText(ch).width),tot=ws.reduce((a,b)=>a+b,0)+GAP*fs*(ws.length-1);
     let px=cx-tot/2;x.textAlign='left';[...word].forEach((ch,i)=>{x.fillText(ch,px,cy);px+=ws[i]+GAP*fs});return tot}
   function wisps(word){
     const oc=document.createElement('canvas'),o=oc.getContext('2d');
     let fs=Math.min(100,W*.25);const setF=x=>{x.font=`italic ${fs}px IntroFell, Georgia, serif`;x.textBaseline='middle'};
     setF(o);const width=()=>[...word].reduce((a,ch)=>a+o.measureText(ch).width,0)+GAP*fs*([...word].length-1);
-    let mw=width();if(mw>W*.72){fs*=W*.72/mw;setF(o);mw=width()}
+    let mw=width();if(mw>W*.8){fs*=W*.8/mw;setF(o);mw=width()}
     const w=Math.ceil(mw+fs*.8),h=Math.ceil(fs*1.6);oc.width=w;oc.height=h;
     setF(o);o.fillStyle='#fff';spaced(o,word,w/2,h/2+fs*.04,fs);
     const px=o.getImageData(0,0,w,h).data,pts=[],st=Math.max(2,Math.round(fs/31)),u=fs/64,E=1;
     const inside=(x,y)=>x>=0&&y>=0&&x<w&&y<h&&px[(y*w+x)*4+3]>110;
     // specks only well inside the strokes (not on their edges), so the holes in letters stay open
-    for(let y=0;y<h;y+=st)for(let x=0;x<w;x+=st)if(inside(x,y)&&inside(x-E,y)&&inside(x+E,y)&&inside(x,y-E)&&inside(x,y+E)&&Math.random()<.85)
+    // letters are made fatter towards the outside only: find the space around the letters (reachable from the
+    // edge of the picture) so the holes inside letters keep their size
+    const out=new Uint8Array(w*h),stack=[];
+    for(let x=0;x<w;x++){stack.push(x,0,x,h-1)}for(let y=0;y<h;y++){stack.push(0,y,w-1,y)}
+    while(stack.length){const y=stack.pop(),x=stack.pop(),i=y*w+x;if(x<0||y<0||x>=w||y>=h||out[i]||px[i*4+3]>110)continue;out[i]=1;stack.push(x+1,y,x-1,y,x,y+1,x,y-1)}
+    const G=Math.max(2,Math.round(fs*.028)),dirs=[[1,0],[-1,0],[0,1],[0,-1],[.7,.7],[-.7,.7],[.7,-.7],[-.7,-.7]];
+    const near=(x,y)=>dirs.some(([a,b])=>inside(Math.round(x+a*G),Math.round(y+b*G))||inside(Math.round(x+a*G/2),Math.round(y+b*G/2)));
+    for(let y=0;y<h;y+=st)for(let x=0;x<w;x+=st)if((inside(x,y)&&inside(x-E,y)&&inside(x+E,y)&&inside(x,y-E)&&inside(x,y+E)||out[y*w+x]&&near(x,y))&&Math.random()<.85)
       pts.push({x:x-w/2,y:y-h/2,dx:0,dy:0,
         r:(1.1+Math.random()*1.0)*u,d:Math.random(),p:Math.random()*6.28,vx:(Math.random()-.5)*16*u,vy:-(8+Math.random()*18)*u,bx:0,by:0});
     // the puff out: every speck is thrown outward from the word's centre
@@ -170,7 +177,7 @@ html.intro-on,html.intro-on body{background:#0e0416!important}   /* dark behind 
   }
   /* #slowintro in the address = test hook, plays 6x slower */
   const STEP=1.0,FORM=.6,HOLD=.3,SLOW=location.hash==='#slowintro'?6:1;let seq=[],t0=0,last=0,endAt=null,started=performance.now(),sparks=[];
-  function begin(list){seq=list.map((w,i)=>({w,s:i*STEP,data:null,dx:(i%2?1:-1)*W*(.03+Math.random()*.07),dy:(i%2?-1:1)*H*(.025+Math.random()*.045),rot:(i%2?1:-1)*(5+Math.random()*6)*Math.PI/180}));t0=performance.now();last=t0;requestAnimationFrame(frame)}
+  function begin(list){seq=list.map((w,i)=>({w,s:i*STEP,data:null,dx:(i%2?1:-1)*W*(.02+Math.random()*.045),dy:(i%2?-1:1)*H*(.025+Math.random()*.045),rot:(i%2?1:-1)*(5+Math.random()*6)*Math.PI/180}));t0=performance.now();last=t0;requestAnimationFrame(frame)}
   function puff(n,fs,it){for(let i=0;i<n;i++){const a=Math.random()*6.28,v=(70+Math.random()*170)*fs/64,ox=(Math.random()-.5)*fs*2.6,oy=(Math.random()-.5)*fs*.6;
     sparks.push({x:it.dx+ox*Math.cos(it.rot),y:it.dy+ox*Math.sin(it.rot)+oy,vx:Math.cos(a)*v,vy:Math.sin(a)*v-12,a:.9,r:(.7+Math.random()*1.1)*fs/64})}}
   function frame(now){
@@ -960,7 +967,7 @@ addEventListener('pageshow',e=>{if(e.persisted)showQuote()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)showQuote()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-40';
+const APP_VERSION='home-41';
 // a new version arrived: drop the saved pictures once so new art shows straight away
 try{const v=localStorage.getItem('home.ver');
   if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);
