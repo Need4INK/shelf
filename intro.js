@@ -11,7 +11,7 @@
   // words: last saved copy straight away; the file is checked quickly and remembered for next time
   const parse=t=>t.split(/\r?\n/).map(w=>w.trim()).filter(Boolean).slice(0,6);
   let words=null;try{words=JSON.parse(localStorage.getItem('intro.words')||'null')}catch(e){}
-  if(!Array.isArray(words)||!words.length)words=['Bibbidi','Bobbidi','Boo'];
+  if(!Array.isArray(words)||!words.length)words=['bibiddi','bobiddi','boo'];
   const fresh=fetch('intro.txt',{cache:'no-store'}).then(r=>r.ok?r.text():null).then(t=>{const w=t&&parse(t);if(w&&w.length){try{localStorage.setItem('intro.words',JSON.stringify(w))}catch(e){}return w}return null}).catch(()=>null);
   // a soft glowing dot, drawn once and reused for every wisp
   const dot=document.createElement('canvas');dot.width=dot.height=32;{const d=dot.getContext('2d'),g=d.createRadialGradient(16,16,0,16,16,16);g.addColorStop(0,'rgba(240,230,255,1)');g.addColorStop(.45,'rgba(215,195,255,.45)');g.addColorStop(1,'rgba(200,180,255,0)');d.fillStyle=g;d.fillRect(0,0,32,32)}
