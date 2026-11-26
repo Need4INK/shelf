@@ -18,7 +18,7 @@ async function loadBooks(){
   BOOKS=await Store.all();
   // books from before genres: guess one once (she can change it on the book page)
   const todo=BOOKS.filter(b=>!GENRES.includes(b.genre));todo.forEach(b=>{b.genre=guessGenre(b)});
-  renderLatest();renderGenres();
+  renderLatest();renderWish();renderGenres();
   for(const b of todo)await Store.put(b).catch(()=>{});
 }
 function renderLatest(){
@@ -30,10 +30,26 @@ function renderLatest(){
   document.getElementById('laWhen').textContent=b?whenText(b.added):'';
   setBook(document.getElementById('laBook'),b?{...b,title}:null);
 }
+/* ---------- Next to Collect: a random wishlist book, new each time Home opens ---------- */
+let wishId=null,lastWish=null;
+function pickWish(){const w=BOOKS.filter(b=>b.status==='wishlist');if(!w.length){wishId=null;return}
+  const pool=w.length>1?w.filter(b=>b.id!==lastWish):w;wishId=pool[Math.floor(Math.random()*pool.length)].id;lastWish=wishId}
+function renderWish(){
+  let b=BOOKS.find(x=>x.id===wishId&&x.status==='wishlist');if(!b){pickWish();b=BOOKS.find(x=>x.id===wishId)}
+  const title=b?(b.title||'Untitled'):'No wishes yet';
+  const tEl=document.getElementById('wiTitle');tEl.textContent=title;
+  tEl.style.fontSize='';let fs=35;while(tEl.scrollWidth>tEl.clientWidth&&fs>27){tEl.style.fontSize=--fs+'px'}
+  document.getElementById('wiAuthor').textContent=b?((b.authors||[]).join(', ')||'Unknown author'):'Add a book to your wishlist';
+  document.getElementById('wiNote').textContent=b?'On your wishlist':'';
+  setBook(document.getElementById('wiBook'),b?{...b,title}:null);
+}
+document.querySelectorAll('#nook .cr-title,#nook .cr-author,#nook .la-when,#wiBook').forEach(e=>{e.style.cursor='pointer';e.addEventListener('click',()=>{
+  if(wishId)location.href='book.html?id='+encodeURIComponent(wishId)})});
+addEventListener('pageshow',()=>{wishId=null});   // coming back to Home: a new teaser
 document.querySelectorAll('#reading .cr-title,#reading .cr-author,#reading .la-when,#laBook').forEach(e=>{e.style.cursor='pointer';e.addEventListener('click',()=>{
   const b=newestBook();if(b&&b.id)location.href='book.html?id='+encodeURIComponent(b.id)})});
 const booksP=loadBooks();booksP.then(()=>Store.fetchMissingCovers());   // keep a copy of every cover on the phone
-Store.onChange(loadBooks);{const ti=document.querySelector('#tabbar img');if(ti&&!ti.complete)ti.addEventListener('load',layoutCards);}layoutCards();if(document.fonts)document.fonts.ready.then(()=>{renderGenres();renderLatest()});addEventListener('pageshow',loadBooks);
+Store.onChange(loadBooks);{const ti=document.querySelector('#tabbar img');if(ti&&!ti.complete)ti.addEventListener('load',layoutCards);}layoutCards();if(document.fonts)document.fonts.ready.then(()=>{renderGenres();renderLatest();renderWish()});addEventListener('pageshow',loadBooks);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadBooks()});
 
 /* ---------- show Home only when it's ready: pictures decoded, fonts, books (max 2.5 s) ---------- */
@@ -66,7 +82,7 @@ addEventListener('pageshow',e=>{if(e.persisted)showQuote()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)showQuote()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-47';
+const APP_VERSION='home-48';
 // a new version arrived: drop the saved pictures once so new art shows straight away
 try{const v=localStorage.getItem('home.ver');
   if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);

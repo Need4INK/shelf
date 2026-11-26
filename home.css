@@ -60,7 +60,16 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 
 #nook{left:27px!important;top:954.6px;width:796px;height:228px;border-radius:33px;overflow:hidden;z-index:3;
  background:url(img/nook_fg.webp) right center/auto 100% no-repeat,url(img/nook_bg.webp) center/100% 100% no-repeat;
- filter:drop-shadow(0 4px 8px rgba(0,0,0,.55))}
+ filter:drop-shadow(0 4px 8px rgba(0,0,0,.55));font-family:"EB Garamond",Georgia,serif;color:#2a1410}
+/* Next to Collect: a random wishlist book, laid out like Latest Addition (same spots on the card) */
+#nook>*{position:absolute}
+#nook .la-head{left:103px;top:7.2%}
+#nook .hat{left:36px;top:6.9%;width:56px;height:17%}
+#nook .bk{left:38px;top:24.3%;width:var(--bk,143px)}
+#nook .la-head{color:#f1cf7c;text-shadow:0 2px 3px rgba(0,0,0,.8)}
+#nook .hat{filter:drop-shadow(0 0 1.5px rgba(241,207,124,.9)) drop-shadow(0 0 6px rgba(241,207,124,.35))}
+#nook .cr-title,#nook .cr-author,#nook .la-when{width:245px;text-shadow:0 2px 3px rgba(0,0,0,.8)}
+#nook .cr-title{left:205px;top:35.7%;color:#f6e2b0}#nook .cr-author{left:206px;top:54.6%;color:#e6cfa2}#nook .la-when{left:206px;top:71.2%;color:#c9a3c4}
 #genres{left:23.4px!important;top:1192.6px;width:803.2px;height:238.8px;box-sizing:border-box;z-index:3;
  border-style:solid;border-width:50.2px 0 20.1px;border-image:url(img/genres_bg.webp) 77 0 31 0 fill stretch;
  font-family:"EB Garamond",Georgia,serif;color:#fbf1da}

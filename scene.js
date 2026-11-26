@@ -23,7 +23,7 @@ function layoutCards(){
   const c1=BAR+G,c2=c1+H+G,c3=c2+H+G;
   const r=document.getElementById('reading'),hb=H*259/240;
   r.style.top=(c1-7*hb/259)+'px';r.style.height=hb+'px';r.style.setProperty('--bk',(143*hb/246)+'px');
-  const n=document.getElementById('nook');n.style.top=c2+'px';n.style.height=H+'px';
+  const n=document.getElementById('nook');n.style.top=c2+'px';n.style.height=H+'px';n.style.setProperty('--bk',(143*hb/246)+'px');
   const g=document.getElementById('genres'),f=.4014,he=H+27*f;
   g.style.top=(c3-10*f)+'px';g.style.height=he+'px';
   const band=he-6.8-50.2,tt=(band-146.9)/2,sc=Math.min(1,(band-12)/146.9);   // centre tiles; shrink a little on small phones
