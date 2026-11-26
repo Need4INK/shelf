@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-80">
+<meta name="app-version" content="home-81">
 <script>try{document.documentElement.classList.add(sessionStorage.getItem('intro.shown')==='1'?'back':'intro-on')}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <link rel="preload" as="image" href="img/frame.webp" fetchpriority="high">
@@ -42,6 +42,8 @@
   const fit=()=>document.documentElement.style.setProperty('--S',Math.max(innerWidth/852,(innerHeight-(p.offsetHeight||0))/1810));
   fit();addEventListener('resize',fit);
   // tapping Home when we came from Home: go back, so the phone shows the Home it kept in memory (no rebuild)
+  // iPhone only shows the pressed glow when the page listens for touches
+  document.addEventListener('touchstart',()=>{},{passive:true});
   document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#tabbar a[aria-label="Home"]');if(!a)return;
     let r=null;try{r=new URL(document.referrer)}catch(err){}
     if(r&&r.origin===location.origin&&/\/(index\.html)?$/.test(r.pathname)&&history.length>1){e.preventDefault();history.back()}});
@@ -134,7 +136,7 @@
   <div class="in">
     <img src="img/tabbar.webp" width="851" height="171" alt="">
     <img class="barbook" src="img/bar_book.webp" alt="">
-    <a class="tb" style="left:4%" aria-label="Home" aria-current="page"></a>
+    <a class="tb" style="left:0" aria-label="Home" aria-current="page"></a>
     <a class="tb" style="left:78%" href="backup.html" aria-label="Backup"></a>
   </div>
 </nav>
