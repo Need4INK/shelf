@@ -96,11 +96,6 @@ html.intro-on,html.intro-on body{background:#0e0416!important}   /* dark behind 
 #intro canvas{position:absolute;inset:0;width:100%;height:100%}
 #intro.out{background-color:rgba(14,4,22,0);pointer-events:none}   /* only the dark fades; the last word finishes its puff over Home */
 
-/* When the app goes to the background, iOS keeps a picture of the screen and shows it on the next launch before the
-   page loads. Going dark first makes that picture match the launch screen and the intro (no lighter flash). */
-body::after{content:"";position:fixed;left:0;right:0;top:calc(-1*env(safe-area-inset-top,0px));bottom:calc(-1*env(safe-area-inset-bottom,0px));
- background:#0e0416;opacity:0;pointer-events:none;z-index:200;transition:opacity .3s ease}
-html.asleep body::after{opacity:1;transition:none}
 
 #tabbar .barbook{position:absolute;left:19.21%;width:61.57%;height:auto;bottom:23.98%;pointer-events:none}   /* 163..688 of 851: centred on the screen, clear of Home and Backup; bottom on 130 of 171, top above the bar */
 #tabbar .bookmagic{position:absolute;left:-1.6%;width:103.2%;bottom:23.98%;pointer-events:none}

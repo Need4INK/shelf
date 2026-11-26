@@ -93,11 +93,10 @@ setTimeout(()=>fetch('quotes.json').then(r=>r.json()).then(a=>{const first=!QUOT
 // a new saying each time Home is entered: app opened, or back from another screen / app
 addEventListener('pageshow',e=>{if(e.persisted)showQuote()});
 if(document.fonts)document.fonts.ready.then(()=>{const q=document.getElementById('quote');if(q.dataset.t)fitQuote(q)});
-document.addEventListener('visibilitychange',()=>{document.documentElement.classList.toggle('asleep',document.hidden);if(!document.hidden)showQuote()});
-addEventListener('pagehide',()=>document.documentElement.classList.add('asleep'));addEventListener('pageshow',()=>document.documentElement.classList.remove('asleep'));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)showQuote()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-73';
+const APP_VERSION='home-74';
 // a new version arrived: drop the saved pictures once so new art shows straight away
 try{const v=localStorage.getItem('home.ver');
   if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);
