@@ -97,7 +97,7 @@ document.addEventListener('visibilitychange',()=>{document.documentElement.class
 addEventListener('pagehide',()=>document.documentElement.classList.add('asleep'));addEventListener('pageshow',()=>document.documentElement.classList.remove('asleep'));
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-69';
+const APP_VERSION='home-70';
 // a new version arrived: drop the saved pictures once so new art shows straight away
 try{const v=localStorage.getItem('home.ver');
   if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);

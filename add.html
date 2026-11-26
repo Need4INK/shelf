@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416}</style>
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a11">
+<meta name="app-version" content="a12">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -94,7 +94,7 @@ main{padding-bottom:140px}
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a11</p>
+  <p style="font-size:12px;opacity:.5">a12</p>
 </header>
 <main>
   <section class="panel">
@@ -410,7 +410,7 @@ const loadBooks = () => Store.all().then(a => { books = a.sort((x, y) => (y.adde
 loadBooks(); Store.onChange(loadBooks);
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a11';
+const VERSION = 'a12';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
