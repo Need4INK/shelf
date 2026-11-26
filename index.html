@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-39">
+<meta name="app-version" content="home-40">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <link rel="preload" as="image" href="img/frame.webp" fetchpriority="high">
 <link rel="preload" as="image" href="img/canopy.webp">
@@ -143,23 +143,29 @@ html.intro-on,html.intro-on body{background:#0e0416!important}   /* dark behind 
   const dot=document.createElement('canvas');dot.width=dot.height=32;{const d=dot.getContext('2d'),g=d.createRadialGradient(16,16,0,16,16,16);g.addColorStop(0,'rgba(240,230,255,1)');g.addColorStop(.45,'rgba(215,195,255,.45)');g.addColorStop(1,'rgba(200,180,255,0)');d.fillStyle=g;d.fillRect(0,0,32,32)}
   /* Each word is made like the ghost's "Boo!": only soft smoke specks (no solid letters) plus a faint hazy
      glow. The specks drift together into the word, hold briefly, then float up and apart. */
+  // letters drawn one by one with a little extra space, so neighbours don't merge in the smoke
+  const GAP=.055;
+  function spaced(x,word,cx,cy,fs){const ws=[...word].map(ch=>x.measureText(ch).width),tot=ws.reduce((a,b)=>a+b,0)+GAP*fs*(ws.length-1);
+    let px=cx-tot/2;x.textAlign='left';[...word].forEach((ch,i)=>{x.fillText(ch,px,cy);px+=ws[i]+GAP*fs});return tot}
   function wisps(word){
     const oc=document.createElement('canvas'),o=oc.getContext('2d');
-    let fs=Math.min(100,W*.25);o.font=`italic ${fs}px IntroFell, Georgia, serif`;
-    let mw=o.measureText(word).width;if(mw>W*.72){fs*=W*.72/mw;mw=W*.72}
+    let fs=Math.min(100,W*.25);const setF=x=>{x.font=`italic ${fs}px IntroFell, Georgia, serif`;x.textBaseline='middle'};
+    setF(o);const width=()=>[...word].reduce((a,ch)=>a+o.measureText(ch).width,0)+GAP*fs*([...word].length-1);
+    let mw=width();if(mw>W*.72){fs*=W*.72/mw;setF(o);mw=width()}
     const w=Math.ceil(mw+fs*.8),h=Math.ceil(fs*1.6);oc.width=w;oc.height=h;
-    const setF=x=>{x.font=`italic ${fs}px IntroFell, Georgia, serif`;x.textAlign='center';x.textBaseline='middle'};
-    setF(o);o.fillStyle='#fff';o.fillText(word,w/2,h/2+fs*.04);
-    const px=o.getImageData(0,0,w,h).data,pts=[],st=Math.max(2,Math.round(fs/31)),u=fs/64;   // same density as the ghost's Boo
-    for(let y=0;y<h;y+=st)for(let x=0;x<w;x+=st)if(px[(y*w+x)*4+3]>110&&Math.random()<.78)
-      pts.push({x:x-w/2,y:y-h/2,sx:(Math.random()-.5)*fs*1.5,sy:(Math.random()-.3)*fs*.9,dx:0,dy:0,
+    setF(o);o.fillStyle='#fff';spaced(o,word,w/2,h/2+fs*.04,fs);
+    const px=o.getImageData(0,0,w,h).data,pts=[],st=Math.max(2,Math.round(fs/31)),u=fs/64,E=1;
+    const inside=(x,y)=>x>=0&&y>=0&&x<w&&y<h&&px[(y*w+x)*4+3]>110;
+    // specks only well inside the strokes (not on their edges), so the holes in letters stay open
+    for(let y=0;y<h;y+=st)for(let x=0;x<w;x+=st)if(inside(x,y)&&inside(x-E,y)&&inside(x+E,y)&&inside(x,y-E)&&inside(x,y+E)&&Math.random()<.85)
+      pts.push({x:x-w/2,y:y-h/2,dx:0,dy:0,
         r:(1.1+Math.random()*1.0)*u,d:Math.random(),p:Math.random()*6.28,vx:(Math.random()-.5)*16*u,vy:-(8+Math.random()*18)*u,bx:0,by:0});
     // the puff out: every speck is thrown outward from the word's centre
     for(const q of pts){const L=Math.hypot(q.x,q.y*1.6)+1,sp=fs*(2.2+Math.random()*3.2),j=(Math.random()-.5)*.9,ca=Math.cos(j),sa=Math.sin(j),ux=q.x/L,uy=q.y*1.6/L;
       q.bx=(ux*ca-uy*sa)*sp;q.by=(ux*sa+uy*ca)*sp-fs*.6}
-    // faint hazy glow of the word (shadow only, no solid letters)
+    // faint hazy glow of the word (shadow only, no solid letters), kept tight so it doesn't fill the holes
     const hc=document.createElement('canvas'),hx=hc.getContext('2d'),pad=Math.ceil(fs*.6);hc.width=w+pad*2;hc.height=h+pad*2;
-    setF(hx);hx.shadowColor='rgba(205,185,255,1)';hx.shadowBlur=fs*.32;hx.shadowOffsetX=20000;hx.fillStyle='#fff';hx.fillText(word,hc.width/2-20000,hc.height/2+fs*.04);
+    setF(hx);hx.shadowColor='rgba(205,185,255,1)';hx.shadowBlur=fs*.18;hx.shadowOffsetX=20000;hx.fillStyle='#fff';spaced(hx,word,hc.width/2-20000,hc.height/2+fs*.04,fs);
     return {pts,fs,halo:hc};
   }
   /* #slowintro in the address = test hook, plays 6x slower */
@@ -182,17 +188,17 @@ html.intro-on,html.intro-on body{background:#0e0416!important}   /* dark behind 
       if(kw>0&&!it.puffed){it.puffed=1;puff(40,D.fs,it)}                 // the little sparkle burst as it goes out in a puff
       c.save();c.translate(W/2+it.dx,H*.46+it.dy);c.rotate(it.rot);
       // hazy glow behind the specks
-      const ha=Math.min(1,lt/FORM)**2*Math.max(0,1-kw/.7)*.17+(kw>0&&kw<.28?Math.sin(kw/.28*Math.PI)*.5:0);   // + soft flash as it puffs out
+      const ha=Math.min(1,lt/FORM)**2*Math.max(0,1-kw/.7)*.12+(kw>0&&kw<.28?Math.sin(kw/.28*Math.PI)*.5:0);   // + soft flash as it puffs out
       if(ha>.01){c.globalAlpha=ha;c.drawImage(D.halo,-D.halo.width/2,-D.halo.height/2)}
       for(const q of D.pts){
         const uq=Math.max(0,Math.min(1,(lt-q.d*FORM*.5)/(FORM*.55))),e=uq*uq*(3-2*uq);   // each puff fades in on the spot, out of thin air
         const k=Math.max(0,kw-q.d*.12);                                                // ... and goes out in a puff, nearly all at once
         if(k>0){const f=Math.exp(-k*4.5);q.dx+=q.bx*f*dt;q.dy+=q.by*f*dt;                 // burst outward, slowing quickly
           q.dy+=dt*q.vy*k*1.4;q.dx+=dt*(q.vx*k+Math.sin(T*1.8+q.p+q.y*.06/u)*(3+k*8)*u)}   // then drift like the ghost's Boo
-        const wob=Math.sin(T*1.9+q.p)*D.fs*.035,lift=-Math.max(0,lt-FORM*.6)*D.fs*.05*(.5+q.d);   // keeps drifting gently, like the ghost's Boo
+        const wob=Math.sin(T*1.9+q.p)*D.fs*.016,lift=-Math.max(0,lt-FORM*.6)*D.fs*.05*(.5+q.d);   // keeps drifting gently, like the ghost's Boo
         const a=e*(k>0?(k<.07?1+k/.07*.5:1.5*Math.max(0,1-(k-.07)/.62))/(1+k*1.8):1);if(a<=.01)continue;   // brief brightening, then fade
-        const r=q.r*(1+k*2.6)*3.1;
-        c.globalAlpha=.34*a;c.drawImage(dot,q.x+q.dx+wob-r,q.y+q.dy+lift-r,r*2,r*2);
+        const r=q.r*(1+k*2.6)*(k>0?3.1:2.4);      // smaller while the word is shown (open holes), puffier as it bursts
+        c.globalAlpha=.42*a;c.drawImage(dot,q.x+q.dx+wob-r,q.y+q.dy+lift-r,r*2,r*2);
       }
       c.restore();
     }
@@ -954,7 +960,7 @@ addEventListener('pageshow',e=>{if(e.persisted)showQuote()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)showQuote()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-39';
+const APP_VERSION='home-40';
 // a new version arrived: drop the saved pictures once so new art shows straight away
 try{const v=localStorage.getItem('home.ver');
   if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);
