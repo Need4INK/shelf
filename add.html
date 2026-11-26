@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a1">
+<meta name="app-version" content="a2">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -61,14 +61,20 @@ dt{color:var(--mute)}dd{margin:0;overflow-wrap:anywhere}
 .form{display:grid;gap:8px;margin-top:12px}
 .hidden{display:none!important}
 a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
+#tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom,0px);
+ background:linear-gradient(transparent,#0d0310 calc(100% - env(safe-area-inset-bottom,0px)))}
+#tabbar .in{position:relative;width:min(100vw,640px);margin:0 auto}
+#tabbar img{display:block;width:100%;height:auto;pointer-events:none}
+#tabbar .tb{position:absolute;top:12%;width:18%;height:76%;border-radius:22px;-webkit-tap-highlight-color:transparent}
+#tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.25),transparent)}
+main{padding-bottom:140px}
 </style>
 </head>
 <body>
 <header>
-  <a href="./" style="display:inline-block;margin-bottom:6px;color:inherit;opacity:.8;text-decoration:none;font-size:15px">&larr; Home</a>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a1</p>
+  <p style="font-size:12px;opacity:.5">a2</p>
 </header>
 <main>
   <section class="panel">
@@ -94,6 +100,13 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 
 </main>
 
+<nav id="tabbar" aria-label="Sections">
+  <div class="in">
+    <img src="img/tabbar.webp" alt="">
+    <a class="tb" style="left:4%" href="./" aria-label="Home"></a>
+    <a class="tb" style="left:78%" href="backup.html" aria-label="Backup"></a>
+  </div>
+</nav>
 <script src="store.js"></script>
 <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
 <script>
@@ -375,7 +388,7 @@ const loadBooks = () => Store.all().then(a => { books = a.sort((x, y) => (y.adde
 loadBooks(); Store.onChange(loadBooks);
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a1';
+const VERSION = 'a2';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
