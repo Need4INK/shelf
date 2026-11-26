@@ -22,7 +22,9 @@ self.addEventListener('fetch', e => {
     if (ASSET.test(url.pathname)) {
       e.respondWith(caches.open(CACHE).then(async c => {
         const hit = await c.match(key);
-        const net = fetch(req).then(res => { if (res.ok) c.put(key, res.clone()); return res; }).catch(() => null);
+        // 'no-cache': always ask the server if the picture changed (cheap when it hasn't), so a new picture
+        // isn't held back by the phone's 10-minute web cache
+        const net = fetch(req, { cache: 'no-cache' }).then(res => { if (res.ok) c.put(key, res.clone()); return res; }).catch(() => null);
         if (hit) { e.waitUntil(net); return hit; }
         return (await net) || Response.error();
       }));
