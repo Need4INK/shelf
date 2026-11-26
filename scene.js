@@ -322,20 +322,21 @@ let emitAcc=0,fxDirty=false;
    its hands run with the fast day and it vanishes when the day stops. Drawn in the photo's own units (case radius 120). */
 const tcc=document.getElementById('tclock'),tc=tcc.getContext('2d'),TCX=320,TCY=240,TCW=220,TCH=210;
 let tcD=1;window.__tcResize=d=>{tcD=d;tcc.width=Math.round(TCW*d);tcc.height=Math.round(TCH*d)};window.__tcResize(Math.min(devicePixelRatio||1,3)*S);
-const CK=.39,FOOT=[425,439],CLK=[425,439-145*CK],CLR=46;   // feet on the shelf; centre of the case
+const CK=.39,FOOT=[395,439],CLK=[395,439-145*CK],CLR=46;   // feet on the shelf; centre of the case
 let clk={a:0,on:false,t:0,drawn:false};
 function clockFrame(dt){
   const on=wandCycle&&mode==='demo'&&!scrubbing;
   if(on!==clk.on){clk.on=on;
     if(on){for(let i=0;i<20;i++)sparkle(CLK[0]+(Math.random()-.5)*60,CLK[1]+(Math.random()-.5)*60,i<10);parts.push({k:'f',x:CLK[0],y:CLK[1],life:0,max:.4})}
-    else if(clk.a>0){for(let i=0;i<22;i++)sparkle(CLK[0]+(Math.random()-.5)*CLR*1.6,CLK[1]+(Math.random()-.5)*CLR*1.6,i<12);parts.push({k:'f',x:CLK[0],y:CLK[1],life:0,max:.4})}}
-  clk.a=on?Math.min(1,clk.a+dt/.55):Math.max(0,clk.a-dt/.45);clk.t+=dt;
+  }
+  const was=clk.a;clk.a=on?Math.min(1,clk.a+dt/.55):Math.max(0,clk.a-dt/.55);clk.t+=dt;
+  if(!on&&was>0&&clk.a===0){for(let i=0;i<20;i++)sparkle(CLK[0]+(Math.random()-.5)*60,CLK[1]+(Math.random()-.5)*60,i<10);parts.push({k:'f',x:CLK[0],y:CLK[1],life:0,max:.4})}   // shrinks back to its feet, then the puff: appearing in reverse
   if(on&&clk.a>.6&&Math.random()<dt*4){const a=Math.random()*6.28;sparkle(CLK[0]+Math.cos(a)*CLR,CLK[1]+Math.sin(a)*CLR,false)}
   if(clk.a>0||clk.drawn){tc.setTransform(tcD,0,0,tcD,0,0);tc.clearRect(0,0,TCW,TCH);clk.drawn=clk.a>0;
     if(clk.a>0){tc.translate(-TCX,-TCY);drawClock(tc)}}
 }
 function drawClock(c){
-  const u=clk.a,k=clk.on?easeBack(u):u;
+  const u=clk.a,k=easeBack(u);
   c.save();c.globalAlpha=Math.min(1,u*1.6);
   // glow on the book behind
   let g=c.createRadialGradient(CLK[0],CLK[1],10,CLK[0],CLK[1],90);g.addColorStop(0,`rgba(214,160,255,${(.3+.1*Math.sin(clk.t*3))*u})`);g.addColorStop(1,'rgba(160,90,255,0)');
@@ -382,14 +383,14 @@ function drawClock(c){
   c.fillStyle=g;c.beginPath();c.arc(FX,FY,FR,0,7);c.fill();
   c.fillStyle='#24201d';
   for(let i=0;i<60;i++){const a=i*Math.PI/30;c.beginPath();c.arc(FX+Math.sin(a)*FR*.6,FY-Math.cos(a)*FR*.6,i%5?1.4:2.4,0,7);c.fill()}
-  c.font='600 30px "EB Garamond", Georgia, serif';c.textAlign='center';c.textBaseline='middle';
+  c.font='700 31px "EB Garamond", Georgia, serif';c.textAlign='center';c.textBaseline='middle';
   for(let i=1;i<=12;i++){const a=i*Math.PI/6;c.fillText(i,FX+Math.sin(a)*FR*.8,FY-Math.cos(a)*FR*.8+1)}
   // hands follow the fast day
   const h=demoH,ha=(h%12)/12*Math.PI*2,ma=(h%1)*Math.PI*2;
   const hand=(a,len,w)=>{c.save();c.translate(FX,FY);c.rotate(a);c.fillStyle='#14100e';c.beginPath();
     c.moveTo(-w*.5,14);c.lineTo(-w,0);c.lineTo(-w*.45,-len*.78);c.lineTo(-w*1.1,-len*.86);c.lineTo(0,-len);c.lineTo(w*1.1,-len*.86);c.lineTo(w*.45,-len*.78);c.lineTo(w,0);c.lineTo(w*.5,14);c.closePath();c.fill();c.restore()};
-  hand(ha,FR*.5,4.2);hand(ma,FR*.74,3.2);
-  ball(FX,FY,7);
+  hand(ha,FR*.52,7.5);hand(ma,FR*.78,5.5);
+  ball(FX,FY,9);
   // glass
   g=c.createLinearGradient(FX-FR,FY-FR,FX+FR*.3,FY+FR*.3);g.addColorStop(0,'rgba(255,255,255,.38)');g.addColorStop(.45,'rgba(255,255,255,0)');
   c.fillStyle=g;c.beginPath();c.arc(FX,FY,FR,0,7);c.fill();
