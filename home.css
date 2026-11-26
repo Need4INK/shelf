@@ -87,7 +87,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 #clock{top:452px;left:60px;width:732px;height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;
  font-family:"IM Fell English SC",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.35),0 2px 2px #000;pointer-events:none}
 #clock{z-index:1;pointer-events:auto;cursor:pointer}   /* under the wand's tap area */
-#quote{font-family:"IM Fell English",Georgia,serif;max-width:600px;text-align:center;font-size:30px;line-height:1.12;padding:0 8px;transition:opacity .35s}
+#quote{font-family:"IM Fell English",Georgia,serif;max-width:600px;text-align:center;white-space:nowrap;font-size:30px;line-height:1.12;padding:0 8px;transition:opacity .35s}
 /* ---------- launch intro: words pop in as glowing wisps and drift away like the ghost's "Boo!" ---------- */
 @font-face{font-family:"IntroFell";font-style:italic;src:url(fonts/IMFellEnglishItalic.woff2) format("woff2");font-display:block}
 #intro{position:fixed;left:0;right:0;top:calc(-1*env(safe-area-inset-top,0px));bottom:calc(-1*env(safe-area-inset-bottom,0px));z-index:100;background:#0e0416;transition:background-color 1.8s cubic-bezier(.45,0,.25,1)}

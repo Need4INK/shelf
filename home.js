@@ -67,22 +67,35 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadBooks(
 
 /* ---------- banner: a random magical saying (her list of 300, quotes.json) ---------- */
 let QUOTES=null;
-function fitQuote(q){let f=30;q.style.fontSize=f+'px';while(q.scrollHeight>80&&f>20){q.style.fontSize=--f+'px'}}
+/* one line if it fits; otherwise two balanced lines, each with at least two words; shrinks the font only if needed */
+const qCtx=document.createElement('canvas').getContext('2d');
+function fitQuote(q){
+  const text=(q.dataset.t||q.textContent).trim(),words=text.split(/\s+/),ff=getComputedStyle(q).fontFamily,maxW=584;
+  const wd=t=>qCtx.measureText(t).width;let best=null,f=30;
+  for(;f>=20;f--){qCtx.font=f+'px '+ff;
+    if(wd(text)<=maxW){best=[text];break}
+    let pick=null;for(let k=2;k<=words.length-2;k++){const a=words.slice(0,k).join(' '),b=words.slice(k).join(' '),m=Math.max(wd(a),wd(b));if(!pick||m<pick.m)pick={m,a,b}}
+    if(pick&&pick.m<=maxW){best=[pick.a,pick.b];break}}
+  if(!best){f=20;best=[text]}
+  q.style.fontSize=f+'px';q.textContent='';
+  best.forEach((t,i)=>{if(i)q.appendChild(document.createElement('br'));q.appendChild(document.createTextNode(t))});
+}
 function showQuote(){
   if(!QUOTES||!QUOTES.length)return;
   let last=-1;try{last=+(localStorage.getItem('home.quote')??-1)}catch(e){}
   let i;do{i=Math.floor(Math.random()*QUOTES.length)}while(QUOTES.length>1&&i===last);   // never the same one twice in a row
   try{localStorage.setItem('home.quote',i)}catch(e){}
   const q=document.getElementById('quote');q.style.opacity=0;
-  setTimeout(()=>{q.textContent=QUOTES[i];fitQuote(q);q.style.opacity=1},q.textContent?350:0);
+  setTimeout(()=>{q.dataset.t=QUOTES[i];fitQuote(q);q.style.opacity=1},q.textContent?350:0);
 }
 setTimeout(()=>fetch('quotes.json').then(r=>r.json()).then(a=>{QUOTES=a;showQuote()}).catch(()=>{}),300);   // after the scene is up
 // a new saying each time Home is entered: app opened, or back from another screen / app
 addEventListener('pageshow',e=>{if(e.persisted)showQuote()});
+if(document.fonts)document.fonts.ready.then(()=>{const q=document.getElementById('quote');if(q.dataset.t)fitQuote(q)});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)showQuote()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-52';
+const APP_VERSION='home-53';
 // a new version arrived: drop the saved pictures once so new art shows straight away
 try{const v=localStorage.getItem('home.ver');
   if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);
