@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <style>html{background:#0e0416;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
-<meta name="app-version" content="library-2">
+<meta name="app-version" content="library-3">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,11 +13,13 @@
 <style>
 html,body{margin:0;min-height:100%;background:#0e0416;color:#f1dcc0;font-family:"EB Garamond",Georgia,serif}
 body{min-height:100vh;box-sizing:border-box;background:radial-gradient(ellipse at 50% 0%,#3a1838 0%,#1a0a1e 55%,#0e0416 100%) fixed;
- padding:calc(env(safe-area-inset-top,0px) + 14px) 0 calc(env(safe-area-inset-bottom,0px) + 140px)}
+ padding:calc(env(safe-area-inset-top,0px) + 14px) 0 0;height:100vh;overflow:hidden}
 h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.3),0 2px 2px #000;margin:2px 0 0;text-align:center}
 .sub{text-align:center;opacity:.75;font-size:17px;margin:0 0 4px}
 /* the bookcase */
-.case{margin:0 8px;padding-top:0}
+.case{position:fixed;left:0;right:0;top:var(--top,180px);bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;
+ box-sizing:border-box;padding:24px 8px calc(171px / 851 * 824 * var(--S,.4577) + env(safe-area-inset-bottom,0px) + 12px);
+ -webkit-mask-image:linear-gradient(transparent 0,rgba(0,0,0,.35) 14px,#000 38px);mask-image:linear-gradient(transparent 0,rgba(0,0,0,.35) 14px,#000 38px)}
 .shelf{position:relative;box-sizing:border-box;min-height:calc(var(--bw,110px) * 179 / 151 + 26px);display:grid;grid-template-columns:repeat(var(--per,3),1fr);gap:0 2px;align-items:end;padding:6px 2px 0;margin-bottom:26px;
  background:radial-gradient(ellipse at 50% 100%,rgba(255,170,80,.12),transparent 70%)}
 .shelf::after{content:"";position:absolute;left:-8px;right:-8px;bottom:-9px;height:16px;border-radius:2px;
@@ -31,7 +33,7 @@ h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shado
 .ttl{width:100%;margin:0 0 3px;font:600 15px/1.1 "EB Garamond",Georgia,serif;text-align:center;color:#f6dcb4;
  text-shadow:0 1px 2px #000,0 0 6px rgba(0,0,0,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* thin gold rule with a small star, under the book count */
-.rule{display:flex;align-items:center;justify-content:center;gap:8px;width:62%;margin:2px auto 8px;opacity:.75}
+.rule{display:flex;align-items:center;justify-content:center;gap:8px;width:62%;margin:2px auto 0;opacity:.75}
 .rule::before,.rule::after{content:"";flex:1;height:1px}
 .rule::before{background:linear-gradient(90deg,transparent,#d9a95c)}
 .rule::after{background:linear-gradient(90deg,#d9a95c,transparent)}
@@ -70,9 +72,11 @@ h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shado
 </style>
 </head>
 <body>
+<header id="hdr">
 <h1 id="title">My Library</h1>
 <p class="sub" id="count">&nbsp;</p>
 <div class="rule" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg></div>
+</header>
 <div class="case" id="case"></div>
 <nav id="tabbar" aria-label="Sections">
   <div class="in">
@@ -117,8 +121,9 @@ function render() {
 // book size: as big as fits the width, but small enough that 3 shelves fit above the bottom bar
 function sizeBooks() {
   const c = $('case'), bar = document.querySelector('#tabbar .in').getBoundingClientRect();
-  const byW = Math.min(151, (c.clientWidth - 4 - (PER - 1) * 2) / PER * 1.06);   // the book picture has ~5% clear edge each side
-  const byH = ((bar.top - c.getBoundingClientRect().top - 8 - 9 - 2 * 26) / 3 - 26) * 151 / 179;
+  c.style.setProperty('--top', Math.round($('hdr').getBoundingClientRect().bottom) + 'px');
+  const byW = Math.min(151, (c.clientWidth - 16 - 4 - (PER - 1) * 2) / PER * 1.06);   // the book picture has ~5% clear edge each side
+  const byH = ((bar.top - c.getBoundingClientRect().top - 24 - 9 - 6 - 2 * 26) / 3 - 26) * 151 / 179;
   c.style.setProperty('--bw', Math.floor(Math.max(70, Math.min(byW, byH))) + 'px');
 }
 sizeBooks(); addEventListener('resize', sizeBooks);
