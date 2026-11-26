@@ -4,7 +4,7 @@
 (function(){
   const ov=document.getElementById('intro');
   let seen=false;try{seen=sessionStorage.getItem('intro.shown')==='1';sessionStorage.setItem('intro.shown','1')}catch(e){}
-  if(seen||matchMedia('(prefers-reduced-motion: reduce)').matches){ov.remove();return}
+  if(seen||matchMedia('(prefers-reduced-motion: reduce)').matches){ov.remove();document.documentElement.classList.remove('intro-on');return}
   document.documentElement.classList.add('intro-on');
   const cv=ov.querySelector('canvas'),c=cv.getContext('2d'),D=Math.min(devicePixelRatio||1,2);
   let W=0,H=0;const size=()=>{W=innerWidth;H=innerHeight;cv.width=W*D;cv.height=H*D;c.setTransform(D,0,0,D,0,0)};size();addEventListener('resize',size);
