@@ -21,7 +21,36 @@
   const CH='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',P=[];let last=performance.now(),acc=0,run=true,boost=0;
   // touching the middle half of the book: a burst of letters, then it calms back down
   const hit=document.createElement('div');hit.className='bookhit';hit.setAttribute('role','button');hit.setAttribute('aria-label','Magic book');cv.after(hit);
-  hit.addEventListener('pointerdown',e=>{e.preventDefault();boost=1;for(let i=0;i<18;i++)spawn()});
+  hit.addEventListener('pointerdown',e=>{e.preventDefault();say()});
+  /* the tap: six steam letters n,o,i,d,o,i are born from the pages and move exactly like all the others (nothing steers
+     them). Their start points, speeds and tilts are worked out backwards, so their ordinary paths happen to cross
+     the line "noi doi" at the same moment, upright and moving up together; then they slowly part and fade. */
+  const WORD='noi doi',LAM=-Math.log(.992)*60,SZ=15/B,VM=-20;let Wd=[],wT0=0;
+  // steam motion in closed form (same as move(): drag on vx, rise speeding up, side sway, steady spin)
+  const sway=(t,sw)=>-4/1.3*(Math.cos(t*1.3+sw)-Math.cos(sw));
+  function say(){if(Wd.length)return;const fs=B*SZ*1.15;c.font=`italic ${fs}px "IM Fell English",Georgia,serif`;
+    const ws=[...WORD].map(ch=>c.measureText(ch).width*(ch===' '?1.7:1.05)),tot=ws.reduce((a,b)=>a+b,0),mid=bx+bw/2;
+    let x=mid-tot/2;const ty=H-bh*1.55,L=[];
+    [...WORD].forEach((ch,i)=>{const tx=x+ws[i]/2;x+=ws[i];if(ch===' ')return;
+      const vm=-(19+Math.random()*7),sw=Math.random()*6.28,side=Math.sign(tx-mid)||1;let a=0,T=3,x0=tx,y0=H,vx0=0;
+      for(let k=0;k<4;k++){y0=H-bh*(.5+.22*a);const D=y0-ty;T=(-vm-Math.sqrt(vm*vm-4.4*D))/2.2;   // y0+v0·T−1.1T² = ty with speed vm at T
+        vx0=side*(4+a*10)+(Math.random()-.5)*4;x0=tx-vx0*(1-Math.exp(-LAM*T))/LAM-sway(T,sw);a=Math.min(.9,Math.abs((x0-mid)/(bw*.42)))}
+      const vr=(Math.random()-.5)*.12;
+      L.push({i:L.length,ch,x0,y0,vx0,vy0:vm+2.2*T,T,sw,vr,r0:-vr*T,life:T/.3})});
+    const Tm=Math.max(...L.map(q=>q.T))+.05;L.forEach(q=>q.d=Tm-q.T);Wd=L;wT0=performance.now()}
+  function drawWord(){if(!Wd.length)return;const now=(performance.now()-wT0)/1000;let alive=0;
+    for(const q of Wd){const t=now-q.d;if(t<0){alive++;continue}if(t>=q.life)continue;alive++;
+      const x=q.x0+q.vx0*(1-Math.exp(-LAM*t))/LAM+sway(t,q.sw),y=q.y0+q.vy0*t-1.1*t*t,r=q.r0+q.vr*t,k=t/q.life;
+      // the eye-catcher: as the word lines up, a warm shimmer runs once along it, left to right
+      const g=Math.exp(-((((t-q.T)-.1-q.i*.09)/.42)**2));
+      const al=Math.min(1,Math.min(1,t/.5)*(1-k)**1.3+.55*g);if(al<=.01)continue;
+      const w=B*2*SZ*(1+k*.45+.08*g);c.save();c.translate(x,y);
+      if(g>.02){c.globalAlpha=.5*g;c.drawImage(HALO,-w*.75,-w*.75,w*1.5,w*1.5)}
+      c.rotate(r);c.globalAlpha=al;c.drawImage(sprite(q.ch),-w/2,-w/2,w,w);
+      if(g>.02){c.globalAlpha=.6*g;c.drawImage(sprite(q.ch),-w/2,-w/2,w,w)}c.restore()}
+    if(!alive)Wd=[]}
+  const HALO=document.createElement('canvas');HALO.width=HALO.height=64;
+  {const x=HALO.getContext('2d'),g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,210,130,.75)');g.addColorStop(.45,'rgba(255,170,80,.28)');g.addColorStop(1,'rgba(255,150,60,0)');x.fillStyle=g;x.fillRect(0,0,64,64);}
   function spawn(){
     const u=(Math.random()*2-1)*.9;                       // where along the pages: -0.9 (left end) … 0.9 (right end)
     const side=Math.sign(u)||1,a=Math.abs(u);
@@ -50,6 +79,7 @@
       const al=Math.min(1,p.t/.5)*(1-k)**1.3;if(al<=.01)continue;   // gentle appear, slow fade
       const sp=sprite(p.ch),z=p.s*(1+k*.45),w=B*2*z;
       c.globalAlpha=al;c.save();c.translate(p.x,p.y);c.rotate(p.r);c.drawImage(sp,-w/2,-w/2,w,w);c.restore()}
+    drawWord();
     c.globalCompositeOperation='source-over';requestAnimationFrame(frame)}
   requestAnimationFrame(frame);
   document.addEventListener('visibilitychange',()=>{run=!document.hidden;if(run){last=performance.now();requestAnimationFrame(frame)}});
