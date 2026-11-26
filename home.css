@@ -103,3 +103,5 @@ body::after{content:"";position:fixed;left:0;right:0;top:calc(-1*env(safe-area-i
 html.asleep body::after{opacity:1;transition:none}
 
 #tabbar .barbook{position:absolute;left:19.21%;width:61.57%;height:auto;bottom:23.98%;pointer-events:none}   /* 163..688 of 851: centred on the screen, clear of Home and Backup; bottom on 130 of 171, top above the bar */
+#tabbar .bookmagic{position:absolute;left:19.21%;width:61.57%;bottom:23.98%;pointer-events:none}
+#tabbar .bookhit{position:absolute;left:34.6%;width:30.8%;bottom:23.98%;height:33%;-webkit-tap-highlight-color:transparent;cursor:pointer}   /* middle half of the book */
