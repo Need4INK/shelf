@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416}</style>
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-75">
+<meta name="app-version" content="home-76">
 <script>try{document.documentElement.classList.add(sessionStorage.getItem('intro.shown')==='1'?'back':'intro-on')}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <link rel="preload" as="image" href="img/frame.webp" fetchpriority="high">
@@ -106,20 +106,21 @@
     <button class="tab" aria-label="My Library"><img class="ic" src="img/ic_library.webp" alt=""><span class="lb">My Library</span></button><button class="tab" aria-label="Wishlist"><img class="ic" src="img/ic_wish.webp" alt=""><span class="lb">Wishlist</span></button><button class="tab" aria-label="Search"><img class="ic" src="img/ic_search.webp" alt=""><span class="lb">Search</span></button><button class="tab" aria-label="Add Book" onclick="location.href='add.html'"><img class="ic" src="img/ic_add.webp" alt=""><span class="lb">Add Book</span></button>
   </nav>
   <section id="reading" aria-label="Latest addition">
-    <div class="la-head">Latest Addition</div>
+    <div class="hd"><img class="hi" src="img/ic_latest.webp" alt=""><span>Latest Addition</span></div>
     <div class="bk" id="laBook"><img class="bk-shadow" src="img/book.png" alt=""><div class="bk-tint"></div><img class="bk-shade" src="img/book_shade.png" alt=""><img class="bk-gold" src="img/book_gold.png" alt=""><div class="bk-frame"><img class="bk-cover" alt="" hidden><div class="bk-ph"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M24 6a14 14 0 1 0 10 24A11 11 0 1 1 24 6z" fill="#e9c873"/><path d="M31 9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#f6dc96"/></svg><span></span></div></div></div>
     <div class="cr-title" id="laTitle"></div>
     <div class="cr-author" id="laAuthor"></div>
     <div class="la-when" id="laWhen"></div>
   </section>
   <section id="nook" aria-label="Next to collect">
-    <div class="la-head">Next to Collect</div><img class="hat" src="img/hat.webp" alt="">
+    <div class="hd"><img class="hi" src="img/hat.webp" alt=""><span>Next to Collect</span></div>
     <div class="bk" id="wiBook"><img class="bk-shadow" src="img/book.png" alt=""><div class="bk-tint"></div><img class="bk-shade" src="img/book_shade.png" alt=""><img class="bk-gold" src="img/book_gold.png" alt=""><div class="bk-frame"><img class="bk-cover" alt="" hidden><div class="bk-ph"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M24 6a14 14 0 1 0 10 24A11 11 0 1 1 24 6z" fill="#e9c873"/><path d="M31 9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#f6dc96"/></svg><span></span></div></div></div>
     <div class="cr-title" id="wiTitle"></div>
     <div class="cr-author" id="wiAuthor"></div>
     <div class="la-when" id="wiNote"></div>
   </section>
   <section id="genres" aria-label="Collections by genre">
+    <div class="hd"><img class="hi" src="img/ic_genres.webp" alt=""><span>Collections by Genre</span></div>
     <button class="gc" style="left:49.2px;background-image:url(img/genre_wiccan.webp)" data-g="Wiccan Fantasy"><span class="gl" style="top:78px">Wiccan<br>Fantasy</span><span class="gn"></span></button>
     <button class="gc" style="left:195.5px;background-image:url(img/genre_fantasy.webp)" data-g="Fantasy"><span class="gl" style="top:77px">Fantasy</span><span class="gn"></span></button>
     <button class="gc" style="left:341.8px;background-image:url(img/genre_romance.webp)" data-g="Romance"><span class="gl" style="top:77px">Romance</span><span class="gn"></span></button>

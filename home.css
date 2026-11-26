@@ -58,7 +58,13 @@ html.back #stage{transition:none}   /* coming back to Home: appears whole the mo
 #reading>*{position:absolute}
 .cr-title{left:232px;top:35.8%;width:340px;font-size:35px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cr-author{left:233px;top:53.3%;width:340px;font-size:29px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.la-head{left:130px;top:9.35%;font-size:33px;font-weight:600;letter-spacing:.2px;color:#2a1410}
+/* card headers: same icon box + text spot on all three cards (icon centre x 90, text x 130, 34px below the card's top edge) */
+.hd{position:absolute;display:flex;align-items:center;gap:10px;height:48px;font:600 33px/1 "EB Garamond",Georgia,serif;letter-spacing:.2px;white-space:nowrap;pointer-events:none}
+.hd .hi{width:60px;height:40px;object-fit:contain}
+#reading .hd{left:60px;top:13px;color:#2a1410}
+#nook .hd{left:33px;top:10px}
+#genres .hd{left:36.6px;top:-40.2px}
+#nook .hd,#genres .hd{color:#f1cf7c;text-shadow:0 2px 3px rgba(0,0,0,.8)}
 .la-when{left:233px;top:68.7%;width:340px;font-size:26px;font-style:italic;color:#6a3a2a}
 #reading .bk{position:absolute;left:65px;top:25.2%;width:var(--bk,143px)}
 
@@ -67,11 +73,8 @@ html.back #stage{transition:none}   /* coming back to Home: appears whole the mo
  filter:drop-shadow(0 4px 8px rgba(0,0,0,.55));font-family:"EB Garamond",Georgia,serif;color:#2a1410}
 /* Next to Collect: a random wishlist book, laid out like Latest Addition (same spots on the card) */
 #nook>*{position:absolute}
-#nook .la-head{left:103px;top:7.2%}
-#nook .hat{left:36px;top:6.9%;width:56px;height:17%}
 #nook .bk{left:38px;top:24.3%;width:var(--bk,143px)}
-#nook .la-head{color:#f1cf7c;text-shadow:0 2px 3px rgba(0,0,0,.8)}
-#nook .hat{filter:drop-shadow(0 0 1.5px rgba(241,207,124,.9)) drop-shadow(0 0 6px rgba(241,207,124,.35))}
+#nook .hi{filter:drop-shadow(0 0 1.5px rgba(241,207,124,.9)) drop-shadow(0 0 6px rgba(241,207,124,.35))}
 #nook .cr-title,#nook .cr-author,#nook .la-when{width:245px;text-shadow:0 2px 3px rgba(0,0,0,.8)}
 #nook .cr-title{left:205px;top:35.7%;color:#f6e2b0}#nook .cr-author{left:206px;top:54.6%;color:#e6cfa2}#nook .la-when{left:206px;top:71.2%;color:#c9a3c4}
 #genres{left:23.4px!important;top:1192.6px;width:803.2px;height:238.8px;box-sizing:border-box;z-index:3;
