@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<style>html{background:#0e0416}</style>
-<meta name="app-version" content="library-1">
+<style>html{background:#0e0416;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
+<meta name="app-version" content="library-2">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,19 +17,25 @@ body{min-height:100vh;box-sizing:border-box;background:radial-gradient(ellipse a
 h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.3),0 2px 2px #000;margin:2px 0 0;text-align:center}
 .sub{text-align:center;opacity:.75;font-size:17px;margin:0 0 4px}
 /* the bookcase */
-.case{margin:0 14px;padding-top:0}
-.shelf{position:relative;box-sizing:border-box;min-height:calc(var(--bw,110px) * 179 / 151 + 28px);display:grid;grid-template-columns:repeat(var(--per,3),1fr);gap:0 6px;align-items:end;padding:6px 2px 0;margin-bottom:28px;
+.case{margin:0 8px;padding-top:0}
+.shelf{position:relative;box-sizing:border-box;min-height:calc(var(--bw,110px) * 179 / 151 + 26px);display:grid;grid-template-columns:repeat(var(--per,3),1fr);gap:0 2px;align-items:end;padding:6px 2px 0;margin-bottom:26px;
  background:radial-gradient(ellipse at 50% 100%,rgba(255,170,80,.12),transparent 70%)}
-.shelf::after{content:"";position:absolute;left:-8px;right:-8px;bottom:-16px;height:16px;border-radius:2px;
- background:linear-gradient(180deg,#a06a3c 0,#7a4a26 25%,#5a3218 70%,#3a1e0e);
- box-shadow:0 6px 10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,220,160,.35)}
-.slot{display:flex;flex-direction:column;align-items:center;min-width:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.shelf::after{content:"";position:absolute;left:-8px;right:-8px;bottom:-9px;height:16px;border-radius:2px;
+ background:url(img/shelf_plank.webp) center/100% 100%;box-shadow:0 8px 12px rgba(0,0,0,.75)}
+.shelf:nth-child(even)::after{transform:scaleX(-1)}   /* so neighbouring shelves don't look identical */
+.slot{display:flex;overflow:visible;flex-direction:column;align-items:center;min-width:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .slot .bk{width:var(--bw,110px);filter:drop-shadow(0 4px 3px rgba(0,0,0,.6))}
 .slot:active .bk{transform:translateY(-4px) scale(1.03)}
 .slot .bk{transition:transform .15s}
 .slot .bk-ph span{font-size:11px}
-.ttl{width:100%;margin:4px 0 4px;font-size:13px;line-height:1.1;text-align:center;color:#f1dcc0;opacity:.85;
- white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ttl{width:100%;margin:0 0 3px;font:600 15px/1.1 "EB Garamond",Georgia,serif;text-align:center;color:#f6dcb4;
+ text-shadow:0 1px 2px #000,0 0 6px rgba(0,0,0,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* thin gold rule with a small star, under the book count */
+.rule{display:flex;align-items:center;justify-content:center;gap:8px;width:62%;margin:2px auto 8px;opacity:.75}
+.rule::before,.rule::after{content:"";flex:1;height:1px}
+.rule::before{background:linear-gradient(90deg,transparent,#d9a95c)}
+.rule::after{background:linear-gradient(90deg,#d9a95c,transparent)}
+.rule svg{width:11px;height:11px;filter:drop-shadow(0 0 3px rgba(255,190,90,.6))}
 .empty{text-align:center;padding:30px 10px 40px;font-size:18px;opacity:.75}
 .empty a{color:#f1cf7c}
 #tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom,0px);
@@ -66,6 +72,7 @@ h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shado
 <body>
 <h1 id="title">My Library</h1>
 <p class="sub" id="count">&nbsp;</p>
+<div class="rule" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg></div>
 <div class="case" id="case"></div>
 <nav id="tabbar" aria-label="Sections">
   <div class="in">
@@ -97,7 +104,7 @@ function render() {
     const sh = document.createElement('div'); sh.className = 'shelf';
     for (const b of a.slice(r * PER, r * PER + PER)) {
       const s = document.createElement('div'); s.className = 'slot';
-      s.innerHTML = '<div class="bk">' + bookFrameHTML() + '</div><div class="ttl">' + esc(b.title) + '</div>';
+      s.innerHTML = '<div class="ttl">' + esc(b.title) + '</div><div class="bk">' + bookFrameHTML() + '</div>';
       setBook(s.querySelector('.bk'), b);
       s.onclick = () => location.href = 'book.html?id=' + encodeURIComponent(b.id);
       sh.appendChild(s);
@@ -110,8 +117,8 @@ function render() {
 // book size: as big as fits the width, but small enough that 3 shelves fit above the bottom bar
 function sizeBooks() {
   const c = $('case'), bar = document.querySelector('#tabbar .in').getBoundingClientRect();
-  const byW = Math.min(151, (c.clientWidth - 4 - (PER - 1) * 6) / PER);
-  const byH = ((bar.top + scrollY - c.getBoundingClientRect().top - scrollY - 80) / 3 - 28) * 151 / 179;
+  const byW = Math.min(151, (c.clientWidth - 4 - (PER - 1) * 2) / PER * 1.06);   // the book picture has ~5% clear edge each side
+  const byH = ((bar.top - c.getBoundingClientRect().top - 8 - 9 - 2 * 26) / 3 - 26) * 151 / 179;
   c.style.setProperty('--bw', Math.floor(Math.max(70, Math.min(byW, byH))) + 'px');
 }
 sizeBooks(); addEventListener('resize', sizeBooks);
