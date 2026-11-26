@@ -81,4 +81,4 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 #intro{position:fixed;left:0;right:0;top:calc(-1*env(safe-area-inset-top,0px));bottom:calc(-1*env(safe-area-inset-bottom,0px));z-index:100;background:#0e0416;transition:opacity .6s ease}
 html.intro-on,html.intro-on body{background:#0e0416!important}   /* dark behind the status bar too while the intro plays */
 #intro canvas{position:absolute;inset:0;width:100%;height:100%}
-#intro.out{opacity:0;pointer-events:none}
+#intro.clear{background-color:rgba(14,4,22,0);pointer-events:none;transition:background-color .6s ease}   /* the dark fades; the last word's smoke drifts on over Home */
