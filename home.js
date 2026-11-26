@@ -1,0 +1,84 @@
+/* Home: Latest Addition, ready-gate fade-in, banner sayings, offline + auto-update. Loaded after scene.js. */
+/* ---------- latest addition card ---------- */
+let BOOKS=[];
+function newestBook(){return BOOKS.reduce((a,b)=>b&&(!a||(b.added||0)>(a.added||0))?b:a,null)}
+function whenText(ms){
+  if(!ms)return '';const d=new Date(ms),n=new Date(),day=864e5;
+  const diff=Math.floor((new Date(n.getFullYear(),n.getMonth(),n.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/day);
+  if(diff<=0)return 'Added today';if(diff===1)return 'Added yesterday';
+  return 'Added '+d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:d.getFullYear()===n.getFullYear()?undefined:'numeric'});
+}
+function renderGenres(){
+  const n={};BOOKS.forEach(b=>{if(b.status==='wishlist')return;const g=GENRES.includes(b.genre)?b.genre:'Other';n[g]=(n[g]||0)+1});   // owned books only
+  document.querySelectorAll('#genres .gc').forEach(c=>{const k=n[c.dataset.g]||0;c.querySelector('.gn').textContent=k;
+    c.setAttribute('aria-label',c.dataset.g+', '+k+' book'+(k===1?'':'s'));
+    const l=c.querySelector('.gl');l.style.fontSize='';let f=40;while(l.scrollWidth>111&&f>25){l.style.fontSize=--f+'px'}});
+}
+async function loadBooks(){
+  BOOKS=await Store.all();
+  // books from before genres: guess one once (she can change it on the book page)
+  const todo=BOOKS.filter(b=>!GENRES.includes(b.genre));todo.forEach(b=>{b.genre=guessGenre(b)});
+  renderLatest();renderGenres();
+  for(const b of todo)await Store.put(b).catch(()=>{});
+}
+function renderLatest(){
+  const b=newestBook();
+  const title=b?(b.title||'Untitled'):'No books yet';
+  const tEl=document.getElementById('laTitle');tEl.textContent=title;
+  tEl.style.fontSize='';let fs=35;while(tEl.scrollWidth>tEl.clientWidth&&fs>27){tEl.style.fontSize=--fs+'px'}   // long titles shrink a little, then …
+  document.getElementById('laAuthor').textContent=b?((b.authors||[]).join(', ')||'Unknown author'):'Add your first book';
+  document.getElementById('laWhen').textContent=b?whenText(b.added):'';
+  setBook(document.getElementById('laBook'),b?{...b,title}:null);
+}
+document.querySelectorAll('#reading .cr-title,#reading .cr-author,#reading .la-when,#laBook').forEach(e=>{e.style.cursor='pointer';e.addEventListener('click',()=>{
+  const b=newestBook();if(b&&b.id)location.href='book.html?id='+encodeURIComponent(b.id)})});
+const booksP=loadBooks();booksP.then(()=>Store.fetchMissingCovers());   // keep a copy of every cover on the phone
+Store.onChange(loadBooks);{const ti=document.querySelector('#tabbar img');if(ti&&!ti.complete)ti.addEventListener('load',layoutCards);}layoutCards();if(document.fonts)document.fonts.ready.then(()=>{renderGenres();renderLatest()});addEventListener('pageshow',loadBooks);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadBooks()});
+
+/* ---------- show Home only when it's ready: pictures decoded, fonts, books (max 2.5 s) ---------- */
+(function(){
+  const urls=new Set(PICS.map(i=>i.src)),re=/url\(\s*['"]?([^'")]+)['"]?\s*\)/g;
+  const add=t=>{let m;re.lastIndex=0;while((m=re.exec(t)))if(m[1].includes('img/'))urls.add(new URL(m[1],location.href).href)};
+  document.querySelectorAll('img[src]').forEach(i=>{if(i.getAttribute('src'))urls.add(i.src)});
+  for(const sh of document.styleSheets){try{for(const r of sh.cssRules)add(r.cssText)}catch(e){}}
+  document.querySelectorAll('[style*="url("]').forEach(el=>add(el.getAttribute('style')));
+  const pics=[...urls].map(u=>{const i=new Image();i.src=u;return (i.decode?i.decode():new Promise(r=>{i.onload=i.onerror=r})).catch(()=>{})});
+  const fonts=document.fonts?document.fonts.ready.catch(()=>{}):null;
+  const show=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.add('ready')));
+  Promise.race([Promise.all([...pics,fonts,booksP.catch(()=>{})]),new Promise(r=>setTimeout(r,2500))]).then(show);
+})();
+
+/* ---------- banner: a random magical saying (her list of 300, quotes.json) ---------- */
+let QUOTES=null;
+function fitQuote(q){let f=30;q.style.fontSize=f+'px';while(q.scrollHeight>80&&f>20){q.style.fontSize=--f+'px'}}
+function showQuote(){
+  if(!QUOTES||!QUOTES.length)return;
+  let last=-1;try{last=+(localStorage.getItem('home.quote')??-1)}catch(e){}
+  let i;do{i=Math.floor(Math.random()*QUOTES.length)}while(QUOTES.length>1&&i===last);   // never the same one twice in a row
+  try{localStorage.setItem('home.quote',i)}catch(e){}
+  const q=document.getElementById('quote');q.style.opacity=0;
+  setTimeout(()=>{q.textContent=QUOTES[i];fitQuote(q);q.style.opacity=1},q.textContent?350:0);
+}
+setTimeout(()=>fetch('quotes.json').then(r=>r.json()).then(a=>{QUOTES=a;showQuote()}).catch(()=>{}),300);   // after the scene is up
+// a new saying each time Home is entered: app opened, or back from another screen / app
+addEventListener('pageshow',e=>{if(e.persisted)showQuote()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)showQuote()});
+
+/* ---------- offline + auto-update ---------- */
+const APP_VERSION='home-42';
+// a new version arrived: drop the saved pictures once so new art shows straight away
+try{const v=localStorage.getItem('home.ver');
+  if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);
+    if(v&&'caches' in window)caches.open('shelf-v3').then(c=>c.keys().then(ks=>Promise.all(ks.filter(k=>/\.(png|jpe?g|webp|gif|svg)$/i.test(new URL(k.url).pathname)).map(k=>c.delete(k))))).then(d=>{if(d.length)location.reload()}).catch(()=>{})}}catch(e){}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+async function checkUpdate(){
+  try{
+    const html=await (await fetch('./?check='+Date.now(),{cache:'no-store'})).text();
+    const m=html.match(/name="app-version" content="([^"]+)"/);
+    if(m&&m[1]!==APP_VERSION){let tried='';try{tried=sessionStorage.getItem('home.reloadFor')||''}catch(e){}
+      if(tried!==m[1]){try{sessionStorage.setItem('home.reloadFor',m[1])}catch(e){}location.reload()}}
+  }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
+checkUpdate();

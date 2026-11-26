@@ -1,0 +1,84 @@
+/* Home page styles (index.html) */
+/* VOICE: cosy, enchanted, storybook
+   IDEA: a window in the painted frame onto a living castle landscape
+   PICTURE: the user's frame over an animated sky, castle, flyers; candle that lights at dusk
+   COLOUR and TYPE: the art's own purples, gold, pumpkin orange; IM Fell English SC
+   LAYOUT: full-screen stage, scaled to cover, anchored to the top */
+:root{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#stage,#tabbar{opacity:0;transition:opacity .45s ease}
+.ready #stage,.ready #tabbar{opacity:1}   /* Home fades in whole, once its pictures are ready */
+#stage{position:absolute;left:50%;top:env(safe-area-inset-top,0px);width:852px;height:1810px;transform-origin:50% 0;overflow:visible}
+#stage>*{position:absolute;left:0;top:0}
+#sky{width:852px;height:400px}
+#frame{width:852px;height:1810px;pointer-events:none}
+#canopy{width:852px;pointer-events:none}
+#bpC{left:90px!important;top:0!important;width:360px;height:260px;pointer-events:none}
+#faceGlow{left:110px!important;top:70px!important;width:340px;height:250px;pointer-events:none;mix-blend-mode:screen;opacity:0;background:radial-gradient(closest-side at 42% 55%,rgba(255,170,80,.5),rgba(255,130,50,.16) 55%,rgba(255,120,40,0) 100%)}
+#bookHit{left:205px;top:218px;width:205px;height:190px;cursor:pointer;z-index:2;transform:rotate(-6deg)}
+#bigPkHit{left:150px;top:25px;width:270px;height:190px;cursor:pointer;z-index:2}
+#catC{left:548px!important;top:176px!important;width:264px;height:108px;pointer-events:none;transform-origin:132px 104px}
+#flame{width:150px;height:170px;left:-15px;top:80px}
+#glow{top:-300px!important;width:852px;height:1200px;pointer-events:none;mix-blend-mode:screen;opacity:0;
+ background:radial-gradient(circle at 60px 532px,rgba(255,200,120,.85) 0,rgba(255,155,60,.45) 70px,rgba(255,125,40,.2) 200px,rgba(255,100,30,.07) 360px,transparent 500px)}
+#catHit{left:575px;top:192px;width:225px;height:88px;cursor:pointer;z-index:2}
+#pumpkinHit{left:700px;top:305px;width:135px;height:135px;cursor:pointer;z-index:2}
+#candleHit{left:0;top:150px;width:120px;height:200px;cursor:pointer;z-index:2}
+#wand{pointer-events:none}
+#fx{width:852px;height:620px;pointer-events:none}
+#ghost{width:211px;height:203px;pointer-events:none;opacity:0;transform-origin:105px 203px}
+#ghost img,#ghost canvas{position:absolute;inset:0;width:100%;height:100%}
+#gHeart,#gHeartGlow{transform-origin:48% 57%}
+#gHeartGlow{mix-blend-mode:screen;opacity:.7}
+#wandHit{left:430px;top:405px;width:270px;height:70px;cursor:pointer;z-index:2}
+#pkGlow,#pkLight{left:700px;top:340px;width:130px;height:110px;pointer-events:none;opacity:0}
+#pkGlow{mix-blend-mode:screen}
+#tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom,0px);
+ background:linear-gradient(transparent,#0d0310 calc(100% - env(safe-area-inset-bottom,0px)))}
+#tabbar .in{position:relative;width:calc(824px * var(--S,.4577));margin:0 auto}
+#tabbar img{display:block;width:100%;height:auto;pointer-events:none}
+#tabbar .tb{position:absolute;top:12%;width:18%;height:76%;border-radius:22px;-webkit-tap-highlight-color:transparent}
+#tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.25),transparent)}
+#bar{left:0!important;top:552px!important;width:852px;height:154px;background:url(img/bar_bg.webp) center/100% 100% no-repeat;z-index:3}
+.tab{position:absolute;top:13px;width:114px;height:114px;padding:0;border:0;border-radius:50%;cursor:pointer;
+ background:radial-gradient(circle at 50% 38%,#64305f 0%,#4a1c44 55%,#2f0f2c 100%);
+ box-shadow:0 0 0 3px #22091f,inset 0 0 0 6px rgba(120,62,108,.45),inset 4px 5px 8px rgba(255,190,232,.18),inset -5px -7px 12px rgba(0,0,0,.45),0 7px 14px rgba(0,0,0,.65)}
+.tab::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
+ background:conic-gradient(from 210deg,#d79ac4,#8a4a7c 18%,#3a1236 45%,#2a0c26 55%,#6a3560 80%,#d79ac4);
+ -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px))}
+.tab:active{transform:scale(.95);filter:brightness(1.15)}
+.tab:nth-child(1){left:107px}.tab:nth-child(2){left:283px}.tab:nth-child(3){left:459px}.tab:nth-child(4){left:635px}
+#reading{left:0!important;top:706px;width:852px;height:246px;background:url(img/reading_bg.webp) center/100% 100% no-repeat;z-index:3;
+ font-family:"EB Garamond",Georgia,serif;color:#2a1410}
+#reading>*{position:absolute}
+.cr-title{left:232px;top:35.8%;width:340px;font-size:35px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-author{left:233px;top:53.3%;width:340px;font-size:29px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.la-head{left:130px;top:9.35%;font-size:33px;font-weight:600;letter-spacing:.2px;color:#2a1410}
+.la-when{left:233px;top:68.7%;width:340px;font-size:26px;font-style:italic;color:#6a3a2a}
+#reading .bk{position:absolute;left:65px;top:25.2%;width:var(--bk,143px)}
+
+#nook{left:27px!important;top:954.6px;width:796px;height:228px;border-radius:33px;overflow:hidden;z-index:3;
+ background:url(img/nook_fg.webp) right center/auto 100% no-repeat,url(img/nook_bg.webp) center/100% 100% no-repeat;
+ filter:drop-shadow(0 4px 8px rgba(0,0,0,.55))}
+#genres{left:23.4px!important;top:1192.6px;width:803.2px;height:238.8px;box-sizing:border-box;z-index:3;
+ border-style:solid;border-width:50.2px 0 20.1px;border-image:url(img/genres_bg.webp) 77 0 31 0 fill stretch;
+ font-family:"EB Garamond",Georgia,serif;color:#fbf1da}
+#genres .gc{position:absolute;top:17.2px;width:120.4px;height:146.9px;padding:0;border:0;border-radius:10px;background:center/100% 100% no-repeat;color:inherit;font:inherit;cursor:pointer;
+ box-shadow:0 5px 12px rgba(0,0,0,.65),0 0 3px rgba(0,0,0,.6)}
+#genres .gc:active{filter:brightness(1.15)}
+#genres .gl,#genres .gn{position:absolute;left:0;right:0;text-align:center;white-space:nowrap;
+ text-shadow:0 2px 3px rgba(0,0,0,.85),0 0 8px rgba(30,0,30,.6),0 0 2px #000}
+#genres .gl{transform:translateY(-50%);font-size:40px;font-weight:400;line-height:.95;letter-spacing:-.3px}
+#genres .gn{top:114px;font-size:31px;font-weight:400;line-height:1}
+
+#clock{top:452px;left:60px;width:732px;height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ font-family:"IM Fell English SC",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.35),0 2px 2px #000;pointer-events:none}
+#clock{z-index:1;pointer-events:auto;cursor:pointer}   /* under the wand's tap area */
+#quote{font-family:"IM Fell English",Georgia,serif;max-width:600px;text-align:center;font-size:30px;line-height:1.12;padding:0 8px;transition:opacity .35s}
+/* ---------- launch intro: words pop in as glowing wisps and drift away like the ghost's "Boo!" ---------- */
+@font-face{font-family:"IntroFell";src:url(fonts/IMFellEnglishSC.woff2) format("woff2");font-display:block}
+#intro{position:fixed;left:0;right:0;top:calc(-1*env(safe-area-inset-top,0px));bottom:calc(-1*env(safe-area-inset-bottom,0px));z-index:100;background:#0e0416;transition:opacity .6s ease}
+html.intro-on,html.intro-on body{background:#0e0416!important}   /* dark behind the status bar too while the intro plays */
+#intro canvas{position:absolute;inset:0;width:100%;height:100%}
+#intro.out{opacity:0;pointer-events:none}
