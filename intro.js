@@ -58,7 +58,7 @@
     const dt=Math.min(.05,(now-last)/1000)/SLOW;last=now;const T=(now-t0)/1000/SLOW;
     const ready=document.documentElement.classList.contains('ready'),lastI=seq.length-1;
     // the last word holds until Home is ready (with a hard limit), then floats away over Home
-    if(endAt===null&&T>=seq[lastI].s+FORM+HOLD+.4&&(ready||(now-started)/1000/SLOW>4))endAt=T;
+    if(endAt===null&&T>=seq[lastI].s+FORM+HOLD-.1&&(ready||(now-started)/1000/SLOW>4))endAt=T;
     c.clearRect(0,0,W,H);
     for(let i=0;i<seq.length;i++){
       const it=seq[i];if(T<it.s)continue;
