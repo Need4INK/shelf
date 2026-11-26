@@ -23,7 +23,7 @@
     let px=cx-tot/2;x.textAlign='left';[...word].forEach((ch,i)=>{x.fillText(ch,px,cy);px+=ws[i]+GAP*fs});return tot}
   function wisps(word){
     const oc=document.createElement('canvas'),o=oc.getContext('2d');
-    let fs=Math.min(100,W*.25);const setF=x=>{x.font=`italic ${fs}px IntroFell, Georgia, serif`;x.textBaseline='middle'};
+    let fs=Math.min(66,W*.165);const setF=x=>{x.font=`italic ${fs}px IntroFell, Georgia, serif`;x.textBaseline='middle'};   // smaller words read more like the ghost's Boo
     setF(o);const width=()=>[...word].reduce((a,ch)=>a+o.measureText(ch).width,0)+GAP*fs*([...word].length-1);
     let mw=width();if(mw>W*.8){fs*=W*.8/mw;setF(o);mw=width()}
     const w=Math.ceil(mw+fs*.8),h=Math.ceil(fs*1.6);oc.width=w;oc.height=h;

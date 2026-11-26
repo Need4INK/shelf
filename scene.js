@@ -451,7 +451,9 @@ document.getElementById('bigPkHit').addEventListener('click',()=>{if(bk.hop<0&&b
 
 /* ---------- the cat: startled by the Boo, then back to sleep ---------- */
 const catImg=img('img/cat.png'),catC=document.getElementById('catC'),cx2=catC.getContext('2d');
-let cat=null,catDrawn=false;
+let cat=null,catDrawn=false,catIdle=0;
+// iPhones can wipe a still canvas from memory (e.g. around an update reload), so the sleeping cat is re-drawn now and then
+addEventListener('pageshow',()=>{catDrawn=false});document.addEventListener('visibilitychange',()=>{if(!document.hidden)catDrawn=false});
 function drawCat(eye,look){
   cx2.setTransform(2,0,0,2,0,0);cx2.clearRect(0,0,264,108);
   if(ready(catImg))cx2.drawImage(catImg,0,0,264,108);
@@ -470,7 +472,7 @@ function drawCat(eye,look){
   }
 }
 function catFrame(dt){
-  if(!cat){if(!catDrawn&&ready(catImg)){drawCat(0,0);catDrawn=true}return}
+  if(!cat){catIdle+=dt;if((!catDrawn||catIdle>2)&&ready(catImg)){drawCat(0,0);catDrawn=true;catIdle=0}return}
   cat.t+=dt;const t=cat.t;
   if(t>2.4){cat=null;catC.style.transform='';drawCat(0,0);return}
   let dy=0,sx=1,sy=1,rot=0;
