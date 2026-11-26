@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-60">
+<meta name="app-version" content="home-61">
 <script>try{if(sessionStorage.getItem('intro.shown')==='1')document.documentElement.classList.add('back')}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <link rel="preload" as="image" href="img/frame.webp" fetchpriority="high">
@@ -32,11 +32,11 @@
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB3UlEQVR42u3bsY3CQBRF0WdEHy4A5AJcBRE94sgSmetwITSARAMWIgHGM+fEG6yWq+8/w7rrxyGw5eBPgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsSBOBAH4kAciANxgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsTBLxxL+CVuz8fnP3y6L1V+EufL1eRg2zpP6zyJg3eJiIMd9CEOfYgDcRge4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOMg+3nhLGy+Qpbw3U0wOxIE4sHM09Gg3ORAH4kAcWEjjEswubHIgDjxW3HOYHIgDcSAOxIHTSlyCNXiwMjkQB+JAHFhIXZ+bHIgDcWDniEuw2lcckwNx4LHiKGtyIA7EgTgQB04rcQlW+wHK5EAciAM7hxtSkwNxIA7EgYU0DV+CNbLtmhw4ymJyIA7EgTgQB+LAUTb+E6z2E7XJgTgQB3YO1+cmB+JAHIgDC2lcgtW+KZsciANxYOdwCWZyIA7EgTgQB+JAHCAOxIE46lXCt8riQBzGhjiUIQ5lxFf2svinrh8HHwweK4gDcSAOxIE4EAfiQByIA8SBOBAH4kAciANxIA7EgThAHIgDcSAOxIE4EAfiQByIA3GAOBAH4uDrXsZIQjfwkiY3AAAAAElFTkSuQmCC">
 <meta name="theme-color" content="#12051f">
 <title>Shelf</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="book-frame.css">
-<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English&family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="home.css">
 <link rel="preload" href="fonts/IMFellEnglishItalic.woff2" as="font" type="font/woff2" crossorigin>
+<script src="tabbar.js"></script>
+<link rel="stylesheet" href="fonts.css">
 </head>
 <body>
 <div id="intro" aria-hidden="true"><canvas></canvas></div>
@@ -111,7 +111,7 @@
 </div>
 <nav id="tabbar" aria-label="Sections">
   <div class="in">
-    <img src="img/tabbar.webp" alt="">
+    <img src="img/tabbar.webp" width="851" height="171" alt="">
     <a class="tb" style="left:4%" aria-label="Home" aria-current="page"></a>
     <a class="tb" style="left:78%" href="backup.html" aria-label="Backup"></a>
   </div>

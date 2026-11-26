@@ -43,7 +43,7 @@ function fit(){
 }
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,300));addEventListener('pageshow',()=>{fit();setTimeout(fit,400)});
 if(window.visualViewport)visualViewport.addEventListener('resize',fit);
-fit();setTimeout(fit,500);setTimeout(fit,1500);   // iOS can settle the screen size a moment after launch
+fit();document.documentElement.classList.add('laid');setTimeout(fit,500);setTimeout(fit,1500);   // 'laid': sizes are set, safe to show when coming back   // iOS can settle the screen size a moment after launch
 
 /* ---------- helpers ---------- */
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
