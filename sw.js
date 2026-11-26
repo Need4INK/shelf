@@ -1,7 +1,7 @@
 // Shelf service worker.
-// Pictures and fonts: shown straight from the phone's copy (fast, works on a bad connection),
-// refreshed quietly in the background. Page code (HTML/JS/JSON): network first so updates
-// arrive, but if the network is slow (3 s) or offline, the saved copy is used instead.
+// Everything of our own (pictures, fonts, page code) is shown straight from the phone's copy
+// (instant, works offline) and refreshed quietly in the background for next time.
+// Update checks (?check=) always go to the network.
 // When Home sees a new app version it clears the saved pictures once (see index.html).
 const CACHE = 'shelf-v3';
 const ASSET = /\.(png|jpe?g|webp|gif|svg|woff2?)$/i;
@@ -31,15 +31,14 @@ self.addEventListener('fetch', e => {
       return;
     }
     const save = !url.searchParams.has('check');   // update checks are never saved
+    if (!save) { e.respondWith(fetch(req, { cache: 'no-store' })); return; }
+    // page code: the saved copy straight away (taps feel instant), fresh copy saved in the background
+    // for next time. When Home/Add see a new version they refresh all saved code and reload (see dropCode).
     e.respondWith(caches.open(CACHE).then(async c => {
-      const net = fetch(req, { cache: 'no-store' }).then(res => { if (res.ok && save) c.put(key, res.clone()); return res; });
-      try {
-        return await Promise.race([net, new Promise((_, rej) => setTimeout(() => rej(new Error('slow')), 3000))]);
-      } catch (err) {
-        const hit = await c.match(key);
-        if (hit) { e.waitUntil(net.catch(() => {})); return hit; }
-        return net;
-      }
+      const net = fetch(req, { cache: 'no-store' }).then(res => { if (res.ok) c.put(key, res.clone()); return res; });
+      const hit = await c.match(key);
+      if (hit) { e.waitUntil(net.catch(() => {})); return hit; }
+      return net;
     }));
     return;
   }

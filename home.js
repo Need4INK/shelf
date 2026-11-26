@@ -96,18 +96,20 @@ if(document.fonts)document.fonts.ready.then(()=>{const q=document.getElementById
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)showQuote()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-81';
+const APP_VERSION='home-82';
 // a new version arrived: drop the saved pictures once so new art shows straight away
 try{const v=localStorage.getItem('home.ver');
   if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);
     if(v&&'caches' in window)caches.open('shelf-v3').then(c=>c.keys().then(ks=>Promise.all(ks.filter(k=>/\.(png|jpe?g|webp|gif|svg)$/i.test(new URL(k.url).pathname)).map(k=>c.delete(k))))).then(d=>{if(d.length)location.reload()}).catch(()=>{})}}catch(e){}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+// refresh every saved page file from the web, so the reload opens the new version (and it still works offline)
+function dropCode(){return 'caches' in window?caches.open('shelf-v3').then(c=>c.keys().then(ks=>Promise.all(ks.filter(k=>!/\.(png|jpe?g|webp|gif|svg|woff2?)$/i.test(new URL(k.url).pathname)).map(k=>fetch(k.url,{cache:'no-store'}).then(r=>r.ok?c.put(k,r):c.delete(k)).catch(()=>{}))))).catch(()=>{}):Promise.resolve()}
 async function checkUpdate(){
   try{
     const html=await (await fetch('./?check='+Date.now(),{cache:'no-store'})).text();
     const m=html.match(/name="app-version" content="([^"]+)"/);
     if(m&&m[1]!==APP_VERSION){let tried='';try{tried=sessionStorage.getItem('home.reloadFor')||''}catch(e){}
-      if(tried!==m[1]){try{sessionStorage.setItem('home.reloadFor',m[1])}catch(e){}location.reload()}}
+      if(tried!==m[1]){try{sessionStorage.setItem('home.reloadFor',m[1])}catch(e){}await dropCode();location.reload()}}
   }catch(e){}
 }
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a14">
+<meta name="app-version" content="a15">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -96,7 +96,7 @@ main{padding-bottom:140px}
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a14</p>
+  <p style="font-size:12px;opacity:.5">a15</p>
 </header>
 <main>
   <section class="panel">
@@ -412,7 +412,7 @@ const loadBooks = () => Store.all().then(a => { books = a.sort((x, y) => (y.adde
 loadBooks(); Store.onChange(loadBooks);
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a14';
+const VERSION = 'a15';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
@@ -423,7 +423,7 @@ async function checkUpdate() {
     if (m && m[1] !== VERSION) {
       // reload at most once per new version, so a stale cache can't cause a reload loop
       let tried = ''; try { tried = sessionStorage.getItem('add.reloadFor') || ''; } catch (e) {}
-      if (tried !== m[1]) { try { sessionStorage.setItem('add.reloadFor', m[1]); } catch (e) {} location.reload(); }
+      if (tried !== m[1]) { try { sessionStorage.setItem('add.reloadFor', m[1]); } catch (e) {} if ('caches' in window) await caches.open('shelf-v3').then(c=>c.keys().then(ks=>Promise.all(ks.filter(k=>!/\.(png|jpe?g|webp|gif|svg|woff2?)$/i.test(new URL(k.url).pathname)).map(k=>fetch(k.url,{cache:'no-store'}).then(r=>r.ok?c.put(k,r):c.delete(k)).catch(()=>{}))))).catch(()=>{}); location.reload(); }
     }
   } catch (e) { /* offline — keep the current version */ }
 }
