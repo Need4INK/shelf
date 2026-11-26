@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="app-version" content="backup-1">
+<meta name="app-version" content="backup-2">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -29,7 +29,7 @@ h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shado
 .hidden{display:none}
 #tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom,0px);
  background:linear-gradient(transparent,#0d0310 calc(100% - env(safe-area-inset-bottom,0px)))}
-#tabbar .in{position:relative;width:min(100vw,640px);margin:0 auto}
+#tabbar .in{position:relative;width:calc(824px * var(--S,.4577));margin:0 auto}
 #tabbar img{display:block;width:100%;height:auto;pointer-events:none}
 #tabbar .tb{position:absolute;top:12%;width:18%;height:76%;border-radius:22px;-webkit-tap-highlight-color:transparent}
 #tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.25),transparent)}
@@ -50,6 +50,7 @@ h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shado
   <input type="file" id="importFile" accept="application/json,.json" class="hidden">
 </div>
 <div class="status" id="status"></div>
+<script src="tabbar.js"></script>
 <nav id="tabbar" aria-label="Sections">
   <div class="in">
     <img src="img/tabbar.webp" alt="">

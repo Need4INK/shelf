@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a2">
+<meta name="app-version" content="a3">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -63,7 +63,7 @@ dt{color:var(--mute)}dd{margin:0;overflow-wrap:anywhere}
 a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 #tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom,0px);
  background:linear-gradient(transparent,#0d0310 calc(100% - env(safe-area-inset-bottom,0px)))}
-#tabbar .in{position:relative;width:min(100vw,640px);margin:0 auto}
+#tabbar .in{position:relative;width:calc(824px * var(--S,.4577));margin:0 auto}
 #tabbar img{display:block;width:100%;height:auto;pointer-events:none}
 #tabbar .tb{position:absolute;top:12%;width:18%;height:76%;border-radius:22px;-webkit-tap-highlight-color:transparent}
 #tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.25),transparent)}
@@ -74,7 +74,7 @@ main{padding-bottom:140px}
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a2</p>
+  <p style="font-size:12px;opacity:.5">a3</p>
 </header>
 <main>
   <section class="panel">
@@ -100,6 +100,7 @@ main{padding-bottom:140px}
 
 </main>
 
+<script src="tabbar.js"></script>
 <nav id="tabbar" aria-label="Sections">
   <div class="in">
     <img src="img/tabbar.webp" alt="">
@@ -388,7 +389,7 @@ const loadBooks = () => Store.all().then(a => { books = a.sort((x, y) => (y.adde
 loadBooks(); Store.onChange(loadBooks);
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a2';
+const VERSION = 'a3';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {

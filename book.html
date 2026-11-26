@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-16">
+<meta name="app-version" content="book-17">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -81,7 +81,7 @@ dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
 
 #tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom,0px);
  background:linear-gradient(transparent,#0d0310 calc(100% - env(safe-area-inset-bottom,0px)))}
-#tabbar .in{position:relative;width:min(100vw,640px);margin:0 auto}
+#tabbar .in{position:relative;width:calc(824px * var(--S,.4577));margin:0 auto}
 #tabbar img{display:block;width:100%;height:auto;pointer-events:none}
 #tabbar .tb{position:absolute;top:12%;width:18%;height:76%;border-radius:22px}
 #tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.25),transparent)}
@@ -92,6 +92,7 @@ dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
   <main id="page"></main>
 </div>
 <div class="saved" id="saved" role="status">Saved</div>
+<script src="tabbar.js"></script>
 <nav id="tabbar" aria-label="Sections">
   <div class="in">
     <img src="img/tabbar.webp" alt="">
