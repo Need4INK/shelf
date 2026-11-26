@@ -1,6 +1,6 @@
 /* Intro on app launch only (not when coming back from another screen). Words come from intro.txt
    (one per line, edited by the owner — don't change its contents). The last word waits for Home
-   to be ready (html.ready), then floats away and the intro fades into Home. Never longer than ~4.5 s. */
+   to be ready (html.ready), then floats away and the intro fades into Home. Never longer than ~6 s. */
 (function(){
   const ov=document.getElementById('intro');
   let seen=false;try{seen=sessionStorage.getItem('intro.shown')==='1';sessionStorage.setItem('intro.shown','1')}catch(e){}
@@ -58,7 +58,7 @@
     const dt=Math.min(.05,(now-last)/1000)/SLOW;last=now;const T=(now-t0)/1000/SLOW;
     const ready=document.documentElement.classList.contains('ready'),lastI=seq.length-1;
     // the last word holds until Home is ready (with a hard limit), then floats away over Home
-    if(endAt===null&&T>=seq[lastI].s+FORM+HOLD&&(ready||(now-started)/1000/SLOW>4))endAt=T;
+    if(endAt===null&&T>=seq[lastI].s+FORM+HOLD+.4&&(ready||(now-started)/1000/SLOW>4))endAt=T;
     c.clearRect(0,0,W,H);
     for(let i=0;i<seq.length;i++){
       const it=seq[i];if(T<it.s)continue;
@@ -87,8 +87,10 @@
     c.save();c.translate(W/2,H*.46);
     for(const s of sparks){s.x+=s.vx*dt;s.y+=s.vy*dt;s.vx*=.92;s.vy=s.vy*.92+20*dt;s.a-=dt*1.1;if(s.a<=0)continue;c.globalAlpha=s.a;c.drawImage(dot,s.x-s.r*3,s.y-s.r*3,s.r*6,s.r*6)}
     c.restore();sparks=sparks.filter(s=>s.a>0);c.globalAlpha=1;
-    if(endAt!==null&&T>endAt+.35&&!ov.classList.contains('out')){ov.classList.add('out');document.documentElement.classList.remove('intro-on');setTimeout(()=>ov.remove(),700)}
-    if(ov.isConnected)requestAnimationFrame(frame);
+    // the dark slowly clears as the last word bursts; the word keeps puffing at its own speed over Home
+    if(endAt!==null&&T>endAt+.25&&!ov.classList.contains('out')){ov.classList.add('out');document.documentElement.classList.remove('intro-on')}
+    if(endAt!==null&&T>endAt+2.2&&!sparks.length){ov.remove();return}
+    requestAnimationFrame(frame);
   }
   // start as soon as the lettering is ready (it's saved in the app, so this is quick), with the freshest words
   const font=document.fonts?document.fonts.load('italic 64px IntroFell').catch(()=>{}):null;

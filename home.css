@@ -78,7 +78,7 @@ html,body{margin:0;height:100%;background:var(--skyTop,#12051f);overflow:hidden;
 #quote{font-family:"IM Fell English",Georgia,serif;max-width:600px;text-align:center;font-size:30px;line-height:1.12;padding:0 8px;transition:opacity .35s}
 /* ---------- launch intro: words pop in as glowing wisps and drift away like the ghost's "Boo!" ---------- */
 @font-face{font-family:"IntroFell";font-style:italic;src:url(fonts/IMFellEnglishItalic.woff2) format("woff2");font-display:block}
-#intro{position:fixed;left:0;right:0;top:calc(-1*env(safe-area-inset-top,0px));bottom:calc(-1*env(safe-area-inset-bottom,0px));z-index:100;background:#0e0416;transition:opacity .6s ease}
+#intro{position:fixed;left:0;right:0;top:calc(-1*env(safe-area-inset-top,0px));bottom:calc(-1*env(safe-area-inset-bottom,0px));z-index:100;background:#0e0416;transition:background-color 1.8s cubic-bezier(.45,0,.25,1)}
 html.intro-on,html.intro-on body{background:#0e0416!important}   /* dark behind the status bar too while the intro plays */
 #intro canvas{position:absolute;inset:0;width:100%;height:100%}
-#intro.out{opacity:0;pointer-events:none}
+#intro.out{background-color:rgba(14,4,22,0);pointer-events:none}   /* only the dark fades; the last word finishes its puff over Home */
