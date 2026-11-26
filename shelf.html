@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="v15">
+<meta name="app-version" content="v16">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shelf</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -68,34 +68,16 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
   <a href="./" style="display:inline-block;margin-bottom:6px;color:inherit;opacity:.8;text-decoration:none;font-size:15px">&larr; Home</a>
   <h1>Shelf</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">v15</p>
+  <p style="font-size:12px;opacity:.5">v16</p>
 </header>
 <main>
-  <section class="panel">
-    <h2>Add a book</h2>
-    <div class="cam" id="cam">
-      <video id="video" playsinline muted autoplay></video>
-      <div class="guide"></div>
-      <div class="hint">Hold about 20 cm away, barcode inside the box</div>
-    </div>
-    <div class="row">
-      <button class="primary grow" id="scanBtn">Scan barcode</button>
-      <label class="btn grow" for="photo">Use a photo</label>
-      <input type="file" id="photo" accept="image/*" class="hidden">
-    </div>
-    <form class="row" id="manual" style="margin-top:10px">
-      <input type="text" id="code" inputmode="numeric" autocomplete="off" placeholder="ISBN, e.g. 978-0-14-118776-1" class="grow" style="flex-basis:200px">
-      <button type="submit">Look up</button>
-    </form>
-    <div class="status" id="status"></div>
-  </section>
-
   <section class="panel hidden" id="result"></section>
 
   <section class="panel">
     <h2>My catalog</h2>
     <input type="search" id="q" placeholder="Search title, author, ISBN">
     <ul class="list" id="list"></ul>
+    <div class="status" id="status"></div>
     <div class="row" style="margin-top:14px">
       <button class="grow" id="exportBtn">Export backup</button>
       <label class="btn grow" for="importFile">Import backup</label>
@@ -108,7 +90,7 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
 <script>
 {
-const $ = id => document.getElementById(id);
+const $ = id => document.getElementById(id) || document.createElement('input');   // parts not on this page are harmless stand-ins
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let books = [], loaded = false;
 const save = () => { if (loaded) Store.replaceAll(books).catch(() => status('Could not save — storage unavailable.', true)); };
@@ -385,7 +367,7 @@ const loadBooks = () => Store.all().then(a => { books = a.sort((x, y) => (y.adde
 loadBooks(); Store.onChange(loadBooks);
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'v15';
+const VERSION = 'v16';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
