@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <style>html{background:#0e0416;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
-<meta name="app-version" content="library-3">
+<meta name="app-version" content="library-4">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -97,7 +97,7 @@ const list = new URLSearchParams(location.search).get('list') === 'wishlist' ? '
 let books = [];
 const esc = s => String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function render() {
-  const name = list === 'wishlist' ? 'Wishlist' : 'My Library';
+  const name = list === 'wishlist' ? 'My Wishlist' : 'My Library';
   $('title').textContent = name; document.title = name;
   const a = books.filter(b => (b.status === 'wishlist') === (list === 'wishlist'))
     .sort((x, y) => String(y.added || '').localeCompare(String(x.added || '')));
