@@ -1,7 +1,7 @@
 /* Home: Latest Addition, ready-gate fade-in, banner sayings, offline + auto-update. Loaded after scene.js. */
 /* ---------- latest addition card ---------- */
 let BOOKS=[];
-function newestBook(){return BOOKS.reduce((a,b)=>b&&(!a||(b.added||0)>(a.added||0))?b:a,null)}
+function newestBook(){return BOOKS.reduce((a,b)=>b&&b.status!=='wishlist'&&(!a||(b.added||0)>(a.added||0))?b:a,null)}   // owned books only
 function whenText(ms){
   if(!ms)return '';const d=new Date(ms),n=new Date(),day=864e5;
   const diff=Math.floor((new Date(n.getFullYear(),n.getMonth(),n.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/day);
@@ -97,7 +97,7 @@ document.addEventListener('visibilitychange',()=>{document.documentElement.class
 addEventListener('pagehide',()=>document.documentElement.classList.add('asleep'));addEventListener('pageshow',()=>document.documentElement.classList.remove('asleep'));
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-70';
+const APP_VERSION='home-71';
 // a new version arrived: drop the saved pictures once so new art shows straight away
 try{const v=localStorage.getItem('home.ver');
   if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);
