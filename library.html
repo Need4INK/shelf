@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>html{background:#0e0416}</style>
+<meta name="app-version" content="library-1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0e0416">
+<title>My Library</title>
+<link rel="stylesheet" href="book-frame.css">
+<style>
+html,body{margin:0;min-height:100%;background:#0e0416;color:#f1dcc0;font-family:"EB Garamond",Georgia,serif}
+body{min-height:100vh;box-sizing:border-box;background:radial-gradient(ellipse at 50% 0%,#3a1838 0%,#1a0a1e 55%,#0e0416 100%) fixed;
+ padding:calc(env(safe-area-inset-top,0px) + 14px) 0 calc(env(safe-area-inset-bottom,0px) + 140px)}
+h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.3),0 2px 2px #000;margin:2px 0 0;text-align:center}
+.sub{text-align:center;opacity:.75;font-size:17px;margin:0 0 4px}
+/* the bookcase */
+.case{margin:0 14px;padding-top:0}
+.shelf{position:relative;box-sizing:border-box;min-height:calc(var(--bw,110px) * 179 / 151 + 28px);display:grid;grid-template-columns:repeat(var(--per,3),1fr);gap:0 6px;align-items:end;padding:6px 2px 0;margin-bottom:28px;
+ background:radial-gradient(ellipse at 50% 100%,rgba(255,170,80,.12),transparent 70%)}
+.shelf::after{content:"";position:absolute;left:-8px;right:-8px;bottom:-16px;height:16px;border-radius:2px;
+ background:linear-gradient(180deg,#a06a3c 0,#7a4a26 25%,#5a3218 70%,#3a1e0e);
+ box-shadow:0 6px 10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,220,160,.35)}
+.slot{display:flex;flex-direction:column;align-items:center;min-width:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.slot .bk{width:var(--bw,110px);filter:drop-shadow(0 4px 3px rgba(0,0,0,.6))}
+.slot:active .bk{transform:translateY(-4px) scale(1.03)}
+.slot .bk{transition:transform .15s}
+.slot .bk-ph span{font-size:11px}
+.ttl{width:100%;margin:4px 0 4px;font-size:13px;line-height:1.1;text-align:center;color:#f1dcc0;opacity:.85;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{text-align:center;padding:30px 10px 40px;font-size:18px;opacity:.75}
+.empty a{color:#f1cf7c}
+#tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom,0px);
+ background:linear-gradient(transparent,#0d0310 calc(100% - env(safe-area-inset-bottom,0px)))}
+#tabbar .in{position:relative;width:calc(824px * var(--S,.4577));margin:0 auto}
+#tabbar img{display:block;width:100%;height:auto;pointer-events:none}
+#tabbar .tb{position:absolute;top:12%;width:18%;height:76%;border-radius:22px;-webkit-tap-highlight-color:transparent}
+#tabbar .barbook{position:absolute;left:19.21%;width:61.57%;height:auto;bottom:23.98%;pointer-events:none}
+#tabbar .bookmagic{position:absolute;left:-1.6%;width:103.2%;bottom:23.98%;pointer-events:none}
+#tabbar .bookhit{position:absolute;left:34.6%;width:30.8%;bottom:14%;height:84%;-webkit-tap-highlight-color:transparent;cursor:pointer}
+#tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.25),transparent)}
+</style>
+<script>(function(){
+  const p=document.createElement('div');p.style.cssText='position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';
+  document.documentElement.appendChild(p);
+  const fit=()=>document.documentElement.style.setProperty('--S',Math.max(innerWidth/852,(innerHeight-(p.offsetHeight||0))/1810));
+  fit();addEventListener('resize',fit);
+  // tapping Home when we came from Home: go back, so the phone shows the Home it kept in memory (no rebuild)
+  document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#tabbar a[aria-label="Home"]');if(!a)return;
+    let r=null;try{r=new URL(document.referrer)}catch(err){}
+    if(r&&r.origin===location.origin&&/\/(index\.html)?$/.test(r.pathname)&&history.length>1){e.preventDefault();history.back()}});
+})();</script>
+<style>/* All app lettering, kept in the app (no Google Fonts) so text never swaps fonts when a page opens. OFL. */
+@font-face{font-family:"EB Garamond";font-weight:400;src:url(fonts/EBGaramond-400.woff2) format("woff2");font-display:block}
+@font-face{font-family:"EB Garamond";font-weight:500;src:url(fonts/EBGaramond-500.woff2) format("woff2");font-display:block}
+@font-face{font-family:"EB Garamond";font-weight:600;src:url(fonts/EBGaramond-600.woff2) format("woff2");font-display:block}
+@font-face{font-family:"EB Garamond";font-weight:700;src:url(fonts/EBGaramond-700.woff2) format("woff2");font-display:block}
+@font-face{font-family:"EB Garamond";font-weight:400;font-style:italic;src:url(fonts/EBGaramond-400i.woff2) format("woff2");font-display:block}
+@font-face{font-family:"IM Fell English";src:url(fonts/IMFellEnglish.woff2) format("woff2");font-display:block}
+@font-face{font-family:"IM Fell English";font-style:italic;src:url(fonts/IMFellEnglishItalic.woff2) format("woff2");font-display:block}
+@font-face{font-family:"IM Fell English SC";src:url(fonts/IMFellEnglishSC.woff2) format("woff2");font-display:block}
+</style>
+</head>
+<body>
+<h1 id="title">My Library</h1>
+<p class="sub" id="count">&nbsp;</p>
+<div class="case" id="case"></div>
+<nav id="tabbar" aria-label="Sections">
+  <div class="in">
+    <img src="img/tabbar.webp" width="851" height="171" alt="">
+    <img class="barbook" src="img/bar_book.webp" alt="">
+    <a class="tb" style="left:4%" href="./" aria-label="Home"></a>
+    <a class="tb" style="left:78%" href="backup.html" aria-label="Backup"></a>
+  </div>
+</nav>
+<script src="bookmagic.js"></script>
+<script src="store.js"></script>
+<script src="book-frame.js"></script>
+<script>
+{
+const $ = id => document.getElementById(id);
+const PER = innerWidth >= 700 ? 4 : 3;           // books per shelf
+const list = new URLSearchParams(location.search).get('list') === 'wishlist' ? 'wishlist' : 'owned';
+let books = [];
+const esc = s => String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function render() {
+  const name = list === 'wishlist' ? 'Wishlist' : 'My Library';
+  $('title').textContent = name; document.title = name;
+  const a = books.filter(b => (b.status === 'wishlist') === (list === 'wishlist'))
+    .sort((x, y) => String(y.added || '').localeCompare(String(x.added || '')));
+  $('count').textContent = a.length ? `${a.length} book${a.length > 1 ? 's' : ''}` : '\u00a0';
+  const c = $('case'); c.style.setProperty('--per', PER); c.innerHTML = '';
+  const rows = Math.max(3, Math.ceil(a.length / PER));       // three shelves to start, a new one for each new row
+  for (let r = 0; r < rows; r++) {
+    const sh = document.createElement('div'); sh.className = 'shelf';
+    for (const b of a.slice(r * PER, r * PER + PER)) {
+      const s = document.createElement('div'); s.className = 'slot';
+      s.innerHTML = '<div class="bk">' + bookFrameHTML() + '</div><div class="ttl">' + esc(b.title) + '</div>';
+      setBook(s.querySelector('.bk'), b);
+      s.onclick = () => location.href = 'book.html?id=' + encodeURIComponent(b.id);
+      sh.appendChild(s);
+    }
+    if (!a.length && r === 0) sh.innerHTML = '<div class="empty" style="grid-column:1/-1">' +
+      (list === 'wishlist' ? 'Your wishlist is empty.' : 'No books on the shelves yet.') + '<br><a href="add.html">Add a book</a></div>';
+    c.appendChild(sh);
+  }
+}
+// book size: as big as fits the width, but small enough that 3 shelves fit above the bottom bar
+function sizeBooks() {
+  const c = $('case'), bar = document.querySelector('#tabbar .in').getBoundingClientRect();
+  const byW = Math.min(151, (c.clientWidth - 4 - (PER - 1) * 6) / PER);
+  const byH = ((bar.top + scrollY - c.getBoundingClientRect().top - scrollY - 80) / 3 - 28) * 151 / 179;
+  c.style.setProperty('--bw', Math.floor(Math.max(70, Math.min(byW, byH))) + 'px');
+}
+sizeBooks(); addEventListener('resize', sizeBooks);
+const load = () => Store.all().then(a => { books = a; render(); });
+load(); Store.onChange(load);
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
