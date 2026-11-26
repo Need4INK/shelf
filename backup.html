@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <style>html{background:#0e0416;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
-<meta name="app-version" content="backup-13">
+<meta name="app-version" content="backup-14">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -29,7 +29,7 @@ h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shado
  background:linear-gradient(transparent,#0d0310 calc(100% - env(safe-area-inset-bottom,0px)))}
 #tabbar .in{position:relative;width:calc(824px * var(--S,.4577));margin:0 auto}
 #tabbar img{display:block;width:100%;height:auto;pointer-events:none}
-#tabbar .tb{position:absolute;top:0;width:22%;height:100%;-webkit-tap-highlight-color:transparent}
+#tabbar .tb{position:absolute;top:0;width:22%;height:100%;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;cursor:pointer}
 #tabbar .barbook{position:absolute;left:19.21%;width:61.57%;height:auto;bottom:23.98%;pointer-events:none}
 #tabbar .bookmagic{position:absolute;left:-1.6%;width:103.2%;bottom:23.98%;pointer-events:none}
 #tabbar .bookhit{position:absolute;left:34.6%;width:30.8%;bottom:14%;height:84%;-webkit-tap-highlight-color:transparent;cursor:pointer}
@@ -41,6 +41,8 @@ h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shado
   const fit=()=>document.documentElement.style.setProperty('--S',Math.max(innerWidth/852,(innerHeight-(p.offsetHeight||0))/1810));
   fit();addEventListener('resize',fit);
   // tapping Home when we came from Home: go back, so the phone shows the Home it kept in memory (no rebuild)
+  // bar buttons have no web link (a long press would open the iPhone link menu); go there on tap
+  addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#tabbar [data-go]');if(a&&!e.defaultPrevented){e.preventDefault();location.href=a.dataset.go}});
   // iPhone only shows the pressed glow when the page listens for touches
   document.addEventListener('touchstart',()=>{},{passive:true});
   document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#tabbar a[aria-label="Home"]');if(!a)return;
@@ -77,8 +79,8 @@ h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shado
   <div class="in">
     <img src="img/tabbar.webp" width="851" height="171" alt="">
     <img class="barbook" src="img/bar_book.webp" alt="">
-    <a class="tb" style="left:0" href="./" aria-label="Home"></a>
-    <a class="tb" style="left:78%" href="backup.html" aria-label="Backup"></a>
+    <a class="tb" style="left:0" data-go="./" role="link" aria-label="Home"></a>
+    <a class="tb" style="left:78%" data-go="backup.html" role="link" aria-label="Backup"></a>
   </div>
 </nav>
 <script src="bookmagic.js"></script>

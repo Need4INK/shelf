@@ -40,7 +40,7 @@ html.back #stage{transition:none}   /* coming back to Home: appears whole the mo
  background:linear-gradient(transparent,#0d0310 calc(100% - env(safe-area-inset-bottom,0px)))}
 #tabbar .in{position:relative;width:calc(824px * var(--S,.4577));margin:0 auto}
 #tabbar img{display:block;width:100%;height:auto;pointer-events:none}
-#tabbar .tb{position:absolute;top:0;width:22%;height:100%;-webkit-tap-highlight-color:transparent}
+#tabbar .tb{position:absolute;top:0;width:22%;height:100%;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;cursor:pointer}
 #tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.38),transparent)}
 #bar{left:0!important;top:552px!important;width:852px;height:154px;background:url(img/bar_bg.webp) center/100% 100% no-repeat;z-index:3}
 .tab{position:absolute;top:13px;width:114px;height:114px;padding:0;border:0;border-radius:50%;cursor:pointer;
