@@ -6,9 +6,10 @@
    LAYOUT: full-screen stage, scaled to cover, anchored to the top */
 :root{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
-html,body{margin:0;height:100%;background:var(--skyTop,#0e0416);overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#0e0416;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 #stage{opacity:0;transition:opacity .45s ease}
 .ready #stage{opacity:1}
+html.ready,html.ready body{background:var(--skyTop,#0e0416)}   /* the sky colour only once Home is showing, never a bare sky-coloured screen while it loads */
 html.back #stage{transition:none}   /* coming back to Home: appears whole the moment its pictures are ready, no fade */   /* the bottom bar never fades, so it stays put between pages */   /* Home fades in whole, once its pictures are ready */
 #stage{position:absolute;left:50%;top:env(safe-area-inset-top,0px);width:852px;height:1810px;transform-origin:50% 0;overflow:visible}
 #stage>*{position:absolute;left:0;top:0}
