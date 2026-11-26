@@ -3,61 +3,61 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a3">
+<meta name="app-version" content="a4">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Shelf">
-<meta name="theme-color" content="#1f3a2e">
+<meta name="theme-color" content="#0e0416">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB3UlEQVR42u3bsY3CQBRF0WdEHy4A5AJcBRE94sgSmetwITSARAMWIgHGM+fEG6yWq+8/w7rrxyGw5eBPgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsSBOBAH4kAciANxgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsTBLxxL+CVuz8fnP3y6L1V+EufL1eRg2zpP6zyJg3eJiIMd9CEOfYgDcRge4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOMg+3nhLGy+Qpbw3U0wOxIE4sHM09Gg3ORAH4kAcWEjjEswubHIgDjxW3HOYHIgDcSAOxIHTSlyCNXiwMjkQB+JAHFhIXZ+bHIgDcWDniEuw2lcckwNx4LHiKGtyIA7EgTgQB04rcQlW+wHK5EAciAM7hxtSkwNxIA7EgYU0DV+CNbLtmhw4ymJyIA7EgTgQB+LAUTb+E6z2E7XJgTgQB3YO1+cmB+JAHIgDC2lcgtW+KZsciANxYOdwCWZyIA7EgTgQB+JAHCAOxIE46lXCt8riQBzGhjiUIQ5lxFf2svinrh8HHwweK4gDcSAOxIE4EAfiQByIA8SBOBAH4kAciANxIA7EgThAHIgDcSAOxIE4EAfiQByIA3GAOBAH4uDrXsZIQjfwkiY3AAAAAElFTkSuQmCC">
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB3UlEQVR42u3bsY3CQBRF0WdEHy4A5AJcBRE94sgSmetwITSARAMWIgHGM+fEG6yWq+8/w7rrxyGw5eBPgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsSBOBAH4kAciANxgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsTBLxxL+CVuz8fnP3y6L1V+EufL1eRg2zpP6zyJg3eJiIMd9CEOfYgDcRge4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOMg+3nhLGy+Qpbw3U0wOxIE4sHM09Gg3ORAH4kAcWEjjEswubHIgDjxW3HOYHIgDcSAOxIHTSlyCNXiwMjkQB+JAHFhIXZ+bHIgDcWDniEuw2lcckwNx4LHiKGtyIA7EgTgQB04rcQlW+wHK5EAciAM7hxtSkwNxIA7EgYU0DV+CNbLtmhw4ymJyIA7EgTgQB+LAUTb+E6z2E7XJgTgQB3YO1+cmB+JAHIgDC2lcgtW+KZsciANxYOdwCWZyIA7EgTgQB+JAHCAOxIE46lXCt8riQBzGhjiUIQ5lxFf2svinrh8HHwweK4gDcSAOxIE4EAfiQByIA8SBOBAH4kAciANxIA7EgThAHIgDcSAOxIE4EAfiQByIA3GAOBAH4uDrXsZIQjfwkiY3AAAAAElFTkSuQmCC">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--green:#1f3a2e;--paper:#f6f3ec;--card:#fff;--ink:#1b1b18;--mute:#6b675e;--line:#e2ddd2;--accent:#f2c14e;--red:#c8371e}
-@media(prefers-color-scheme:dark){:root{--paper:#121513;--card:#1c201d;--ink:#eeebe4;--mute:#a19d93;--line:#2e332f}}
+@view-transition{navigation:auto}
+@font-face{font-family:"IM Fell English";src:url(fonts/IMFellEnglishItalic.woff2) format("woff2");font-style:italic}
+:root{--paper:#1a0a1e;--card:rgba(60,24,62,.6);--ink:#f1dcc0;--mute:#c4a2b4;--line:rgba(232,190,140,.35);--accent:#f1cf7c;--red:#ff9a8a;--gold:linear-gradient(180deg,#f3d29a,#d9a066)}
 *{box-sizing:border-box;min-width:0}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 "Schibsted Grotesk",system-ui,-apple-system,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
-header{background:var(--green);color:#fff;padding:calc(env(safe-area-inset-top) + 14px) 18px 18px}
-header h1{margin:0;font-size:32px;font-weight:800;line-height:1.05}
-header p{margin:4px 0 0;opacity:.75;font-size:14px}
-main{max-width:640px;margin:0 auto;padding:16px}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
-h2{font-size:18px;margin:0 0 12px}
-.row{display:flex;gap:8px;flex-wrap:wrap}
-button,.btn{font:inherit;font-weight:600;min-height:46px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
-button.primary,.btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
+html{-webkit-text-size-adjust:100%;background:#0e0416;overflow-x:hidden}
+body{margin:0;min-height:100vh;overflow-x:hidden;color:var(--ink);font:18px/1.45 "EB Garamond",Georgia,serif;
+ background:radial-gradient(ellipse at 50% 0%,#3a1838 0%,#1a0a1e 55%,#0e0416 100%) fixed}
+header{padding:calc(env(safe-area-inset-top,0px) + 14px) 22px 0;text-align:center}
+header h1{margin:22px 0 6px;font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.3),0 2px 2px #000}
+header p{margin:0;opacity:.75;font-size:17px}
+header p+p{display:none}
+main{max-width:640px;margin:0 auto;padding:22px 22px 0}
+.panel{background:linear-gradient(180deg,rgba(90,40,88,.55),rgba(46,18,48,.7));border:1.5px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 6px 16px rgba(0,0,0,.5)}
+h2{font-size:22px;margin:0 0 12px;color:#f6dcb4}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+button,.btn{font:600 18px "EB Garamond",Georgia,serif;min-height:48px;padding:0 18px;border-radius:999px;border:1.5px solid var(--line);background:rgba(30,10,32,.6);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-align:center}
+button.primary,.btn.primary{background:var(--gold);color:#2a1410;border:0;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+button:active,.btn:active{filter:brightness(1.1);transform:scale(.98)}
 button.warn{color:var(--red)}
 button:disabled{opacity:.5}
 button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .grow{flex:1}
-input[type=text],input[type=search]{font:inherit;font-size:17px;width:100%;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+input[type=text],input[type=search]{font:inherit;font-size:17px;width:100%;min-height:48px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:rgba(20,6,22,.7);color:var(--ink)}
+input::placeholder{color:var(--mute);opacity:.8}
 .cam{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:4/3;margin-bottom:12px;display:none}
 .cam.on{display:block}
 .cam video{width:100%;height:100%;object-fit:cover;display:block}
 .cam .guide{position:absolute;left:10%;right:10%;top:32%;bottom:32%;border:3px solid var(--accent);border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.35)}
-.cam .hint{position:absolute;left:0;right:0;bottom:8px;text-align:center;color:#fff;font-size:14px}
-.status{font-size:14px;color:var(--mute);margin-top:10px;min-height:20px}
+.cam .hint{position:absolute;left:0;right:0;bottom:8px;text-align:center;color:#fff;font-size:15px}
+.status{font-size:16px;color:var(--accent);margin-top:10px;min-height:22px;text-align:center}
 .status.err{color:var(--red)}
 .book{display:grid;grid-template-columns:110px minmax(0,1fr);gap:14px}
-.cover{width:110px;aspect-ratio:2/3;border-radius:6px;background:var(--line);object-fit:cover;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:12px;text-align:center}
-.book h3{margin:0;font-size:21px;line-height:1.15}
+.cover{width:110px;aspect-ratio:2/3;border-radius:6px;background:rgba(0,0,0,.3);object-fit:cover;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:13px;text-align:center}
+.book h3{margin:0;font-size:22px;line-height:1.15;color:#f6dcb4}
 .book .sub{color:var(--mute);margin:2px 0 6px}
 .book .by{font-weight:600}
-dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:14px 0 0;font-size:14px}
+dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:14px 0 0;font-size:16px}
 dt{color:var(--mute)}dd{margin:0;overflow-wrap:anywhere}
-.desc{font-size:14px;margin-top:12px;color:var(--ink);max-height:9em;overflow:auto}
+.desc{font-size:16px;margin-top:12px;max-height:9em;overflow:auto}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.tags span{font-size:12px;background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
-.list{list-style:none;margin:12px 0 0;padding:0}
-.list li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
-.list img,.list .ph{width:44px;height:64px;border-radius:4px;object-fit:cover;background:var(--line)}
-.list b{display:block;line-height:1.2}
-.list small{color:var(--mute)}
-.empty{color:var(--mute);font-size:14px;padding:12px 0 0}
+.tags span{font-size:14px;background:rgba(20,6,22,.6);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+.empty{color:var(--mute);font-size:16px;padding:12px 0 0}
 .form{display:grid;gap:8px;margin-top:12px}
 .hidden{display:none!important}
 a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
@@ -74,7 +74,7 @@ main{padding-bottom:140px}
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a3</p>
+  <p style="font-size:12px;opacity:.5">a4</p>
 </header>
 <main>
   <section class="panel">
@@ -389,7 +389,7 @@ const loadBooks = () => Store.all().then(a => { books = a.sort((x, y) => (y.adde
 loadBooks(); Store.onChange(loadBooks);
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a3';
+const VERSION = 'a4';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
