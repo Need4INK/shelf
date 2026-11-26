@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416}</style>
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a7">
+<meta name="app-version" content="a8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -63,6 +63,7 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 #tabbar .in{position:relative;width:calc(824px * var(--S,.4577));margin:0 auto}
 #tabbar img{display:block;width:100%;height:auto;pointer-events:none}
 #tabbar .tb{position:absolute;top:12%;width:18%;height:76%;border-radius:22px;-webkit-tap-highlight-color:transparent}
+#tabbar .barbook{position:absolute;left:19.21%;width:61.57%;height:auto;bottom:23.98%;pointer-events:none}
 #tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.25),transparent)}
 main{padding-bottom:140px}
 </style>
@@ -91,7 +92,7 @@ main{padding-bottom:140px}
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a7</p>
+  <p style="font-size:12px;opacity:.5">a8</p>
 </header>
 <main>
   <section class="panel">
@@ -120,6 +121,7 @@ main{padding-bottom:140px}
 <nav id="tabbar" aria-label="Sections">
   <div class="in">
     <img src="img/tabbar.webp" width="851" height="171" alt="">
+    <img class="barbook" src="img/bar_book.webp" alt="">
     <a class="tb" style="left:4%" href="./" aria-label="Home"></a>
     <a class="tb" style="left:78%" href="backup.html" aria-label="Backup"></a>
   </div>
@@ -405,7 +407,7 @@ const loadBooks = () => Store.all().then(a => { books = a.sort((x, y) => (y.adde
 loadBooks(); Store.onChange(loadBooks);
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a7';
+const VERSION = 'a8';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
