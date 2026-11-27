@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-33">
+<meta name="app-version" content="book-34">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -193,7 +193,7 @@ function render(){
     <dl>
       <dt>Genre</dt><dd><select id="fGenre" aria-label="Genre">${GENRES.map(g=>`<option${g===(GENRES.includes(b.genre)?b.genre:'Other')?' selected':''}>${g}</option>`).join('')}</select></dd>
       <dt>Series</dt><dd><div class="ser"><input id="fSeries" placeholder="Series name" value="${esc(b.series)}"><input id="fSeriesNo" inputmode="decimal" placeholder="No." value="${esc(b.seriesNo)}"></div></dd>
-      <dt>Edition</dt><dd><input id="fEdition" placeholder="e.g. Hardback, signed" value="${esc(b.edition)}"></dd>
+      <dt>Edition</dt><dd><input id="fEdition" placeholder="e.g. Hardback, special edition" value="${esc(b.edition)}"></dd>
       ${rows.map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}
     </dl>
   </section>

@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a20">
+<meta name="app-version" content="a22">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -77,15 +77,22 @@ input::placeholder{color:var(--mute);opacity:.8}
 .book h3{margin:0;font:600 22px/1.15 "EB Garamond",Georgia,serif;color:#f6dcb4}
 .book .sub{color:#e0c79e;font-style:italic;margin:2px 0 4px;font-size:16px}
 .book .by{font-size:17px;margin-top:4px}
-dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;margin:14px 0 0;font-size:15px}
+dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 8px;margin:8px 0 0;font-size:14px;line-height:1.3}
 dt{color:var(--mute)}dd{margin:0;overflow-wrap:anywhere}
-.lbl{margin:16px 0 6px;font:400 15px "IM Fell English SC",Georgia,serif;color:#f1cf7c;letter-spacing:.3px}
+.lbl{margin:12px 0 5px;font:400 15px "IM Fell English SC",Georgia,serif;color:#f1cf7c;letter-spacing:.3px}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border-radius:999px;background:#14041c;box-shadow:inset 0 2px 5px rgba(0,0,0,.5)}
-.seg button{min-height:42px;border:0;background:transparent;color:#e7cfa6;font-size:17px}
+.seg button{min-height:38px;border:0;background:transparent;color:#e7cfa6;font-size:17px}
 .seg button[aria-pressed=true]{background:linear-gradient(#f6dc96,#c9a24e);color:#2a1408;box-shadow:0 2px 4px rgba(0,0,0,.4),inset 0 1px 0 #fff4c8}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips button{min-height:36px;padding:0 13px;font:500 15px "EB Garamond",Georgia,serif;background:rgba(20,6,22,.6)}
-.chips button[aria-pressed=true]{background:linear-gradient(#f6dc96,#c9a24e);color:#2a1408;border-color:transparent}
+/* genre: one row of round ticks with the name under each */
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:2px}
+.chips button{flex-direction:column;justify-content:flex-start;gap:4px;min-height:0;padding:2px 0;border:0;background:none;font:500 14px/1.1 "EB Garamond",Georgia,serif;color:#e7cfa6}
+.chips button::before{content:"";width:22px;height:22px;border-radius:50%;box-sizing:border-box;border:1.5px solid rgba(232,190,140,.55);background:#14041c;box-shadow:inset 0 2px 4px rgba(0,0,0,.5)}
+.chips button[aria-pressed=true]{color:#f6dcb4}
+.chips button[aria-pressed=true]::before{border:0;box-shadow:0 0 8px rgba(255,190,90,.6),inset 0 1px 0 #fff4c8;
+ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3 7.5l2.6 2.6L11 4.5' fill='none' stroke='%232a1408' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/14px no-repeat,linear-gradient(#f6dc96,#c9a24e)}
+.ser{display:grid;grid-template-columns:minmax(0,1fr) 72px;gap:8px}
+.ser input{min-height:40px}
+.lbl i{font:italic 14px "EB Garamond",Georgia,serif;letter-spacing:0;opacity:.7}
 .dup{margin:12px 0 0;text-align:center;font-style:italic;font-size:15px;color:var(--red)}
 .done{text-align:center}
 .done .bk{width:120px;margin:4px auto 14px;cursor:default}
@@ -140,7 +147,7 @@ main{padding-bottom:140px}
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a20</p>
+  <p style="font-size:12px;opacity:.5">a22</p>
   <div class="rule" id="steps" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg></div>
 </header>
 <main>
@@ -310,7 +317,10 @@ async function lookup(raw) {
 }
 
 /* ---------- Step 3: check & add ---------- */
-const facts = b => [['Publisher', b.publisher], ['Published', b.published], ['Pages', b.pages], ['ISBN', b.isbn13 || b.isbn10 || b.code]].filter(f => f[1]);
+// same names and order as the Book page's Details
+const LANG = { en: 'English', ro: 'Romanian', fr: 'French', de: 'German', es: 'Spanish', it: 'Italian', hu: 'Hungarian', ru: 'Russian', pt: 'Portuguese', nl: 'Dutch', pl: 'Polish', ja: 'Japanese' };
+const year = p => { const m = String(p || '').match(/\d{4}/); return m ? m[0] : p; };
+const facts = b => [['Publisher', b.publisher], ['Published', year(b.published)], ['Pages', b.pages], ['Language', LANG[b.language] || b.language], ['ISBN-13', b.isbn13]].filter(f => f[1]);
 function showBook(b) {
   const dup = b.isbn13 && books.some(x => x.isbn13 === b.isbn13);
   let list = 'owned', genre = GENRES.includes(b.genre) ? b.genre : guessGenre(b);
@@ -318,14 +328,16 @@ function showBook(b) {
   r.innerHTML = `<h2>Is this your book?</h2>
     <div class="book"><div class="bk">${bookFrameHTML()}</div>
       <div><h3>${esc(b.title || 'Untitled')}</h3>${b.subtitle ? `<div class="sub">${esc(b.subtitle)}</div>` : ''}
-      <div class="by">${esc((b.authors || []).join(', ') || 'Unknown author')}</div></div></div>
-    ${facts(b).length ? `<dl>${facts(b).map(f => `<dt>${f[0]}</dt><dd>${esc(f[1])}</dd>`).join('')}</dl>` : ''}
-    <div class="lbl">Put it on</div>
-    <div class="seg" id="list"><button data-v="owned" aria-pressed="true">My Library</button><button data-v="wishlist" aria-pressed="false">Wishlist</button></div>
+      <div class="by">${esc((b.authors || []).join(', ') || 'Unknown author')}</div>
+      ${facts(b).length ? `<dl>${facts(b).map(f => `<dt>${f[0]}</dt><dd>${esc(f[1])}</dd>`).join('')}</dl>` : ''}</div></div>
+    <div class="lbl">In my collection</div>
+    <div class="seg" id="list"><button data-v="owned" aria-pressed="true">Owned</button><button data-v="wishlist" aria-pressed="false">Wishlist</button></div>
     <div class="lbl">Genre</div>
-    <div class="chips" id="genre">${GENRES.map(g => `<button data-v="${esc(g)}" aria-pressed="${g === genre}">${esc(g)}</button>`).join('')}</div>
+    <div class="chips" id="genre" role="radiogroup">${GENRES.map(g => `<button data-v="${esc(g)}" aria-pressed="${g === genre}" aria-label="${esc(g)}">${esc(g).replace(' ', '<br>')}</button>`).join('')}</div>
+    <div class="lbl">Series <i>(optional)</i></div>
+    <div class="ser"><input type="text" id="aSeries" placeholder="Series name" autocomplete="off" value="${esc(b.series || '')}"><input type="text" id="aSeriesNo" inputmode="decimal" placeholder="No." autocomplete="off" value="${esc(b.seriesNo || '')}"></div>
     ${dup ? '<p class="dup">This book is already in your collection.</p>' : ''}
-    <button class="primary full" id="addBtn" style="margin-top:18px">Add to my library</button>
+    <button class="primary full" id="addBtn" style="margin-top:14px">Add to my library</button>
     <button class="other">Choose another way</button>`;
   setBook(r.querySelector('.bk'), b);
   const pick = (box, set) => box.onclick = e => { const t = e.target.closest('button'); if (!t) return;
@@ -333,7 +345,7 @@ function showBook(b) {
   pick($('list'), v => { list = v; $('addBtn').textContent = v === 'wishlist' ? 'Add to my wishlist' : 'Add to my library'; });
   pick($('genre'), v => genre = v);
   r.querySelector('.other').onclick = () => { status(''); show('s1'); };
-  $('addBtn').onclick = () => addBook(b, list, genre);
+  $('addBtn').onclick = () => addBook({ ...b, series: $('aSeries').value.trim(), seriesNo: $('aSeriesNo').value.trim() }, list, genre);
   show('s3');
 }
 function showNotFound(base) {
@@ -346,7 +358,7 @@ $('writeForm').onsubmit = e => { e.preventDefault();
   const a = $('wA').value.trim();
   showBook({ ...pending, title: $('wT').value.trim(), authors: a ? [a] : [], source: 'Manual' }); };
 async function addBook(b, list, genre) {
-  const { link, ...keep } = b;
+  const { link, ...keep } = b; if (!keep.series) { delete keep.series; delete keep.seriesNo; }
   const nb = { ...keep, status: list, genre, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: Date.now() };
   $('addBtn').disabled = true;
   try { await Store.put(nb); } catch (e) { $('addBtn').disabled = false; status('Could not save — storage unavailable.', true); return; }
@@ -472,7 +484,7 @@ loadBooks(); Store.onChange(loadBooks);
 show('s1');
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a20';
+const VERSION = 'a22';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
