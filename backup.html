@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
-<meta name="app-version" content="backup-17">
+<meta name="app-version" content="backup-18">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,11 +15,23 @@ html,body{margin:0;min-height:100%;background:#0e0416;color:#f1dcc0;font-family:
 body{min-height:100vh;box-sizing:border-box;background:radial-gradient(ellipse at 50% 0%,#3a1838 0%,#1a0a1e 55%,#0e0416 100%) fixed;
  padding:calc(env(safe-area-inset-top,0px) + 14px) 22px calc(env(safe-area-inset-bottom,0px) + 140px)}
 .back{color:#e8c890;text-decoration:none;font-size:17px;opacity:.85}
-h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.3),0 2px 2px #000;margin:22px 0 6px;text-align:center}
-.sub{text-align:center;opacity:.75;font-size:17px;margin:0 0 26px}
-.card{background:linear-gradient(180deg,rgba(90,40,88,.55),rgba(46,18,48,.7));border:1.5px solid rgba(232,190,140,.45);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 6px 16px rgba(0,0,0,.5)}
-.card h2{margin:0 0 4px;font-size:22px;color:#f6dcb4}
-.card p{margin:0 0 14px;font-size:16px;opacity:.8}
+h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.3),0 2px 2px #000;margin:2px 0 0;text-align:center}
+.sub{text-align:center;opacity:.75;font-size:17px;margin:0 0 4px}
+/* thin gold rule with a small star, under the book count (same as Library) */
+.rule{display:flex;align-items:center;justify-content:center;gap:8px;width:62%;margin:2px auto 24px;opacity:.75}
+.rule::before,.rule::after{content:"";flex:1;height:1px}
+.rule::before{background:linear-gradient(90deg,transparent,#d9a95c)}
+.rule::after{background:linear-gradient(90deg,#d9a95c,transparent)}
+.rule svg{width:11px;height:11px;filter:drop-shadow(0 0 3px rgba(255,190,90,.6))}
+/* same painted card as the Book page: purple panel + gold rim with leaf sprigs */
+.card{position:relative;margin:0 0 18px;padding:26px 28px;border-radius:24px;color:#f3e3c3;
+ background:linear-gradient(rgba(40,8,46,.25),rgba(20,4,26,.45)),url(img/panel.jpg) center/cover;
+ box-shadow:0 10px 22px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.4)}
+.card::before{content:"";position:absolute;inset:0;pointer-events:none;border-style:solid;border-color:transparent;border-width:42px;border-image:url(img/card_frame.webp) 190 stretch}
+.card>*{position:relative;z-index:1}
+.card h2{margin:0 0 6px;font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:22px;color:#f1cf7c}
+.card p{margin:0 0 14px;font-size:16px;opacity:.85}
+.card .last{margin:10px 0 0;text-align:center;font-style:italic;font-size:15px;color:#e0c79e;opacity:.9}
 .btn{display:block;width:100%;box-sizing:border-box;text-align:center;padding:13px;border-radius:999px;font:600 18px "EB Garamond",Georgia,serif;cursor:pointer;
  color:#2a1410;background:linear-gradient(180deg,#f3d29a,#d9a066);border:0;box-shadow:0 3px 8px rgba(0,0,0,.5)}
 .btn:active{filter:brightness(1.1);transform:scale(.98)}
@@ -72,16 +84,19 @@ h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shado
 <body>
 <h1>Backup</h1>
 <p class="sub" id="count">Keep your collection safe</p>
+<div class="rule" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg></div>
 <div class="card">
   <h2>Save a backup</h2>
   <p>Saves all your books to a file you can keep in Files or send to yourself.</p>
   <button class="btn" id="exportBtn">Save backup</button>
+  <p class="last" id="lastSave"></p>
 </div>
 <div class="card">
-  <h2>Restore from a backup</h2>
+  <h2>Restore a backup</h2>
   <p>Adds the books from a backup file. Books you already have stay as they are.</p>
-  <label class="btn" for="importFile">Choose backup file</label>
+  <label class="btn" for="importFile">Restore backup</label>
   <input type="file" id="importFile" accept="application/json,.json" class="hidden">
+  <p class="last" id="lastRestore"></p>
 </div>
 <div class="status" id="status"></div>
 <nav id="tabbar" aria-label="Sections">
@@ -101,11 +116,18 @@ const status = (m, err) => { const s = $('status'); s.textContent = m || ''; s.c
 let books = [];
 const load = () => Store.all().then(a => { books = a; $('count').textContent = a.length ? `${a.length} book${a.length > 1 ? 's' : ''} in your collection` : 'Keep your collection safe'; });
 load(); Store.onChange(load);
+// when the last backup / restore was done (kept on this phone)
+const when = t => new Date(t).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', ' ·');
+const showLast = () => { let s = null, r = null; try { s = localStorage.getItem('backup.saved'); r = localStorage.getItem('backup.restored'); } catch (e) {}
+  $('lastSave').textContent = s ? `Last backup: ${when(+s)}` : 'No backup saved yet';
+  $('lastRestore').textContent = r ? `Last restore: ${when(+r)}` : 'Nothing restored yet'; };
+const mark = k => { try { localStorage.setItem(k, Date.now()); } catch (e) {} showLast(); };
+showLast();
 $('exportBtn').onclick = () => {
   const blob = new Blob([JSON.stringify(books, null, 2)], { type: 'application/json' });
   const file = new File([blob], `shelf-backup-${new Date().toISOString().slice(0, 10)}.json`, { type: 'application/json' });
-  if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file] }).catch(() => {}); return; }
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click();
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file] }).then(() => mark('backup.saved')).catch(() => {}); return; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click(); mark('backup.saved');
 };
 $('importFile').onchange = async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
@@ -113,7 +135,7 @@ $('importFile').onchange = async e => {
     const data = JSON.parse(await f.text()); if (!Array.isArray(data)) throw 0;
     const have = new Set(books.map(b => b.id)); const fresh = data.filter(b => b && b.id && !have.has(b.id));
     fresh.forEach(b => { if (b.status !== 'wishlist') b.status = 'owned'; if (!GENRES.includes(b.genre)) b.genre = guessGenre(b); });
-    await Store.replaceAll([...fresh, ...books]); await load();
+    await Store.replaceAll([...fresh, ...books]); await load(); mark('backup.restored');
     status(`Restored ${fresh.length} book${fresh.length === 1 ? '' : 's'}.`);
     fresh.forEach(b => Store.saveCover(b));
   } catch (err) { status('That file isn’t a Shelf backup.', true); }
