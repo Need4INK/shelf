@@ -25,10 +25,13 @@
   /* the tap: six steam letters n,o,i,d,o,i are born from the pages and move exactly like all the others (nothing steers
      them). Their start points, speeds and tilts are worked out backwards, so their ordinary paths happen to cross
      the line "noi doi" at the same moment, upright and moving up together; then they slowly part and fade. */
-  const WORD='noi doi',LAM=-Math.log(.992)*60,SZ=15/B,VM=-20;let Wd=[],wMeet=-1e9;   // wMeet: when the latest word lines up
+  const WORDS=['noi doi','forever'],LAM=-Math.log(.992)*60,SZ=15/B,VM=-20;let Wd=[],wMeet=-1e9;   // wMeet: when the latest word lines up
   // steam motion in closed form (same as move(): drag on vx, rise speeding up, side sway, steady spin)
   const sway=(t,sw)=>-4/1.3*(Math.cos(t*1.3+sw)-Math.cos(sw));
-  function say(){const T0=performance.now();if(T0<wMeet+500)return;   // a new word only once the last one has lined upconst fs=B*SZ*1.15;c.font=`italic ${fs}px "IM Fell English",Georgia,serif`;
+  function say(){const T0=performance.now();if(T0<wMeet+500)return;   // a new word only once the last one has lined up
+    // the words take turns, tap after tap (remembered across pages)
+    let wi=0;try{wi=+(sessionStorage.getItem('bookmagic.word')||0)%WORDS.length;sessionStorage.setItem('bookmagic.word',(wi+1)%WORDS.length)}catch(e){}
+    const WORD=WORDS[wi];const fs=B*SZ*1.15;c.font=`italic ${fs}px "IM Fell English",Georgia,serif`;
     const ws=[...WORD].map(ch=>c.measureText(ch).width*(ch===' '?1.7:1.05)),tot=ws.reduce((a,b)=>a+b,0),mid=bx+bw/2;
     let x=mid-tot/2;const ty=H-bh*1.55,L=[];
     [...WORD].forEach((ch,i)=>{const tx=x+ws[i]/2;x+=ws[i];if(ch===' ')return;
