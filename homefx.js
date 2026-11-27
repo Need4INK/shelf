@@ -76,10 +76,10 @@
       e.stopPropagation();
       pk.classList.remove('tickle');void pk.offsetWidth;pk.classList.add('tickle');
       if(reduce)return;
-      // "ha ha ha" to his left: each "ha" pops in and fades, one after another, a little further from him each time
+      // "he he he" to his left: each "he" pops in and fades, one after another, a little further from him each time
       card.querySelectorAll('.giggle').forEach(g=>g.remove());
       const g=document.createElement('div');g.className='giggle';g.setAttribute('aria-hidden','true');
-      g.innerHTML='<span>ha</span><span>ha</span><span>ha</span>';card.appendChild(g);setTimeout(()=>g.remove(),1700);
+      g.innerHTML='<span>he</span><span>he</span><span>he</span>';card.appendChild(g);setTimeout(()=>g.remove(),1700);
     });
     pk.addEventListener('animationend',()=>pk.classList.remove('tickle'));
   }

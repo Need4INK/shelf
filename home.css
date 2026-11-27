@@ -120,7 +120,7 @@ html.intro-on,html.intro-on body{background:#0e0416!important}   /* dark behind 
  74%{transform:translateY(1px) scale(1.03,.97);animation-timing-function:ease-out}
  86%{transform:translateY(-2px) scale(.995,1.01)}
  100%{transform:none}}
-/* "ha ha ha" left of him (clear of his hat brim): the "ha"s pop in and fade one after another, zig-zagging up (right, left, right), each a little bigger */
+/* "he he he" left of him (clear of his hat brim): the "he"s pop in and fade one after another, zig-zagging up (right, left, right), each a little bigger */
 #reading .giggle{left:57%;top:16%;width:10%;height:30%;z-index:4;pointer-events:none}
 #reading .giggle span{position:absolute;font:italic 30px/1 "IM Fell English",Georgia,serif;color:#7a3410;opacity:0;animation:ha .62s ease-out forwards}
 #reading .giggle span:nth-child(1){right:0;top:62%;font-size:27px;animation-delay:.1s}
