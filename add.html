@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a30">
+<meta name="app-version" content="a31">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -115,6 +115,13 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 #tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.38),transparent)}
 main{padding-bottom:140px}
 </style>
+<style>/* Same as the Library: the page itself never moves or bounces, only its content scrolls (inside the body).
+   On the iPhone a bouncing page swallowed taps on the bottom bar; this keeps the bar quick on every page. */
+html{height:100%;overflow:hidden;overscroll-behavior:none;background:radial-gradient(ellipse at 50% 0%,#3a1838 0%,#1a0a1e 55%,#0e0416 100%)}
+body{height:100%;min-height:0;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;background:none}
+/* always a little scrollable, so a swipe never falls through to the page */
+body::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% + 1px)}
+</style>
 <script>(function(){
   const p=document.createElement('div');p.style.cssText='position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';
   document.documentElement.appendChild(p);
@@ -152,7 +159,7 @@ main{padding-bottom:140px}
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a30</p>
+  <p style="font-size:12px;opacity:.5">a31</p>
   <div class="rule" id="steps" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg></div>
 </header>
 <main>
@@ -251,7 +258,7 @@ function show(id) {
   // the status line sits inside the open card, above "Choose another way"
   const st = $('status'), other = p.querySelector('.other'); other ? p.insertBefore(st, other) : p.appendChild(st);
   const n = +p.dataset.step; document.querySelectorAll('#steps svg').forEach((g, i) => g.classList.toggle('on', i < n));
-  scrollTo({ top: 0, behavior: 'smooth' });
+  document.body.scrollTo({ top: 0, behavior: 'smooth' });
 }
 document.querySelectorAll('.other').forEach(b => b.onclick = () => { status(''); show('s1'); });
 document.querySelectorAll('.way').forEach(b => b.onclick = () => {
@@ -506,7 +513,7 @@ show('s1');
 if (qp.get('title')) { pending = {}; $('writeForm').reset(); $('wT').value = qp.get('title').slice(0, 200); show('s2write'); setTimeout(() => $('wA').focus(), 50); }
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a30';
+const VERSION = 'a31';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {

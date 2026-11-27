@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
-<meta name="app-version" content="backup-23">
+<meta name="app-version" content="backup-24">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -47,6 +47,13 @@ h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shado
 #tabbar .bookmagic{position:absolute;left:-1.6%;width:103.2%;bottom:23.98%;pointer-events:none}
 #tabbar .bookhit{position:absolute;left:34.6%;width:30.8%;bottom:calc(0px - env(safe-area-inset-bottom,0px));height:calc(98% + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent;cursor:pointer}
 #tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.38),transparent)}
+</style>
+<style>/* Same as the Library: the page itself never moves or bounces, only its content scrolls (inside the body).
+   On the iPhone a bouncing page swallowed taps on the bottom bar; this keeps the bar quick on every page. */
+html{height:100%;overflow:hidden;overscroll-behavior:none;background:radial-gradient(ellipse at 50% 0%,#3a1838 0%,#1a0a1e 55%,#0e0416 100%)}
+body{height:100%;min-height:0;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;background:none}
+/* always a little scrollable, so a swipe never falls through to the page */
+body::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% + 1px)}
 </style>
 <script>(function(){
   const p=document.createElement('div');p.style.cssText='position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';

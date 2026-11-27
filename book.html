@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-43">
+<meta name="app-version" content="book-44">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -104,6 +104,13 @@ dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
 #tabbar .bookmagic{position:absolute;left:-1.6%;width:103.2%;bottom:23.98%;pointer-events:none}
 #tabbar .bookhit{position:absolute;left:34.6%;width:30.8%;bottom:calc(0px - env(safe-area-inset-bottom,0px));height:calc(98% + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent;cursor:pointer}
 #tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.38),transparent)}
+</style>
+<style>/* Same as the Library: the page itself never moves or bounces, only its content scrolls (inside the body).
+   On the iPhone a bouncing page swallowed taps on the bottom bar; this keeps the bar quick on every page. */
+html{height:100%;overflow:hidden;overscroll-behavior:none;background:radial-gradient(120% 60% at 50% 0%,#4a1a5e 0%,#2a0b38 45%,#14051c 100%)}
+body{height:100%;min-height:0;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;background:none}
+/* always a little scrollable, so a swipe never falls through to the page */
+body::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% + 1px)}
 </style>
 <script>(function(){
   const p=document.createElement('div');p.style.cssText='position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';
@@ -246,7 +253,7 @@ function render(){
   });
   // edit mode: Edit book → work on a copy; Save stores it (and the new cover), Cancel drops it
   const ed=document.getElementById('ed');
-  if(!editing)ed.onclick=()=>{draft=JSON.parse(JSON.stringify(real));editing=true;render();scrollTo({top:0,behavior:'smooth'})};
+  if(!editing)ed.onclick=()=>{draft=JSON.parse(JSON.stringify(real));editing=true;render();document.body.scrollTo({top:0,behavior:'smooth'})};
   if(editing){
   ed.onclick=async()=>{
     ed.disabled=true;const nb=draft;
@@ -257,10 +264,10 @@ function render(){
     }catch(e){ed.disabled=false;return}
     if(dropOwn)Store.saveCover(nb);
     const k=ALL.findIndex(x=>x.id===id);if(k>=0)ALL[k]=nb;
-    endEdit();render();scrollTo({top:0,behavior:'smooth'});
+    endEdit();render();document.body.scrollTo({top:0,behavior:'smooth'});
     const sv=document.getElementById('saved');sv.classList.add('show');clearTimeout(save.t);save.t=setTimeout(()=>sv.classList.remove('show'),1100);
   };
-  document.getElementById('cancel').onclick=()=>{endEdit();render();scrollTo({top:0,behavior:'smooth'})};
+  document.getElementById('cancel').onclick=()=>{endEdit();render();document.body.scrollTo({top:0,behavior:'smooth'})};
   const hero=()=>{document.querySelector('.hero h1').textContent=draft.title||'Untitled';document.querySelector('.hero .by').textContent=(draft.authors||[]).join(', ')||'Unknown author';
     const t=draft.series?draft.series+(draft.seriesNo?' · Book '+draft.seriesNo:''):'';let s=document.querySelector('.hero .series');
     if(!s&&t){s=document.createElement('p');s.className='series';document.querySelector('.hero').appendChild(s)}if(s){s.textContent=t;s.hidden=!t}};
