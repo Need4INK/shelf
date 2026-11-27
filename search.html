@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
+<meta name="color-scheme" content="dark">
+<meta name="app-version" content="search-1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0e0416">
+<title>Search</title>
+<link rel="stylesheet" href="book-frame.css">
+<style>
+html,body{margin:0;background:#0e0416;color:#f1dcc0;font-family:"EB Garamond",Georgia,serif}
+/* like the Library: the page stays still, only the results scroll */
+html{height:100%;overflow:hidden;overscroll-behavior:none}
+body{height:100vh;overflow:hidden;overscroll-behavior:none;box-sizing:border-box;
+ background:radial-gradient(ellipse at 50% 0%,#3a1838 0%,#1a0a1e 55%,#0e0416 100%) fixed;padding:calc(env(safe-area-inset-top,0px) + 14px) 0 0}
+h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.3),0 2px 2px #000;margin:2px 0 0;text-align:center}
+.rule{display:flex;align-items:center;justify-content:center;gap:8px;width:62%;margin:4px auto 12px;opacity:.75}
+.rule::before,.rule::after{content:"";flex:1;height:1px}
+.rule::before{background:linear-gradient(90deg,transparent,#d9a95c)}
+.rule::after{background:linear-gradient(90deg,#d9a95c,transparent)}
+.rule svg{width:11px;height:11px;filter:drop-shadow(0 0 3px rgba(255,190,90,.6))}
+#hdr{max-width:640px;margin:0 auto}
+/* the search field: purple panel in the gold frame */
+.box{position:relative;margin:0 16px;height:58px;border-radius:18px;display:flex;align-items:center;padding:0 16px 0 20px;gap:10px;
+ background:linear-gradient(rgba(40,8,46,.25),rgba(20,4,26,.45)),url(img/panel.jpg) center/cover;box-shadow:0 8px 18px rgba(0,0,0,.5),inset 0 0 20px rgba(0,0,0,.5)}
+.box::before{content:"";position:absolute;inset:0;border-style:solid;border-color:transparent;border-width:22px;border-image:url(img/card_frame.webp) 190 stretch;pointer-events:none}
+.box img{width:30px;height:30px;object-fit:contain;flex:none;position:relative}
+#q{position:relative;flex:1;min-width:0;height:100%;border:0;background:none;outline:none;padding:0;margin:0;color:#f6e6c8;font:21px "EB Garamond",Georgia,serif;caret-color:#f1cf7c;-webkit-appearance:none;appearance:none}
+#q::placeholder{color:rgba(241,220,192,.5);font-style:italic}
+#q::-webkit-search-cancel-button{display:none}
+#clr{position:relative;flex:none;width:34px;height:34px;margin-right:-4px;border:0;padding:0;border-radius:50%;background:none;display:grid;place-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#clr span{width:24px;height:24px;border-radius:50%;background:rgba(241,207,124,.25);color:#f1cf7c;font:16px/24px Georgia,serif;text-align:center}
+#clr[hidden]{display:none}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 16px 2px}
+.chip{font:17px "EB Garamond",Georgia,serif;padding:4px 14px;min-height:32px;border-radius:16px;border:1px solid rgba(217,169,92,.55);background:none;color:#f1dcc0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.chip[aria-pressed=true]{background:linear-gradient(#e2b865,#a8742e);color:#2a0f22;font-weight:600;border-color:#f1cf7c}
+.chip:active{filter:brightness(1.15)}
+#res{position:fixed;left:0;right:0;top:var(--top,220px);bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;
+ box-sizing:border-box;padding:6px 0 calc(171px / 851 * 824 * var(--S,.4577) + env(safe-area-inset-bottom,0px) + 16px);
+ -webkit-mask-image:linear-gradient(transparent 0,#000 14px);mask-image:linear-gradient(transparent 0,#000 14px)}
+#res::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% + 1px)}
+.in-res{max-width:640px;margin:0 auto}
+h2{font:400 19px "IM Fell English SC",Georgia,serif;color:#f1cf7c;margin:12px 22px 6px;display:flex;justify-content:space-between;align-items:baseline}
+h2 small{font:15px "EB Garamond",Georgia,serif;opacity:.7}
+.row{display:flex;gap:12px;align-items:center;margin:0 16px 8px;padding:6px 12px 6px 6px;border-radius:14px;background:rgba(60,20,62,.55);border:1px solid rgba(217,169,92,.25);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.row:active{background:rgba(90,34,88,.7)}
+.row .bk{width:60px;flex:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.6));pointer-events:none}
+.row .bk-ph span{font-size:7px}
+.row .tx{min-width:0}
+.t{font:600 18px/1.15 "EB Garamond",Georgia,serif;color:#f6dcb4}
+.a{font-size:15px;opacity:.8;line-height:1.25}
+.s{font-size:14px;color:#d9a95c;font-style:italic;line-height:1.25}
+mark{background:none;color:#ffd77a;text-shadow:0 0 8px rgba(255,190,90,.7);box-shadow:inset 0 -1px 0 #d9a95c}
+.rec{margin:0 22px}
+.rec button{display:flex;gap:10px;align-items:center;width:100%;padding:9px 0;border:0;border-bottom:1px solid rgba(217,169,92,.18);background:none;color:#f1dcc0;font:18px "EB Garamond",Georgia,serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rec button::before{content:"\21BA";color:#d9a95c}
+.rec button:active{color:#ffd77a}
+.ser{display:flex;flex-wrap:wrap;gap:8px;margin:0 20px}
+.hint{text-align:center;margin:26px 30px 0;font-size:18px;opacity:.7;font-style:italic}
+.none{text-align:center;margin:30px 26px 0;font-size:19px;line-height:1.4}
+.none .big{font:italic 26px "IM Fell English",Georgia,serif;color:#f1cf7c;margin-bottom:6px}
+.none .btn{display:flex;align-items:center;justify-content:center;margin:14px auto 0;width:240px;min-height:46px;border-radius:23px;font:600 18px "EB Garamond",Georgia,serif;background:linear-gradient(#f3d29a,#d9a066);color:#2a1410;border:0;box-shadow:0 3px 8px rgba(0,0,0,.5);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.none .btn.o{background:none;border:1.5px solid rgba(232,190,140,.55);color:#f1cf7c;box-shadow:none}
+.none .btn:active{filter:brightness(1.1);transform:scale(.98)}
+#tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom,0px);
+ background:linear-gradient(transparent,#0d0310 calc(100% - env(safe-area-inset-bottom,0px)))}
+#tabbar .in{position:relative;width:calc(824px * var(--S,.4577));margin:0 auto}
+#tabbar img{display:block;width:100%;height:auto;pointer-events:none}
+#tabbar .tb{position:absolute;top:8%;width:22%;height:calc(92% + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;cursor:pointer}
+#tabbar .barbook{position:absolute;left:19.21%;width:61.57%;height:auto;bottom:23.98%;pointer-events:none}
+#tabbar .bookmagic{position:absolute;left:-1.6%;width:103.2%;bottom:23.98%;pointer-events:none}
+#tabbar .bookhit{position:absolute;left:34.6%;width:30.8%;bottom:calc(0px - env(safe-area-inset-bottom,0px));height:calc(98% + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent;cursor:pointer}
+#tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.38),transparent)}
+</style>
+<script>(function(){
+  const p=document.createElement('div');p.style.cssText='position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';
+  document.documentElement.appendChild(p);
+  const fit=()=>document.documentElement.style.setProperty('--S',Math.max(innerWidth/852,(innerHeight-(p.offsetHeight||0))/1810));
+  fit();addEventListener('resize',fit);
+  // tapping Home when we came from Home: go back, so the phone shows the Home it kept in memory (no rebuild)
+  // bar buttons have no web link (a long press would open the iPhone link menu); go there on tap
+  addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#tabbar [data-go]');if(a&&!e.defaultPrevented){e.preventDefault();location.href=a.dataset.go}});
+  // iPhone only shows the pressed glow when the page listens for touches
+  document.addEventListener('touchstart',()=>{},{passive:true});
+  // the bar keeps its own touches: it never scrolls what is under it (the shelves on Library/Wishlist could take the
+  // touch, so taps were lost), and lifting the finger on the same button counts as a tap
+  document.addEventListener('DOMContentLoaded',()=>{const t=document.getElementById('tabbar');if(!t)return;
+    t.addEventListener('touchmove',e=>{if(e.cancelable)e.preventDefault()},{passive:false});
+    t.addEventListener('touchend',e=>{const a=e.target.closest&&e.target.closest('.tb'),p=e.changedTouches[0];if(!a||!p)return;
+      const h=document.elementFromPoint(p.clientX,p.clientY);if(h&&h.closest&&h.closest('.tb')===a&&e.cancelable){e.preventDefault();a.click()}});});
+  document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#tabbar a[aria-label="Home"]');if(!a)return;
+    let r=null;try{r=new URL(document.referrer)}catch(err){}
+    if(r&&r.origin===location.origin&&/\/(index\.html)?$/.test(r.pathname)&&history.length>1){e.preventDefault();
+      // if the phone ignores going back (it can, e.g. after the app was in the background), open Home directly
+      const t=setTimeout(()=>{location.href=a.dataset.go||'index.html'},600);addEventListener('pagehide',()=>clearTimeout(t),{once:true});history.back()}});
+})();</script>
+<style>/* All app lettering, kept in the app (no Google Fonts) so text never swaps fonts when a page opens. OFL. */
+@font-face{font-family:"EB Garamond";font-weight:400;src:url(fonts/EBGaramond-400.woff2) format("woff2");font-display:block}
+@font-face{font-family:"EB Garamond";font-weight:500;src:url(fonts/EBGaramond-500.woff2) format("woff2");font-display:block}
+@font-face{font-family:"EB Garamond";font-weight:600;src:url(fonts/EBGaramond-600.woff2) format("woff2");font-display:block}
+@font-face{font-family:"EB Garamond";font-weight:700;src:url(fonts/EBGaramond-700.woff2) format("woff2");font-display:block}
+@font-face{font-family:"EB Garamond";font-weight:400;font-style:italic;src:url(fonts/EBGaramond-400i.woff2) format("woff2");font-display:block}
+@font-face{font-family:"IM Fell English";src:url(fonts/IMFellEnglish.woff2) format("woff2");font-display:block}
+@font-face{font-family:"IM Fell English";font-style:italic;src:url(fonts/IMFellEnglishItalic.woff2) format("woff2");font-display:block}
+@font-face{font-family:"IM Fell English SC";src:url(fonts/IMFellEnglishSC.woff2) format("woff2");font-display:block}
+</style>
+</head>
+<body>
+<header id="hdr">
+<h1>Search</h1>
+<div class="rule" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg></div>
+<form class="box" id="form" role="search" action="javascript:void 0">
+<img src="img/ic_search.webp" alt="">
+<input id="q" type="search" enterkeyhint="search" placeholder="Title, author or series…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Search your books">
+<button type="button" id="clr" aria-label="Clear" hidden><span>&#x2715;</span></button>
+</form>
+<div class="chips" id="lists">
+<button class="chip" data-v="all" aria-pressed="true">All</button><button class="chip" data-v="owned" aria-pressed="false">Library</button><button class="chip" data-v="wishlist" aria-pressed="false">Wishlist</button>
+</div>
+</header>
+<div id="res"><div class="in-res" id="out"></div></div>
+<nav id="tabbar" aria-label="Sections">
+  <div class="in">
+    <img src="img/tabbar.webp" width="851" height="171" alt="">
+    <img class="barbook" src="img/bar_book.webp" alt="">
+    <a class="tb" style="left:0" data-go="./" role="link" aria-label="Home"></a>
+    <a class="tb" style="left:78%" data-go="backup.html" role="link" aria-label="Backup"></a>
+  </div>
+</nav>
+<script src="bookmagic.js"></script>
+<script src="store.js"></script>
+<script src="book-frame.js"></script>
+<script src="undo.js"></script>
+<script>
+{
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const RECENT = 'search.recent', LAST = 'search.q';
+let books = [], which = 'all';
+try { which = sessionStorage.getItem('search.list') || 'all'; } catch (e) {}
+
+/* matching ignores capitals and accents: each letter is folded, and we keep where it came from (for the gold glow) */
+const fold1 = ch => ch.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[ßæœ]/, c => ({ 'ß': 's', 'æ': 'a', 'œ': 'o' }[c]));
+function fold(s) { s = String(s || ''); let t = '', at = []; for (let i = 0; i < s.length; i++) { const f = fold1(s[i]); for (const c of f) { t += c; at.push(i); } } return { t, at }; }
+const words = q => fold(q).t.replace(/[^\p{L}\p{N}]+/gu, ' ').trim().split(' ').filter(Boolean);
+const isStart = (t, i) => i === 0 || /[^\p{L}\p{N}]/u.test(t[i - 1]);
+// how well one word fits a text: 0 the text starts with it, 1 a word starts with it, 2 somewhere inside, -1 not at all
+function fit(text, w) {
+  const i = text.indexOf(w); if (i < 0) return -1; if (i === 0) return 0;
+  for (let j = i; j >= 0; j = text.indexOf(w, j + 1)) if (isStart(text, j)) return 1;
+  return 2;
+}
+function score(b, ws) {
+  const f = [b.title, b.subtitle, (b.authors || []).join(', '), b.series].map(x => fold(x).t);
+  let total = 0;
+  for (const w of ws) {
+    let best = 9;
+    f.forEach((t, k) => { const r = fit(t, w); if (r >= 0) best = Math.min(best, r + (k ? 1 : 0)); });   // the title counts a little more
+    if (best === 9) return null; total += best;
+  }
+  return total;
+}
+// the words she typed, glowing gold inside a line of text
+function glow(s, ws) {
+  s = String(s || ''); if (!s) return '';
+  const { t, at } = fold(s), on = new Array(s.length).fill(false);
+  for (const w of ws) for (let i = t.indexOf(w); i >= 0; i = t.indexOf(w, i + 1)) for (let k = i; k < i + w.length; k++) on[at[k]] = true;
+  let h = '', open = false;
+  for (let i = 0; i < s.length; i++) { if (on[i] !== open) { h += on[i] ? '<mark>' : '</mark>'; open = on[i]; } h += esc(s[i]); }
+  return h + (open ? '</mark>' : '');
+}
+
+const recent = () => { try { const a = JSON.parse(localStorage.getItem(RECENT) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } };
+function remember(q) {
+  q = q.trim(); if (q.length < 2) return;
+  const a = [q, ...recent().filter(x => fold(x).t !== fold(q).t)].slice(0, 5);
+  try { localStorage.setItem(RECENT, JSON.stringify(a)); } catch (e) {}
+}
+
+function setList(v) {
+  which = v; try { sessionStorage.setItem('search.list', v); } catch (e) {}
+  $('lists').querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.v === v));
+}
+function row(b, ws) {
+  const r = document.createElement('div'); r.className = 'row'; r.setAttribute('role', 'link');
+  const ser = b.series ? glow(b.series, ws) + (b.seriesNo ? ' · #' + esc(b.seriesNo) : '') : '';
+  r.innerHTML = '<div class="bk">' + bookFrameHTML() + '</div><div class="tx"><div class="t">' + glow(b.title || 'Untitled', ws) + '</div>' +
+    (b.subtitle && words(b.subtitle).some(x => ws.some(w => x.includes(w))) ? '<div class="a">' + glow(b.subtitle, ws) + '</div>' : '') +
+    '<div class="a">' + (glow((b.authors || []).join(', '), ws) || 'Unknown author') + '</div>' + (ser ? '<div class="s">' + ser + '</div>' : '') + '</div>';
+  setBook(r.querySelector('.bk'), b);
+  r.onclick = () => { remember($('q').value); location.href = 'book.html?id=' + encodeURIComponent(b.id); };
+  return r;
+}
+function render() {
+  const q = $('q').value, ws = words(q), out = $('out');
+  $('clr').hidden = !q;
+  try { sessionStorage.setItem(LAST, q); } catch (e) {}
+  out.innerHTML = '';
+  const lists = $('lists').querySelectorAll('.chip');
+  if (!ws.length) {
+    lists[1].textContent = 'Library'; lists[2].textContent = 'Wishlist';
+    const rc = recent(), ser = [...new Set(books.filter(b => which === 'all' || (b.status === 'wishlist') === (which === 'wishlist')).map(b => (b.series || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    let h = '';
+    if (rc.length) h += '<h2>Recent searches</h2><div class="rec">' + rc.map(x => '<button type="button" data-q="' + esc(x) + '">' + esc(x) + '</button>').join('') + '</div>';
+    if (ser.length) h += '<h2>Your series</h2><div class="ser">' + ser.map(x => '<button type="button" class="chip" data-q="' + esc(x) + '">' + esc(x) + '</button>').join('') + '</div>';
+    if (!h) h = '<p class="hint">Type a title, an author or a series.</p>';
+    out.innerHTML = h;
+    out.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { $('q').value = b.dataset.q; remember(b.dataset.q); render(); });
+    return;
+  }
+  const hits = books.map(b => ({ b, s: score(b, ws) })).filter(x => x.s !== null)
+    .sort((x, y) => x.s - y.s || String(x.b.title || '').localeCompare(String(y.b.title || '')));
+  const own = hits.filter(x => x.b.status !== 'wishlist'), wish = hits.filter(x => x.b.status === 'wishlist');
+  lists[1].textContent = 'Library ' + own.length; lists[2].textContent = 'Wishlist ' + wish.length;
+  const groups = [];
+  if (which !== 'wishlist') groups.push(['In your Library', own]);
+  if (which !== 'owned') groups.push(['On your Wishlist', wish]);
+  let any = false;
+  for (const [name, a] of groups) {
+    if (!a.length) continue; any = true;
+    const h = document.createElement('h2'); h.innerHTML = esc(name) + '<small>' + a.length + '</small>'; out.appendChild(h);
+    a.forEach(x => out.appendChild(row(x.b, ws)));
+  }
+  if (!any) {
+    const t = q.trim(), where = which === 'owned' ? ' in your Library' : which === 'wishlist' ? ' on your Wishlist' : '';
+    const d = document.createElement('div'); d.className = 'none';
+    d.innerHTML = '<div class="big">Not on your shelves… yet</div>No book' + where + ' matches “' + esc(t) + '”.' +
+      '<button type="button" class="btn" data-l="owned">Add it to the Library</button><button type="button" class="btn o" data-l="wishlist">Add it to the Wishlist</button>';
+    d.querySelectorAll('.btn').forEach(b => b.onclick = () => { remember(t); location.href = 'add.html?title=' + encodeURIComponent(t) + '&list=' + b.dataset.l; });
+    out.appendChild(d);
+  }
+}
+
+$('q').addEventListener('input', () => { $('res').scrollTop = 0; render(); });
+$('form').addEventListener('submit', e => { e.preventDefault(); remember($('q').value); $('q').blur(); });
+$('clr').onclick = () => { $('q').value = ''; render(); $('q').focus(); };
+$('lists').onclick = e => { const c = e.target.closest('.chip'); if (!c) return; setList(c.dataset.v); $('res').scrollTop = 0; render(); };
+// moving the results puts the keyboard away, so she can see them all
+$('res').addEventListener('touchstart', () => { if (document.activeElement === $('q')) $('q').blur(); }, { passive: true });
+
+function place() { $('res').style.setProperty('--top', Math.round($('hdr').getBoundingClientRect().bottom) + 'px'); }
+place(); addEventListener('resize', place);
+if (window.ResizeObserver) new ResizeObserver(place).observe($('hdr'));
+if (document.fonts) document.fonts.ready.then(place);
+
+// coming back from a book: the same search again; from Home: a fresh one
+try { if (/\/book\.html/.test(document.referrer)) $('q').value = sessionStorage.getItem(LAST) || ''; else which = 'all'; } catch (e) {}
+setList(which);
+const load = () => Store.all().then(a => { books = a; render(); });
+load(); Store.onChange(load);
+addEventListener('pageshow', e => { if (e.persisted) load(); }); addEventListener('shelf-undo', load);
+// ready to type straight away (the iPhone may still want a tap on the field to show the keyboard)
+if (!$('q').value) $('q').focus();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

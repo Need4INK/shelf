@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a29">
+<meta name="app-version" content="a30">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -152,7 +152,7 @@ main{padding-bottom:140px}
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a29</p>
+  <p style="font-size:12px;opacity:.5">a30</p>
   <div class="rule" id="steps" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg></div>
 </header>
 <main>
@@ -235,7 +235,9 @@ main{padding-bottom:140px}
 const $ = id => document.getElementById(id) || document.createElement('input');   // parts not on this page are harmless stand-ins
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let books = [];
-let current = null, pending = {};   // pending: ISBN/code kept when a lookup finds nothing and she writes it in
+let current = null, pending = {};
+// from Search ("Add it to the Library / Wishlist"): add.html?title=…&list=wishlist|owned
+const qp = new URLSearchParams(location.search), startList = qp.get('list') === 'wishlist' ? 'wishlist' : 'owned';   // pending: ISBN/code kept when a lookup finds nothing and she writes it in
 
 function status(msg, err) { const s = $('status'); s.textContent = msg || ''; s.className = 'status' + (err ? ' err' : ''); }
 
@@ -330,7 +332,7 @@ const facts = b => [['Publisher', b.publisher], ['Published', year(b.published)]
 let photo = null, photoURL = null;   // her own cover photo, kept until the book is added
 function showBook(b) {
   const dup = b.isbn13 && books.some(x => x.isbn13 === b.isbn13);
-  let list = 'owned', genre = GENRES.includes(b.genre) ? b.genre : guessGenre(b);
+  let list = startList, genre = GENRES.includes(b.genre) ? b.genre : guessGenre(b);
   const r = $('s3');
   r.innerHTML = `<h2>Is this your book?</h2>
     <div class="book"><div class="bkw"><div class="bk">${bookFrameHTML()}</div><button class="covcam" id="covcam" aria-label="Use my own cover photo"><svg viewBox="0 0 24 24" fill="none" stroke="#2a1408" stroke-width="2" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.6"/></svg></button></div>
@@ -338,13 +340,13 @@ function showBook(b) {
       <div class="by">${esc((b.authors || []).join(', ') || 'Unknown author')}</div>
       ${facts(b).length ? `<dl>${facts(b).map(f => `<dt>${f[0]}</dt><dd>${esc(f[1])}</dd>`).join('')}</dl>` : ''}</div></div>
     <div class="lbl">In my collection</div>
-    <div class="seg" id="list"><button data-v="owned" aria-pressed="true">Owned</button><button data-v="wishlist" aria-pressed="false">Wishlist</button></div>
+    <div class="seg" id="list"><button data-v="owned" aria-pressed="${list === 'owned'}">Owned</button><button data-v="wishlist" aria-pressed="${list === 'wishlist'}">Wishlist</button></div>
     <div class="lbl">Genre</div>
     <div class="chips" id="genre" role="radiogroup">${GENRES.map(g => `<button data-v="${esc(g)}" aria-pressed="${g === genre}" aria-label="${esc(g)}">${esc(g).replace(' ', '<br>')}</button>`).join('')}</div>
     <div class="lbl">Series <i>(optional)</i></div>
     <div class="ser"><input type="text" id="aSeries" placeholder="Series name" autocomplete="off" value="${esc(b.series || '')}"><input type="text" id="aSeriesNo" inputmode="decimal" placeholder="No." autocomplete="off" value="${esc(b.seriesNo || '')}"></div>
     ${dup ? '<p class="dup">This book is already in your collection.</p>' : ''}
-    <button class="primary full" id="addBtn" style="margin-top:14px">Add to my library</button>
+    <button class="primary full" id="addBtn" style="margin-top:14px">${list === 'wishlist' ? 'Add to my wishlist' : 'Add to my library'}</button>
     <button class="other">Choose another way</button>`;
   setBook(r.querySelector('.bk'), photo ? { ...b, cover: photoURL } : b);
   $('covcam').onclick = async () => {
@@ -500,9 +502,11 @@ const loadBooks = () => Store.all().then(a => { books = a;
   $('count').textContent = a.length ? `${a.length} book${a.length > 1 ? 's' : ''} in your catalog` : 'Your book catalog'; });
 loadBooks(); Store.onChange(loadBooks);
 show('s1');
+// from Search: straight to Write it in, with her words as the title
+if (qp.get('title')) { pending = {}; $('writeForm').reset(); $('wT').value = qp.get('title').slice(0, 200); show('s2write'); setTimeout(() => $('wA').focus(), 50); }
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a29';
+const VERSION = 'a30';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
