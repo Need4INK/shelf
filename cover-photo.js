@@ -11,19 +11,22 @@ const CoverPhoto = (() => {
  padding:calc(env(safe-area-inset-top,0px) + 12px) 16px calc(env(safe-area-inset-bottom,0px) + 16px);color:#f3e3c3;font:17px/1.4 "EB Garamond",Georgia,serif;touch-action:none;-webkit-user-select:none;user-select:none}
 #cph h2{margin:0;text-align:center;font:italic 32px/1.15 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.3),0 2px 2px #000}
 #cph p{margin:2px 0 10px;text-align:center;font-size:15px;opacity:.8}
-#cph .cph-wrap{flex:1;min-height:0;position:relative}
-#cph canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+/* the photo sits in the app's painted card: purple panel + gold rim with leaf sprigs (frame drawn over the photo's edge) */
+#cph .cph-wrap{flex:1;min-height:0;position:relative;margin:4px 6px 0;border-radius:24px;
+ background:linear-gradient(rgba(40,8,46,.25),rgba(20,4,26,.45)),url(img/panel.jpg) center/cover;box-shadow:0 10px 22px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.4)}
+#cph .cph-wrap::after{content:"";position:absolute;inset:0;pointer-events:none;border-style:solid;border-color:transparent;border-width:38px;border-image:url(img/card_frame.webp) 190 stretch}
+#cph canvas{position:absolute;inset:10px;width:calc(100% - 20px);height:calc(100% - 20px);touch-action:none;border-radius:16px}
 #cph .cph-row{display:flex;gap:10px;margin-top:12px}
 #cph button{flex:1;min-height:50px;border-radius:999px;font:600 18px "EB Garamond",Georgia,serif;border:1.5px solid rgba(232,190,140,.45);background:rgba(30,10,32,.7);color:#f1dcc0;cursor:pointer}
 #cph button.go{background:linear-gradient(180deg,#f3d29a,#d9a066);color:#2a1410;border:0;box-shadow:0 3px 8px rgba(0,0,0,.5)}
 #cph button:disabled{opacity:.5}
-#cph .cph-bot{display:flex;gap:16px;align-items:center;margin-top:12px}
+#cph .cph-bot{display:flex;gap:18px;align-items:center;margin:14px 6px 0}
 /* the two sliders sit within the height of the book preview */
-#cph .cph-pv{width:92px;flex:none;cursor:default}
-#cph .cph-ctl{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;align-self:stretch;padding:2px 0}
+#cph .cph-pv{width:118px;flex:none;cursor:default}
+#cph .cph-ctl{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-around;align-self:stretch;padding:6px 0}
 #cph .cph-lbl{display:flex;justify-content:space-between;align-items:baseline;font:400 15px/1.1 "IM Fell English SC",Georgia,serif;color:#f1cf7c;margin:0}
 #cph .cph-lbl i{font:italic 14px "EB Garamond",Georgia,serif;color:#c4a2b4}
-#cph .cph-sl{display:flex;align-items:center;gap:8px;height:30px}
+#cph .cph-sl{display:flex;align-items:center;gap:8px;height:34px;margin-top:2px}
 #cph .cph-sl svg{flex:none}
 #cph input[type=range]{-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:6px;margin:0;border-radius:3px;background:linear-gradient(90deg,#3a2030,#f1cf7c);outline:none;touch-action:pan-x}
 #cph input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(#f6dc96,#c9a24e);box-shadow:0 2px 6px rgba(0,0,0,.6),inset 0 1px 0 #fff4c8}
@@ -288,7 +291,7 @@ const CoverPhoto = (() => {
     return new Promise(res => {
       const box = document.createElement('div'); box.id = 'cph';
       const pv = typeof bookFrameHTML === 'function';
-      box.innerHTML = `<h2>Fit the cover</h2><p>Drag the four gold corners onto the corners of the cover</p>
+      box.innerHTML = `<h2>Fit the cover</h2><p>&nbsp;</p>
         <div class="cph-wrap"><canvas></canvas></div>
         <div class="cph-bot">${pv ? `<div class="bk cph-pv">${bookFrameHTML()}</div>` : ''}
           <div class="cph-ctl">
@@ -309,7 +312,7 @@ const CoverPhoto = (() => {
       if (start === 'full') { const A = found ? Math.abs((found[2][0] - found[0][0]) * (found[3][1] - found[1][1]) - (found[3][0] - found[1][0]) * (found[2][1] - found[0][1])) / 2 : W * H;
         if (A > W * H * .85) found = [[0, 0], [W, 0], [W, H], [0, H]]; else start = 'detect'; }
       let q = found || [[(W - fw) / 2, (H - fh) / 2], [(W + fw) / 2, (H - fh) / 2], [(W + fw) / 2, (H + fh) / 2], [(W - fw) / 2, (H + fh) / 2]];
-      box.querySelector('p').textContent = start === 'full' ? 'Drag a gold corner to crop or straighten' : found ? 'Found the cover — drag a gold corner if it’s a little off' : 'Drag the four gold corners onto the corners of the cover';
+      box.querySelector('p').textContent = (start === 'full' ? 'Drag a corner to crop' : found ? 'Found it — drag a corner to adjust' : 'Drag the gold corners onto the cover') + ' · pinch to zoom';
       // live preview: a small straightened copy inside the standard book
       const tone = { br: 0, ct: 0 }, pvEl = box.querySelector('.cph-pv');
       let pvT = 0, pvURL = null;
@@ -324,11 +327,19 @@ const CoverPhoto = (() => {
       });
       let sc = 1, ox = 0, oy = 0, dpr = 1, drag = -1, grab = [0, 0], touchAt = null;
       const R = 13, HIT = 34;   // corner dot radius / finger reach, CSS px
+      let fitSc = 1, minSc = 1, vw = 0, vh = 0;
       const fit = () => {
-        const r = wrap.getBoundingClientRect(); dpr = devicePixelRatio || 1;
+        const r = cv.getBoundingClientRect(); dpr = devicePixelRatio || 1; vw = r.width; vh = r.height;
         cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
-        const pad = 18; sc = Math.min((r.width - pad * 2) / W, (r.height - pad * 2) / H);
-        ox = (r.width - W * sc) / 2; oy = (r.height - H * sc) / 2; draw();
+        // the photo fills the whole window (no empty bands); centred on the cover's corners
+        sc = fitSc = Math.max(r.width / W, r.height / H); minSc = Math.min(r.width / W, r.height / H);   // pinch in to see it all
+        const cx = q.reduce((a, p) => a + p[0], 0) / 4, cy = q.reduce((a, p) => a + p[1], 0) / 4;
+        ox = r.width / 2 - cx * sc; oy = r.height / 2 - cy * sc; clampView(); draw();
+      };
+      // keep the photo on screen: centred when smaller than the window, else no empty gap at the sides
+      const clampView = () => {
+        const iw = W * sc, ih = H * sc;
+        ox = iw <= vw ? (vw - iw) / 2 : Math.min(0, Math.max(vw - iw, ox)); oy = ih <= vh ? (vh - ih) / 2 : Math.min(0, Math.max(vh - ih, oy));
       };
       const toS = p => [ox + p[0] * sc, oy + p[1] * sc];
       function draw() {
@@ -358,19 +369,42 @@ const CoverPhoto = (() => {
         ctx.beginPath(); ctx.moveTo(cx - 9, cy); ctx.lineTo(cx + 9, cy); ctx.moveTo(cx, cy - 9); ctx.lineTo(cx, cy + 9); ctx.lineWidth = 1.5; ctx.strokeStyle = '#fff4c8'; ctx.stroke();
       }
       const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+      // one finger on a corner moves the corner; one finger elsewhere moves the photo; two fingers zoom;
+      // double tap fits the whole photo again
+      const ptr = new Map(); let pan = null, pinch = null, lastTap = 0;
+      const startGesture = () => {
+        const P = [...ptr.values()];
+        if (P.length >= 2) { const [a, b] = P; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, m: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], sc, ox, oy }; pan = null; }
+        else if (P.length === 1) { pan = { m: P[0], ox, oy }; pinch = null; }
+        else { pan = pinch = null; }
+      };
       cv.addEventListener('pointerdown', e => {
-        const m = pos(e); let best = -1, bd = HIT;
-        q.map(toS).forEach((p, i) => { const d = Math.hypot(p[0] - m[0], p[1] - m[1]); if (d < bd) { bd = d; best = i; } });
-        if (best < 0) return;
-        drag = best; const p = toS(q[best]); grab = [p[0] - m[0], p[1] - m[1]]; touchAt = m;
-        cv.setPointerCapture(e.pointerId); e.preventDefault(); draw();
+        const m = pos(e); e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+        if (!ptr.size && drag < 0) {
+          let best = -1, bd = HIT;
+          q.map(toS).forEach((p, i) => { const d = Math.hypot(p[0] - m[0], p[1] - m[1]); if (d < bd) { bd = d; best = i; } });
+          if (best >= 0) { drag = best; const p = toS(q[best]); grab = [p[0] - m[0], p[1] - m[1]]; touchAt = m; draw(); return; }
+          const now = Date.now(); if (now - lastTap < 300) { fit(); lastTap = 0; return; } lastTap = now;
+        }
+        if (drag >= 0) { drag = -1; touchAt = null; preview(); }   // a second finger: zoom instead
+        ptr.set(e.pointerId, m); startGesture();
       });
       cv.addEventListener('pointermove', e => {
-        if (drag < 0) return; const m = pos(e); touchAt = m;
-        const x = (m[0] + grab[0] - ox) / sc, y = (m[1] + grab[1] - oy) / sc;
-        q[drag] = [Math.max(0, Math.min(W, x)), Math.max(0, Math.min(H, y))]; draw();
+        const m = pos(e);
+        if (drag >= 0) { touchAt = m;
+          const x = (m[0] + grab[0] - ox) / sc, y = (m[1] + grab[1] - oy) / sc;
+          q[drag] = [Math.max(0, Math.min(W, x)), Math.max(0, Math.min(H, y))]; draw(); return; }
+        if (!ptr.has(e.pointerId)) return; ptr.set(e.pointerId, m);
+        const P = [...ptr.values()];
+        if (pinch && P.length >= 2) { const [a, b] = P, d = Math.hypot(a[0] - b[0], a[1] - b[1]), mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+          sc = Math.max(minSc, Math.min(fitSc * 6, pinch.sc * d / pinch.d));
+          const ix = (pinch.m[0] - pinch.ox) / pinch.sc, iy = (pinch.m[1] - pinch.oy) / pinch.sc;   // photo point under the fingers
+          ox = mid[0] - ix * sc; oy = mid[1] - iy * sc; clampView(); draw(); }
+        else if (pan) { ox = pan.ox + m[0] - pan.m[0]; oy = pan.oy + m[1] - pan.m[1]; clampView(); draw(); }
       });
-      const up = () => { const was = drag; drag = -1; touchAt = null; draw(); if (was >= 0) preview(); };
+      const up = e => {
+        if (drag >= 0) { drag = -1; touchAt = null; draw(); preview(); return; }
+        ptr.delete(e.pointerId); startGesture(); };
       cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
       const ro = new ResizeObserver(fit); ro.observe(wrap); fit(); preview();
       const close = v => { ro.disconnect(); clearTimeout(pvT); if (pvURL) URL.revokeObjectURL(pvURL); box.remove(); res(v); };
