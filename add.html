@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a17">
+<meta name="app-version" content="a18">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -82,7 +82,9 @@ main{padding-bottom:140px}
   document.addEventListener('touchstart',()=>{},{passive:true});
   document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#tabbar a[aria-label="Home"]');if(!a)return;
     let r=null;try{r=new URL(document.referrer)}catch(err){}
-    if(r&&r.origin===location.origin&&/\/(index\.html)?$/.test(r.pathname)&&history.length>1){e.preventDefault();history.back()}});
+    if(r&&r.origin===location.origin&&/\/(index\.html)?$/.test(r.pathname)&&history.length>1){e.preventDefault();
+      // if the phone ignores going back (it can, e.g. after the app was in the background), open Home directly
+      const t=setTimeout(()=>{location.href=a.dataset.go||'index.html'},600);addEventListener('pagehide',()=>clearTimeout(t),{once:true});history.back()}});
 })();</script>
 <style>/* All app lettering, kept in the app (no Google Fonts) so text never swaps fonts when a page opens. OFL. */
 @font-face{font-family:"EB Garamond";font-weight:400;src:url(fonts/EBGaramond-400.woff2) format("woff2");font-display:block}
@@ -99,7 +101,7 @@ main{padding-bottom:140px}
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a17</p>
+  <p style="font-size:12px;opacity:.5">a18</p>
 </header>
 <main>
   <section class="panel">
@@ -415,7 +417,7 @@ const loadBooks = () => Store.all().then(a => { books = a.sort((x, y) => (y.adde
 loadBooks(); Store.onChange(loadBooks);
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a17';
+const VERSION = 'a18';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
