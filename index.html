@@ -6,13 +6,14 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0e0416">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="home-109">
+<meta name="app-version" content="home-110">
 <script>try{document.documentElement.classList.add(sessionStorage.getItem('intro.shown')==='1'?'back':'intro-on')}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <link rel="preload" as="image" href="img/frame.webp" fetchpriority="high">
 <link rel="preload" as="image" href="img/canopy.webp">
 <link rel="preload" as="image" href="img/bar_bg.webp">
 <link rel="preload" as="image" href="img/reading_bg.webp">
+<link rel="preload" as="image" href="img/reading_pk.webp">
 <link rel="preload" as="image" href="img/nook_bg.webp">
 <link rel="preload" as="image" href="img/nook_fg.webp">
 <link rel="preload" as="image" href="img/genres_bg.webp">
@@ -120,6 +121,7 @@
     <button class="tab" aria-label="My Library" onclick="location.href='library.html'"><img class="ic" src="img/ic_library.webp" alt=""><span class="lb">My Library</span></button><button class="tab" aria-label="Wishlist" onclick="location.href='library.html?list=wishlist'"><img class="ic" src="img/ic_wish.webp" alt=""><span class="lb">Wishlist</span></button><button class="tab" aria-label="Search" onclick="location.href='search.html'"><img class="ic" src="img/ic_search.webp" alt=""><span class="lb">Search</span></button><button class="tab" aria-label="Add Book" onclick="location.href='add.html'"><img class="ic" src="img/ic_add.webp" alt=""><span class="lb">Add Book</span></button>
   </nav>
   <section id="reading" aria-label="Latest addition">
+    <img id="pkReader" src="img/reading_pk.webp" alt="" role="button" aria-label="Tickle the reading pumpkin">
     <div class="hd"><img class="hi" src="img/ic_latest.webp" alt=""><span>Latest Addition</span></div>
     <div class="bk" id="laBook"><img class="bk-shadow" src="img/book.png" alt=""><div class="bk-tint"></div><img class="bk-shade" src="img/book_shade.png" alt=""><img class="bk-gold" src="img/book_gold.png" alt=""><div class="bk-frame"><img class="bk-cover" alt="" hidden><div class="bk-ph"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M24 6a14 14 0 1 0 10 24A11 11 0 1 1 24 6z" fill="#e9c873"/><path d="M31 9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#f6dc96"/></svg><span></span></div></div></div>
     <div class="cr-title" id="laTitle"></div>
@@ -127,6 +129,7 @@
     <div class="la-when" id="laWhen"></div>
   </section>
   <section id="nook" aria-label="Next to collect">
+    <canvas id="steam" aria-hidden="true"></canvas>
     <div class="hd"><img class="hi" src="img/hat.webp" alt=""><span>Next to Collect</span></div>
     <div class="bk" id="wiBook"><img class="bk-shadow" src="img/book.png" alt=""><div class="bk-tint"></div><img class="bk-shade" src="img/book_shade.png" alt=""><img class="bk-gold" src="img/book_gold.png" alt=""><div class="bk-frame"><img class="bk-cover" alt="" hidden><div class="bk-ph"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M24 6a14 14 0 1 0 10 24A11 11 0 1 1 24 6z" fill="#e9c873"/><path d="M31 9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#f6dc96"/></svg><span></span></div></div></div>
     <div class="cr-title" id="wiTitle"></div>
@@ -157,5 +160,6 @@
 <script src="undo.js"></script>
 <script src="scene.js"></script>
 <script src="home.js"></script>
+<script src="homefx.js"></script>
 </body>
 </html>

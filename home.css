@@ -105,3 +105,21 @@ html.intro-on,html.intro-on body{background:#0e0416!important}   /* dark behind 
 #tabbar .barbook{position:absolute;left:19.21%;width:61.57%;height:auto;bottom:23.98%;pointer-events:none}   /* 163..688 of 851: centred on the screen, clear of Home and Backup; bottom on 130 of 171, top above the bar */
 #tabbar .bookmagic{position:absolute;left:-1.6%;width:103.2%;bottom:23.98%;pointer-events:none}
 #tabbar .bookhit{position:absolute;left:34.6%;width:30.8%;bottom:calc(0px - env(safe-area-inset-bottom,0px));height:calc(98% + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent;cursor:pointer}   /* middle half of the book */
+
+/* ---------- Latest Addition: the reading pumpkin is his own picture, so he can be tickled (homefx.js) ---------- */
+#pkReader{left:67.606%;top:5.405%;width:27.7%;height:85.71%;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;transform-origin:50% 96%}
+#pkReader.tickle{animation:tickle 1.05s cubic-bezier(.3,0,.3,1)}
+@keyframes tickle{
+ 0%{transform:none}
+ 9%{transform:rotate(-4deg) scale(1.04,.95)}
+ 20%{transform:rotate(3.5deg) scale(.97,1.04) translateY(-4px)}
+ 31%{transform:rotate(-3.5deg) scale(1.04,.95)}
+ 42%{transform:rotate(3deg) scale(.97,1.04) translateY(-3px)}
+ 53%{transform:rotate(-2.5deg) scale(1.03,.97)}
+ 64%{transform:rotate(2deg) scale(.99,1.02) translateY(-1px)}
+ 76%{transform:rotate(-1deg) scale(1.01,.99)}
+ 100%{transform:none}}
+#reading .giggle{top:14%;z-index:4;pointer-events:none;font:italic 30px/1 "IM Fell English",Georgia,serif;color:#8a3d12;text-shadow:0 0 6px rgba(255,230,180,.9);white-space:nowrap;animation:giggle 1.4s ease-out forwards}
+@keyframes giggle{0%{opacity:0;transform:translate(-50%,18px) scale(.6)}18%{opacity:1;transform:translate(-50%,0) scale(1.05)}100%{opacity:0;transform:translate(calc(-50% + var(--dx,0px)),-34px) scale(1)}}
+/* ---------- Next to Collect: living steam over the mug (homefx.js); the steam is no longer painted in nook_fg ---------- */
+#nook #steam{left:500px;top:0;width:260px;height:135px;touch-action:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
