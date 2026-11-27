@@ -154,11 +154,80 @@ const CoverPhoto = (() => {
       const onEdge = new Float64Array(K); let nE = 0;
       for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (x < m || y < m || x >= w - m || y >= h - m) { onEdge[lab[y * w + x]]++; nE++; }
       const g = new Uint8Array(N); for (let i = 0; i < N; i++) g[i] = onEdge[lab[i]] / nE < .03 ? 1 : 0; return g; };
-    // keep the best-shaped answer of the three
-    const tries = [fromMask(byGroups(), 2), fromMask(byColour, 2), fromMask(byEdges(), 4)].filter(Boolean);
-    if (!tries.length) return null;
-    tries.sort((a, b) => b.fill - a.fill);
-    return tries[0].q;
+    // brightness gradients (Sobel) — used to check how well a 4-corner shape sits on real edges
+    const Lm = new Float32Array(N); for (let i = 0; i < N; i++) Lm[i] = d[i * 4] * .3 + d[i * 4 + 1] * .59 + d[i * 4 + 2] * .11;
+    const GX = new Float32Array(N), GY = new Float32Array(N), MAG = new Float32Array(N);
+    for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) { const i = y * w + x;
+      const gx = Lm[i - w + 1] + 2 * Lm[i + 1] + Lm[i + w + 1] - Lm[i - w - 1] - 2 * Lm[i - 1] - Lm[i + w - 1];
+      const gy = Lm[i + w - 1] + 2 * Lm[i + w] + Lm[i + w + 1] - Lm[i - w - 1] - 2 * Lm[i - w] - Lm[i - w + 1];
+      GX[i] = gx; GY[i] = gy; MAG[i] = Math.hypot(gx, gy); }
+    const thr = Math.max(24, Array.from(MAG).sort((p, q) => p - q)[Math.floor(N * .85)]);
+    const areaOf = q => { let a = 0; for (let i = 0; i < 4; i++) { const p = q[i], r = q[(i + 1) % 4]; a += p[0] * r[1] - r[0] * p[1]; } return Math.abs(a) / 2; };
+    // share of each side that lies on a matching edge (within 2 px, edge running along the side)
+    function support(q) {
+      const sides = [];
+      for (let s = 0; s < 4; s++) { const A = q[s], B = q[(s + 1) % 4], L = Math.hypot(B[0] - A[0], B[1] - A[1]) || 1, nx = -(B[1] - A[1]) / L, ny = (B[0] - A[0]) / L;
+        let hit = 0; const n = 40;
+        for (let t = 0; t < n; t++) { const f = (t + .5) / n, px = A[0] + (B[0] - A[0]) * f, py = A[1] + (B[1] - A[1]) * f;
+          for (let o = -2; o <= 2; o++) { const X = Math.round(px + nx * o), Y = Math.round(py + ny * o); if (X < 1 || Y < 1 || X >= w - 1 || Y >= h - 1) continue;
+            const i = Y * w + X; if (MAG[i] > thr && Math.abs(GX[i] * nx + GY[i] * ny) > .8 * MAG[i]) { hit++; break; } } }
+        sides.push(hit / n); }
+      return sides;
+    }
+    const order = q => { const mx = q.reduce((a, p) => a + p[0], 0) / 4, my = q.reduce((a, p) => a + p[1], 0) / 4;
+      q = q.slice().sort((a, b) => Math.atan2(a[1] - my, a[0] - mx) - Math.atan2(b[1] - my, b[0] - mx));
+      let s0 = 0; q.forEach((p, i) => { if (p[0] + p[1] < q[s0][0] + q[s0][1]) s0 = i; }); return [0, 1, 2, 3].map(i => q[(s0 + i) % 4]); };
+    const sane = q => { const A = areaOf(q); if (A < N * .06 || A > N * .97) return false;
+      for (const p of q) if (p[0] < -w * .03 || p[1] < -h * .03 || p[0] > w * 1.03 || p[1] > h * 1.03) return false;
+      for (let i = 0; i < 4; i++) { const a = q[(i + 3) % 4], b = q[i], e = q[(i + 1) % 4];
+        const v1 = [a[0] - b[0], a[1] - b[1]], v2 = [e[0] - b[0], e[1] - b[1]];
+        const ang = Math.acos(Math.max(-1, Math.min(1, (v1[0] * v2[0] + v1[1] * v2[1]) / (Math.hypot(...v1) * Math.hypot(...v2) || 1)))) * 180 / Math.PI;
+        if (ang < 55 || ang > 125) return false; }
+      const sd = [0, 1, 2, 3].map(i => Math.hypot(q[(i + 1) % 4][0] - q[i][0], q[(i + 1) % 4][1] - q[i][1]));
+      if (Math.max(sd[0], sd[2]) > 2.2 * Math.min(sd[0], sd[2]) || Math.max(sd[1], sd[3]) > 2.2 * Math.min(sd[1], sd[3])) return false;
+      // a book cover stands upright: taller than wide, and not turned more than ~25°
+      if (sd[1] + sd[3] < .95 * (sd[0] + sd[2])) return false;
+      const tilt = Math.abs(Math.atan2(q[1][1] - q[0][1], q[1][0] - q[0][0])) * 180 / Math.PI;
+      return tilt <= 25; };
+    // straight lines (Hough, voting along each edge's own direction) → every 2 + 2 of them make a candidate
+    function lines() {
+      const D = Math.ceil(Math.hypot(w, h)), R = 2 * D + 1, V = new Float32Array(180 * R), COS = [], SIN = [];
+      for (let t = 0; t < 180; t++) { COS[t] = Math.cos(t * Math.PI / 180); SIN[t] = Math.sin(t * Math.PI / 180); }
+      for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) { const i = y * w + x; if (MAG[i] <= thr) continue;
+        let t0 = Math.round(Math.atan2(GY[i], GX[i]) * 180 / Math.PI); t0 = ((t0 % 180) + 180) % 180;
+        for (let dt = -5; dt <= 5; dt++) { const t = (t0 + dt + 180) % 180, r = Math.round(x * COS[t] + y * SIN[t]) + D; V[t * R + r] += 1; } }
+      const pk = [], minV = Math.min(w, h) * .2;
+      for (let t = 0; t < 180; t++) for (let r = 1; r < R - 1; r++) { const v = V[t * R + r]; if (v < minV) continue; let top = true;
+        for (let dt = -4; dt <= 4 && top; dt++) for (let dr = -6; dr <= 6; dr++) { const tt = t + dt, rr = r + dr; let u;
+          if (tt < 0) u = V[(tt + 180) * R + (2 * D - rr)]; else if (tt >= 180) u = V[(tt - 180) * R + (2 * D - rr)]; else u = V[tt * R + rr];
+          if (u > v || (u === v && (dt < 0 || (dt === 0 && dr < 0)))) { top = false; break; } }
+        if (top) pk.push({ t, r: r - D, v }); }
+      pk.sort((a, b) => b.v - a.v);
+      return pk.slice(0, 18);
+    }
+    const cross = (a, b) => { const det = COSd(a.t) * SINd(b.t) - SINd(a.t) * COSd(b.t); if (Math.abs(det) < 1e-6) return null;
+      return [(a.r * SINd(b.t) - b.r * SINd(a.t)) / det, (COSd(a.t) * b.r - COSd(b.t) * a.r) / det]; };
+    function COSd(t) { return Math.cos(t * Math.PI / 180); } function SINd(t) { return Math.sin(t * Math.PI / 180); }
+    const cands = [];
+    try {
+      const L = lines(), H = L.filter(l => l.t >= 45 && l.t < 135), Vv = L.filter(l => l.t < 45 || l.t >= 135);
+      for (let a = 0; a < H.length; a++) for (let b = a + 1; b < H.length; b++) for (let c = 0; c < Vv.length; c++) for (let e = c + 1; e < Vv.length; e++) {
+        const P = [cross(H[a], Vv[c]), cross(H[a], Vv[e]), cross(H[b], Vv[e]), cross(H[b], Vv[c])]; if (P.some(p => !p)) continue;
+        const q = order(P); if (sane(q)) cands.push(q); }
+    } catch (e) {}
+    // plus the blob answers
+    const blobs = [fromMask(byGroups(), 2), fromMask(byColour, 2), fromMask(byEdges(), 4)].filter(Boolean);
+    const okBlobs = blobs.filter(r => sane(r.q.map(p => [p[0] * k, p[1] * k])));
+    okBlobs.forEach(r => cands.push(r.q.map(p => [p[0] * k, p[1] * k])));
+    // best: sits on edges all round (weakest side counts), then bigger
+    let pick = null, bs = 0;
+    for (const q of cands) { const sp = support(q), lo = Math.min(...sp), mean = sp.reduce((a, b) => a + b, 0) / 4;
+      if (lo < .3 || mean < .5) continue; const sc = mean * (.5 + .5 * lo) * Math.pow(areaOf(q) / N, .35); if (sc > bs) { bs = sc; pick = q; } }
+    if (pick) return pick.map(p => [Math.min(src.width, Math.max(0, p[0] / k)), Math.min(src.height, Math.max(0, p[1] / k))]);
+    // no shape sits clearly on edges: the best-filled upright blob, if any
+    if (!okBlobs.length) return null;
+    okBlobs.sort((a, b) => b.fill - a.fill);
+    return okBlobs[0].q;
 
     function fromMask(fg, close) {
     // close small gaps (text, pictures on the cover), then fill holes
@@ -235,8 +304,10 @@ const CoverPhoto = (() => {
       // start: the biggest 2:3 frame in the middle of the photo, a little inside
       let fw = Math.min(W * .8, H * .8 * 2 / 3), fh = fw * 1.5;
       let found = null;
-      if (start === 'full') found = [[0, 0], [W, 0], [W, H], [0, H]];
-      else try { found = detect(src); } catch (e) {}
+      try { found = detect(src); } catch (e) {}
+      // her own picture: if it is already a straight cover (nothing smaller found), start on its edges
+      if (start === 'full') { const A = found ? Math.abs((found[2][0] - found[0][0]) * (found[3][1] - found[1][1]) - (found[3][0] - found[1][0]) * (found[2][1] - found[0][1])) / 2 : W * H;
+        if (A > W * H * .85) found = [[0, 0], [W, 0], [W, H], [0, H]]; else start = 'detect'; }
       let q = found || [[(W - fw) / 2, (H - fh) / 2], [(W + fw) / 2, (H - fh) / 2], [(W + fw) / 2, (H + fh) / 2], [(W - fw) / 2, (H + fh) / 2]];
       box.querySelector('p').textContent = start === 'full' ? 'Drag a gold corner to crop or straighten' : found ? 'Found the cover — drag a gold corner if it’s a little off' : 'Drag the four gold corners onto the corners of the cover';
       // live preview: a small straightened copy inside the standard book
@@ -338,8 +409,8 @@ const CoverPhoto = (() => {
       const url = URL.createObjectURL(current.blob);
       let a; try { a = await chooser(url, title); } finally { URL.revokeObjectURL(url); }
       if (!a) return null;
-      // her own (already straight) photo opens on its own edges; a web cover is often a photo at an angle: find it
-      if (a === 'fix') return edit(current.blob, current.own ? 'full' : 'detect');
+      // fix: look for a cover inside the picture (a photo at an angle); if none is clearly smaller, start on its edges
+      if (a === 'fix') return edit(current.blob, 'full');
     }
     const f = await chooseFile(); if (!f) return null;
     return edit(f, 'detect');

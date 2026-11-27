@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-39">
+<meta name="app-version" content="book-40">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -33,6 +33,8 @@ body{min-height:100vh;color:#f3e3c3;font:17px/1.5 "EB Garamond",Georgia,serif;-w
 .hero .bk{width:min(52vw,210px)}
 /* change cover: gold camera badge on the book's bottom-right corner */
 .bkw{position:relative}
+/* Owned/Wishlist and pumpkins change only in Edit book */
+#page:not(.editing) .status button,#page:not(.editing) .pk{pointer-events:none}
 .covcam{position:absolute;right:-12px;bottom:-10px;width:46px;height:46px;border-radius:50%;border:0;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;
  background:linear-gradient(#f6dc96,#c9a24e);box-shadow:0 3px 8px rgba(0,0,0,.6),inset 0 1px 0 #fff4c8,0 0 0 2px rgba(42,20,8,.6);-webkit-tap-highlight-color:transparent}
 .covcam svg{width:24px;height:24px}.covcam:active{transform:scale(.94)}
@@ -155,6 +157,9 @@ dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
 <script>
 {
 let ALL=[],editing=false;
+// edit mode works on a copy: nothing is stored until Save (Cancel throws it away)
+let draft=null,newCover=null,newCoverURL=null,dropOwn=false;
+const endEdit=()=>{editing=false;draft=null;newCover=null;dropOwn=false;if(newCoverURL)URL.revokeObjectURL(newCoverURL);newCoverURL=null};
 const load=()=>ALL;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const page=document.getElementById('page');
@@ -172,13 +177,14 @@ function year(p){const m=String(p||'').match(/\d{4}/);return m?m[0]:''}
 
 function render(){
   const all=load();
-  const b=id?all.find(x=>x.id===id):all.slice().sort((x,y)=>(y.added||0)-(x.added||0))[0];
-  if(b)id=b.id;
+  const real=id?all.find(x=>x.id===id):all.slice().sort((x,y)=>(y.added||0)-(x.added||0))[0];
+  if(real)id=real.id;
+  const b=editing&&draft?draft:real;
   if(!b){page.innerHTML='<div class="empty">This book isn\'t in your collection.<br><a href="./">Back to Home</a></div>';return}
   document.title=b.title||'Book';
   const status=b.status==='wishlist'?'wishlist':'owned',rating=b.rating||0;
   const inp=(fid,v,ph,extra='')=>`<input id="${fid}" placeholder="${ph}" value="${esc(v)}" autocomplete="off"${extra}>`;
-  const rows=editing?[
+  const rows=(editing?[
     ['Title',inp('fTitle',b.title,'Title')],['Author',inp('fAuthor',(b.authors||[]).join(', '),'Author(s), comma between')],
     ['Genre',`<select id="fGenre" aria-label="Genre">${GENRES.map(g=>`<option${g===(GENRES.includes(b.genre)?b.genre:'Other')?' selected':''}>${g}</option>`).join('')}</select>`],
     ['Series',`<div class="ser">${inp('fSeries',b.series,'Series name')}${inp('fSeriesNo',b.seriesNo,'No.',' inputmode="decimal"')}</div>`],
@@ -191,12 +197,12 @@ function render(){
     ['Publisher',esc(b.publisher)],['Published',esc(year(b.published)||b.published)],['Pages',esc(b.pages)],
     ['Language',esc(LANG[b.language]||b.language)],['ISBN-13',esc(b.isbn13)],['ISBN-10',esc(b.isbn10)],
     ['Added',b.added?new Date(b.added).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'']
-  ].filter(r=>r[1]);
+  ]).filter(r=>r[1]);
   page.classList.toggle('editing',editing);
   page.innerHTML=`
   <section class="hero">
     <div class="bkw"><div class="bk" id="bk">${bookFrameHTML()}</div>${editing?'<button class="covcam" id="covcam" aria-label="Change cover photo"><svg viewBox="0 0 24 24" fill="none" stroke="#2a1408" stroke-width="2" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.6"/></svg></button>':''}</div>
-    ${editing&&b.webCover&&Store.isOwn(b.cover)?'<button class="orig" id="orig">Use the original cover</button>':''}
+    ${editing&&!dropOwn&&(newCover||Store.isOwn(real.cover))&&(real.webCover||(real.cover&&!Store.isOwn(real.cover)))?'<button class="orig" id="orig">Use the original cover</button>':''}
     <h1>${esc(b.title||'Untitled')}</h1>
     ${b.subtitle?`<p class="sub">${esc(b.subtitle)}</p>`:''}
     <p class="by">${esc((b.authors||[]).join(', ')||'Unknown author')}</p>
@@ -222,54 +228,64 @@ function render(){
   </section>
 
   ${b.description?`<section class="card desc clamp" aria-label="Description"><h2>About this book</h2><p id="dText"></p><button class="more" id="more" hidden>Read more</button></section>`:''}
-  ${editing?'<p class="note">Changes save on this phone automatically.</p>':''}
-  <div class="acts">${editing?'<button class="edit done" id="ed">Done</button>':'<button class="edit" id="ed">Edit book</button>'}<button class="remove" id="rm">Remove</button></div>`;
+  ${editing?'<p class="note">Nothing changes until you tap Save.</p>':''}
+  <div class="acts">${editing?'<button class="edit" id="cancel">Cancel</button><button class="edit done" id="ed">Save</button>':'<button class="edit" id="ed">Edit book</button><button class="remove" id="rm">Remove</button>'}</div>`;
 
-  setBook(document.getElementById('bk'),b);
+  setBook(document.getElementById('bk'),editing&&newCoverURL?{...b,cover:newCoverURL,color:null}:b);
   if(b.description){
     const p=document.getElementById('dText');p.textContent=String(b.description).replace(/<[^>]+>/g,'');
     requestAnimationFrame(()=>{const m=document.getElementById('more');if(p.scrollHeight>p.clientHeight+4){m.hidden=false;m.onclick=()=>{const c=p.parentNode.classList.toggle('clamp');m.textContent=c?'Read more':'Show less'}}});
   }
-  const setStatus=v=>{save(x=>{x.status=v});document.getElementById('sOwn').setAttribute('aria-pressed',v==='owned');document.getElementById('sWish').setAttribute('aria-pressed',v==='wishlist')};
+  const setStatus=v=>{if(!editing)return;draft.status=v;document.getElementById('sOwn').setAttribute('aria-pressed',v==='owned');document.getElementById('sWish').setAttribute('aria-pressed',v==='wishlist')};
   document.getElementById('sOwn').onclick=()=>setStatus('owned');
   document.getElementById('sWish').onclick=()=>setStatus('wishlist');
   page.querySelectorAll('.pk').forEach(btn=>btn.onclick=()=>{
-    const n=+btn.dataset.n,cur=(load().find(x=>x.id===id)||{}).rating||0,v=n===cur?0:n;   // tap the same pumpkin again to clear
-    save(x=>{x.rating=v});page.querySelectorAll('.pk').forEach(p=>p.classList.toggle('on',+p.dataset.n<=v));
+    const n=+btn.dataset.n,cur=(editing?draft:load().find(x=>x.id===id)||{}).rating||0,v=n===cur?0:n;   // tap the same pumpkin again to clear
+    if(!editing)return;draft.rating=v;page.querySelectorAll('.pk').forEach(p=>p.classList.toggle('on',+p.dataset.n<=v));
   });
-  const field=(el,k,fix=v=>v)=>{el.addEventListener('change',()=>{const v0=fix(el.value.trim());el.value=v0;const b2=save(x=>{if(v0)x[k]=v0;else delete x[k]});
-    if(k.startsWith('series')&&b2){const s=document.querySelector('.series');const t=b2.series?b2.series+(b2.seriesNo?' · Book '+b2.seriesNo:''):'';
-      if(s){s.textContent=t;s.hidden=!t}else if(t){const n=document.createElement('p');n.className='series';n.textContent=t;document.querySelector('.hero').appendChild(n)}}})};
-  // edit mode: Edit book → fields, cover photo; Done → back to reading
-  document.getElementById('ed').onclick=()=>{editing=!editing;render();scrollTo({top:0,behavior:'smooth'})};
+  // edit mode: Edit book → work on a copy; Save stores it (and the new cover), Cancel drops it
+  const ed=document.getElementById('ed');
+  if(!editing)ed.onclick=()=>{draft=JSON.parse(JSON.stringify(real));editing=true;render();scrollTo({top:0,behavior:'smooth'})};
   if(editing){
-  field(document.getElementById('fSeries'),'series');
-  field(document.getElementById('fSeriesNo'),'seriesNo');
-  field(document.getElementById('fEdition'),'edition');
-  field(document.getElementById('fPublisher'),'publisher');
-  field(document.getElementById('fPublished'),'published');
-  field(document.getElementById('fPages'),'pages',v=>v.replace(/\D/g,''));
-  document.getElementById('fGenre').addEventListener('change',e=>save(x=>{x.genre=e.target.value}));
-  const ft=document.getElementById('fTitle');ft.addEventListener('change',()=>{const v=ft.value.trim();if(!v){ft.value=(ALL.find(x=>x.id===id)||{}).title||'';return}
-    save(x=>{x.title=v});document.querySelector('.hero h1').textContent=v;document.title=v});
-  const fa=document.getElementById('fAuthor');fa.addEventListener('change',()=>{const a=fa.value.split(',').map(t=>t.trim()).filter(Boolean);
-    save(x=>{if(a.length)x.authors=a;else delete x.authors});document.querySelector('.hero .by').textContent=a.join(', ')||'Unknown author'});
-  // cover photo: take one or pick from the library, fit the corners, save on the phone
+  ed.onclick=async()=>{
+    ed.disabled=true;const nb=draft;
+    try{
+      if(newCover){await Store.setCover(id,newCover);if(real.cover&&!Store.isOwn(real.cover))nb.webCover=real.cover;nb.cover='own:'+Date.now();delete nb.color}
+      else if(dropOwn){await Store.dropCover(id);nb.cover=nb.webCover||real.webCover;delete nb.webCover;delete nb.color}
+      await Store.put(nb);
+    }catch(e){ed.disabled=false;return}
+    if(dropOwn)Store.saveCover(nb);
+    const k=ALL.findIndex(x=>x.id===id);if(k>=0)ALL[k]=nb;
+    endEdit();render();scrollTo({top:0,behavior:'smooth'});
+    const sv=document.getElementById('saved');sv.classList.add('show');clearTimeout(save.t);save.t=setTimeout(()=>sv.classList.remove('show'),1100);
+  };
+  document.getElementById('cancel').onclick=()=>{endEdit();render();scrollTo({top:0,behavior:'smooth'})};
+  const hero=()=>{document.querySelector('.hero h1').textContent=draft.title||'Untitled';document.querySelector('.hero .by').textContent=(draft.authors||[]).join(', ')||'Unknown author';
+    const t=draft.series?draft.series+(draft.seriesNo?' · Book '+draft.seriesNo:''):'';let s=document.querySelector('.hero .series');
+    if(!s&&t){s=document.createElement('p');s.className='series';document.querySelector('.hero').appendChild(s)}if(s){s.textContent=t;s.hidden=!t}};
+  const put=(fid,k,fix=v=>v)=>{const el=document.getElementById(fid);el.addEventListener('change',()=>{const v=fix(el.value.trim());el.value=v;if(v)draft[k]=v;else delete draft[k];hero()})};
+  put('fSeries','series');put('fSeriesNo','seriesNo');put('fEdition','edition');put('fPublisher','publisher');put('fPublished','published');
+  put('fPages','pages',v=>v.replace(/\D/g,''));
+  document.getElementById('fGenre').addEventListener('change',e=>{draft.genre=e.target.value});
+  const ft=document.getElementById('fTitle');ft.addEventListener('change',()=>{const v=ft.value.trim();if(!v){ft.value=draft.title||'';return}draft.title=v;hero()});
+  const fa=document.getElementById('fAuthor');fa.addEventListener('change',()=>{const a=fa.value.split(',').map(t=>t.trim()).filter(Boolean);if(a.length)draft.authors=a;else delete draft.authors;hero()});
+  // cover photo: kept aside until Save
   document.getElementById('covcam').onclick=async()=>{
-    // the cover now: saved picture on the phone (own photo or downloaded web cover), else the web address
-    const cur=ALL.find(x=>x.id===id)||{};let bl=null;
-    try{bl=await Store.getCoverBlob(id)}catch(e){}
-    if(!bl&&cur.cover&&!Store.isOwn(cur.cover)){try{const r=await fetch(cur.cover,{mode:'cors'});if(r.ok)bl=await r.blob()}catch(e){}}
-    const blob=await CoverPhoto.change(bl?{blob:bl,own:Store.isOwn(cur.cover)}:null,cur.title);if(!blob)return;
-    await Store.setCover(id,blob);
-    save(x=>{if(!Store.isOwn(x.cover)&&x.cover)x.webCover=x.cover;x.cover='own:'+Date.now();delete x.color});render();
+    let bl=newCover;
+    if(!bl&&!dropOwn){try{bl=await Store.getCoverBlob(id)}catch(e){}}
+    const web=dropOwn?(real.webCover||''):(real.cover&&!Store.isOwn(real.cover)?real.cover:'');
+    if(!bl&&web){try{const r=await fetch(web,{mode:'cors'});if(r.ok)bl=await r.blob()}catch(e){}}
+    const own=!!newCover||(!dropOwn&&Store.isOwn(real.cover));
+    const blob=await CoverPhoto.change(bl?{blob:bl,own}:null,draft.title);if(!blob)return;
+    newCover=blob;dropOwn=false;if(newCoverURL)URL.revokeObjectURL(newCoverURL);newCoverURL=URL.createObjectURL(blob);render();
   };
   const og=document.getElementById('orig');
-  if(og)og.onclick=async()=>{await Store.dropCover(id);const b2=save(x=>{x.cover=x.webCover;delete x.webCover;delete x.color});render();if(b2)Store.saveCover(b2)};
+  if(og)og.onclick=()=>{newCover=null;if(newCoverURL)URL.revokeObjectURL(newCoverURL);newCoverURL=null;
+    dropOwn=Store.isOwn(real.cover);draft.cover=dropOwn?real.webCover:real.cover;delete draft.color;render()};
   }
   // remove: first tap asks, second tap removes; the shelf then offers Undo for a few seconds
   const rm=document.getElementById('rm');
-  rm.onclick=async()=>{
+  if(rm)rm.onclick=async()=>{
     if(!rm.classList.contains('sure')){rm.classList.add('sure');rm.textContent='Tap again';clearTimeout(rm.t);
       rm.t=setTimeout(()=>{rm.classList.remove('sure');rm.textContent='Remove'},4000);return}
     clearTimeout(rm.t);rm.disabled=true;
