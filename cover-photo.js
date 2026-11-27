@@ -11,9 +11,9 @@ const CoverPhoto = (() => {
  padding:calc(env(safe-area-inset-top,0px) + 12px) 16px calc(env(safe-area-inset-bottom,0px) + 16px);color:#f3e3c3;font:17px/1.4 "EB Garamond",Georgia,serif;touch-action:none;-webkit-user-select:none;user-select:none}
 #cph h2{margin:0;text-align:center;font:italic 32px/1.15 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.3),0 2px 2px #000}
 #cph p{margin:2px 0 10px;text-align:center;font-size:15px;opacity:.8}
-/* the photo sits in the app's painted card: purple panel + gold rim with leaf sprigs (frame drawn over the photo's edge) */
+/* the photo sits in the app's gold frame on dark wood (frame drawn over the photo's edge) */
 #cph .cph-wrap{flex:1;min-height:0;position:relative;margin:4px 6px 0;border-radius:24px;
- background:linear-gradient(rgba(40,8,46,.25),rgba(20,4,26,.45)),url(img/panel.jpg) center/cover;box-shadow:0 10px 22px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.4)}
+ background:#1a0f08 url(img/wood_dark.webp) center/cover;box-shadow:0 10px 22px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.4)}
 #cph .cph-wrap::after{content:"";position:absolute;inset:0;pointer-events:none;border-style:solid;border-color:transparent;border-width:38px;border-image:url(img/card_frame.webp) 190 stretch}
 #cph canvas{position:absolute;inset:10px;width:calc(100% - 20px);height:calc(100% - 20px);touch-action:none;border-radius:16px}
 #cph .cph-row{display:flex;gap:10px;margin-top:12px}

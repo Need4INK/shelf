@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-41">
+<meta name="app-version" content="book-43">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -38,7 +38,8 @@ body{min-height:100vh;color:#f3e3c3;font:17px/1.5 "EB Garamond",Georgia,serif;-w
 .covcam{position:absolute;right:-12px;bottom:-10px;width:46px;height:46px;border-radius:50%;border:0;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;
  background:linear-gradient(#f6dc96,#c9a24e);box-shadow:0 3px 8px rgba(0,0,0,.6),inset 0 1px 0 #fff4c8,0 0 0 2px rgba(42,20,8,.6);-webkit-tap-highlight-color:transparent}
 .covcam svg{width:24px;height:24px}.covcam:active{transform:scale(.94)}
-.orig{margin:14px 0 -6px;border:0;background:none;color:#e0c79e;font:italic 16px "EB Garamond",Georgia,serif;text-decoration:underline;text-decoration-color:rgba(241,207,124,.5);text-underline-offset:3px;cursor:pointer;min-height:36px}
+.covcam.orig{right:auto;left:-12px;overflow:visible}
+.covcam.orig span{position:absolute;right:100%;top:50%;transform:translateY(-50%);margin-right:7px;text-align:right;font:italic 14px/1.1 "EB Garamond",Georgia,serif;color:#e0c79e;text-shadow:0 1px 2px #000;pointer-events:none}
 h1{font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:32px;line-height:1.08;margin:18px 0 4px;color:#f6e2b0;text-wrap:balance;text-shadow:0 2px 3px rgba(0,0,0,.5)}
 .sub{font-style:italic;color:#e0c79e;margin:0 0 6px;text-wrap:balance}
 .by{font-size:19px;color:#f3e3c3;margin:0}
@@ -201,8 +202,7 @@ function render(){
   page.classList.toggle('editing',editing);
   page.innerHTML=`
   <section class="hero">
-    <div class="bkw"><div class="bk" id="bk">${bookFrameHTML()}</div>${editing?'<button class="covcam" id="covcam" aria-label="Change cover photo"><svg viewBox="0 0 24 24" fill="none" stroke="#2a1408" stroke-width="2" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.6"/></svg></button>':''}</div>
-    ${editing&&!dropOwn&&(newCover||Store.isOwn(real.cover))&&(real.webCover||(real.cover&&!Store.isOwn(real.cover)))?'<button class="orig" id="orig">Use the original cover</button>':''}
+    <div class="bkw"><div class="bk" id="bk">${bookFrameHTML()}</div>${editing&&!dropOwn&&(newCover||Store.isOwn(real.cover))&&(real.webCover||(real.cover&&!Store.isOwn(real.cover)))?'<button class="covcam orig" id="orig" aria-label="Restore the original cover"><svg viewBox="0 0 24 24" fill="none" stroke="#2a1408" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5v5h5"/><path d="M5.5 15a7 7 0 1 0 1.6-7.3L4 10"/></svg><span>Restore<br>original</span></button>':''}${editing?'<button class="covcam" id="covcam" aria-label="Change cover photo"><svg viewBox="0 0 24 24" fill="none" stroke="#2a1408" stroke-width="2" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.6"/></svg></button>':''}</div>
     <h1>${esc(b.title||'Untitled')}</h1>
     ${b.subtitle?`<p class="sub">${esc(b.subtitle)}</p>`:''}
     <p class="by">${esc((b.authors||[]).join(', ')||'Unknown author')}</p>
@@ -231,7 +231,8 @@ function render(){
   ${editing?'<p class="note">Nothing changes until you tap Save.</p>':''}
   <div class="acts">${editing?'<button class="edit" id="cancel">Cancel</button><button class="edit done" id="ed">Save</button>':'<button class="edit" id="ed">Edit book</button><button class="remove" id="rm">Remove</button>'}</div>`;
 
-  setBook(document.getElementById('bk'),editing&&newCoverURL?{...b,cover:newCoverURL,color:null}:b);
+  // in edit mode show what Save would store: the new photo, or the original web cover (no id, so the saved picture isn't used)
+  setBook(document.getElementById('bk'),editing&&newCoverURL?{...b,id:undefined,cover:newCoverURL,color:null}:editing&&dropOwn?{...b,id:undefined,color:null}:b);
   if(b.description){
     const p=document.getElementById('dText');p.textContent=String(b.description).replace(/<[^>]+>/g,'');
     requestAnimationFrame(()=>{const m=document.getElementById('more');if(p.scrollHeight>p.clientHeight+4){m.hidden=false;m.onclick=()=>{const c=p.parentNode.classList.toggle('clamp');m.textContent=c?'Read more':'Show less'}}});
