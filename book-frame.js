@@ -28,7 +28,7 @@ function paintBook(el,hex){const t=bookTint(hex);if(t)el.style.setProperty('--ti
 /* store colour + metal on the book the first time we can read its cover */
 function rememberLook(b,look){
   if(typeof Store==='undefined'||!b||!b.id)return;
-  Store.get(b.id).then(k=>{if(k&&k.color!==look.color){k.color=look.color;return Store.put(k)}}).catch(()=>{});
+  Store.get(b.id).then(k=>{if(k&&k.color!==look.color){k.color=look.color;return Store.put(k,false)}}).catch(()=>{});
 }
 function setBook(el,b){
   const im=el.querySelector('.bk-cover'),ph=el.querySelector('.bk-ph');

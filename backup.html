@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
-<meta name="app-version" content="backup-18">
+<meta name="app-version" content="backup-19">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -123,22 +123,26 @@ const showLast = () => { let s = null, r = null; try { s = localStorage.getItem(
   $('lastRestore').textContent = r ? `Last restore: ${when(+r)}` : 'Nothing restored yet'; };
 const mark = k => { try { localStorage.setItem(k, Date.now()); } catch (e) {} showLast(); };
 showLast();
-$('exportBtn').onclick = () => {
-  const blob = new Blob([JSON.stringify(books, null, 2)], { type: 'application/json' });
+$('exportBtn').onclick = async () => {
+  // the books + the list of removed books, so restoring an older backup never brings removed books back
+  const blob = new Blob([JSON.stringify(await Store.backup(), null, 2)], { type: 'application/json' });
   const file = new File([blob], `shelf-backup-${new Date().toISOString().slice(0, 10)}.json`, { type: 'application/json' });
   if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file] }).then(() => mark('backup.saved')).catch(() => {}); return; }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click(); mark('backup.saved');
 };
+// restore: each book keeps whichever copy was changed last (phone or backup); removed books stay removed
 $('importFile').onchange = async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-  try {
-    const data = JSON.parse(await f.text()); if (!Array.isArray(data)) throw 0;
-    const have = new Set(books.map(b => b.id)); const fresh = data.filter(b => b && b.id && !have.has(b.id));
-    fresh.forEach(b => { if (b.status !== 'wishlist') b.status = 'owned'; if (!GENRES.includes(b.genre)) b.genre = guessGenre(b); });
-    await Store.replaceAll([...fresh, ...books]); await load(); mark('backup.restored');
-    status(`Restored ${fresh.length} book${fresh.length === 1 ? '' : 's'}.`);
-    fresh.forEach(b => Store.saveCover(b));
-  } catch (err) { status('That file isn’t a Shelf backup.', true); }
+  let n;
+  try { n = await Store.restore(JSON.parse(await f.text())); }
+  catch (err) { status('That file isn’t a Shelf backup.', true); return; }
+  await load(); mark('backup.restored');
+  const bk = k => `${k} book${k === 1 ? '' : 's'}`, parts = [];
+  if (n.added) parts.push(`Added ${bk(n.added)}`);
+  if (n.updated) parts.push(`Updated ${bk(n.updated)}`);
+  if (n.removed) parts.push(`Removed ${bk(n.removed)}`);
+  if (n.keptAway) parts.push(`${bk(n.keptAway)} you removed stayed removed`);
+  status(parts.length ? parts.join(' · ') + '.' : 'Everything was already up to date.');
 };
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 }

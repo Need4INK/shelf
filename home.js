@@ -19,7 +19,7 @@ async function loadBooks(){
   // books from before genres: guess one once (she can change it on the book page)
   const todo=BOOKS.filter(b=>!GENRES.includes(b.genre));todo.forEach(b=>{b.genre=guessGenre(b)});
   renderLatest();renderWish();renderGenres();
-  for(const b of todo)await Store.put(b).catch(()=>{});
+  for(const b of todo)await Store.put(b,false).catch(()=>{});
 }
 function renderLatest(){
   const b=newestBook();
@@ -92,11 +92,13 @@ try{QUOTES=JSON.parse(localStorage.getItem('quotes.cache')||'null')}catch(e){}if
 setTimeout(()=>fetch('quotes.json').then(r=>r.json()).then(a=>{const first=!QUOTES;QUOTES=a;try{localStorage.setItem('quotes.cache',JSON.stringify(a))}catch(e){}if(first)showQuote()}).catch(()=>{}),300);   // after the scene is up
 // a new saying each time Home is entered: app opened, or back from another screen / app
 addEventListener('pageshow',e=>{if(e.persisted)showQuote()});
+// back from a Book page (kept in memory): it may have been changed or removed; Undo puts a book back
+addEventListener('pageshow',e=>{if(e.persisted)loadBooks()});addEventListener('shelf-undo',()=>loadBooks());
 if(document.fonts)document.fonts.ready.then(()=>{const q=document.getElementById('quote');if(q.dataset.t)fitQuote(q)});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)showQuote()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-95';
+const APP_VERSION='home-96';
 // a new version arrived: drop the saved pictures once so new art shows straight away
 try{const v=localStorage.getItem('home.ver');
   if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);

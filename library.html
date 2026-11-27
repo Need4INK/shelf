@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
-<meta name="app-version" content="library-10">
+<meta name="app-version" content="library-11">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -102,6 +102,7 @@ h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shado
 <script src="bookmagic.js"></script>
 <script src="store.js"></script>
 <script src="book-frame.js"></script>
+<script src="undo.js"></script>
 <script>
 {
 const $ = id => document.getElementById(id);
@@ -147,6 +148,8 @@ if (document.fonts) document.fonts.ready.then(sizeBooks);
 [150, 500, 1200].forEach(ms => setTimeout(sizeBooks, ms)); addEventListener('pageshow', sizeBooks);
 const load = () => Store.all().then(a => { books = a; render(); });
 load(); Store.onChange(load);
+// back from a Book page (kept in memory): it may have been changed or removed; Undo puts a book back
+addEventListener('pageshow', e => { if (e.persisted) load(); }); addEventListener('shelf-undo', load);
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 </script>

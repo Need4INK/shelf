@@ -1,6 +1,7 @@
 /* Book storage on this phone (IndexedDB): the books, plus their covers downloaded as pictures.
    Shared by every page. Load before book-frame.js.
-   Store.all() · get(id) · put(book) · replaceAll(books) · remove(id)
+   Store.all() · get(id) · put(book[, mine]) · replaceAll(books) · remove(id) · unremove(book)
+   Store.backup() · restore(data) — newest edit wins (book.edited / removed-list time)
    Store.saveCover(book) · coverURL(id) · fetchMissingCovers() · onChange(fn)
    First run copies the old list (localStorage 'shelf.books.v1') in; the old copy is left untouched. */
 /* the only genres (Home "Collections by Genre"); anything else counts as Other */
@@ -18,7 +19,7 @@ function guessGenre(b) {
 }
 
 const Store = (() => {
-  const OLD = 'shelf.books.v1', DONE = 'shelf.idb.migrated';
+  const OLD = 'shelf.books.v1', DONE = 'shelf.idb.migrated', GONE = 'shelf.removed', DEMO = 'shelf.demoCleaned';
   const chan = 'BroadcastChannel' in self ? new BroadcastChannel('shelf') : null;
   let dbp = null;
 
@@ -50,11 +51,28 @@ const Store = (() => {
         const r = indexedDB.open('shelf', 1);
         r.onupgradeneeded = () => { const d = r.result; d.createObjectStore('books', { keyPath: 'id' }); d.createObjectStore('covers'); };
         r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
-      }).then(migrate);
+      }).then(migrate).then(cleanDemo);
       dbp.catch(() => { dbp = null; });
       if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});  // ask the phone not to clear it
     }
     return dbp;
+  }
+
+  /* removed books leave a note (id → when), so a backup saved before can't bring them back */
+  function gone() { try { return JSON.parse(localStorage.getItem(GONE) || '{}') || {}; } catch (e) { return {}; } }
+  function setGone(m) { try { localStorage.setItem(GONE, JSON.stringify(m)); } catch (e) {} }
+  /* one time: take out the 25 sample books (demo-01…25) */
+  async function cleanDemo(db) {
+    let done = null; try { done = localStorage.getItem(DEMO); } catch (e) {}
+    if (done) return db;
+    const ids = (await tx(db, 'books', 'readonly', t => req(t.objectStore('books').getAllKeys()))).filter(id => /^demo-/.test(id));
+    if (ids.length) {
+      await tx(db, ['books', 'covers'], 'readwrite', t => ids.forEach(id => { t.objectStore('books').delete(id); t.objectStore('covers').delete(id); }));
+      const m = gone(), now = Date.now(); ids.forEach(id => m[id] = now); setGone(m);
+    }
+    try { localStorage.setItem(DEMO, String(Date.now())); } catch (e) {}
+    if (ids.length) setTimeout(changed, 0);
+    return db;
   }
 
   const listeners = [];
@@ -66,11 +84,53 @@ const Store = (() => {
     catch (e) { return oldBooks(); }   // storage unavailable: show the old list read-only
   }
   async function get(id) { const db = await open(); return tx(db, 'books', 'readonly', t => req(t.objectStore('books').get(id))); }
-  async function put(b) { if (!b.id) b.id = newId(); const db = await open(); await tx(db, 'books', 'readwrite', t => { t.objectStore('books').put(b); }); changed(); return b; }
+  /* mine = an edit she made (stamps the time); false for the app's own tidy-ups (cover colour, guessed genre) */
+  async function put(b, mine = true) {
+    if (!b.id) b.id = newId(); if (mine) b.edited = Date.now();
+    const db = await open(); await tx(db, 'books', 'readwrite', t => { t.objectStore('books').put(b); });
+    const m = gone(); if (m[b.id]) { delete m[b.id]; setGone(m); }
+    changed(); return b;
+  }
   async function remove(id) {
     const db = await open();
     await tx(db, ['books', 'covers'], 'readwrite', t => { t.objectStore('books').delete(id); t.objectStore('covers').delete(id); });
+    const m = gone(); m[id] = Date.now(); setGone(m);
     forget(id); changed();
+  }
+  /* Undo: put the removed book back exactly as it was */
+  async function unremove(b) { await put(b, false); saveCover(b); }
+
+  /* backup file: the books + the removed-list */
+  async function backup() { return { app: 'shelf', saved: Date.now(), books: await all(), removed: gone() }; }
+  /* restore: for each book the newest edit wins; books without an edit time lose to the phone's copy */
+  async function restore(data) {
+    const list = Array.isArray(data) ? data : data && Array.isArray(data.books) ? data.books : null;
+    if (!list) throw new Error('not a backup');
+    const theirGone = (!Array.isArray(data) && data.removed) || {};
+    const mine = new Map((await all()).map(b => [b.id, b])), myGone = gone();
+    const put_ = [], del = [], n = { added: 0, updated: 0, removed: 0, keptAway: 0 };
+    for (const b of list) {
+      if (!b || !b.id) continue;
+      if (/^demo-/.test(b.id)) { n.keptAway++; continue; }   // the old sample books never come back
+      const have = mine.get(b.id), t = b.edited || 0;
+      if (have) { if (t > (have.edited || 0)) { put_.push(b); n.updated++; } }
+      else if (myGone[b.id] && myGone[b.id] >= t) n.keptAway++;
+      else { put_.push(b); n.added++; delete myGone[b.id]; }
+    }
+    for (const id in theirGone) {
+      const have = mine.get(id), when = +theirGone[id] || 0;
+      if (have && (have.edited || 0) < when && !put_.some(b => b.id === id)) { del.push(id); n.removed++; }
+      if (!have && !put_.some(b => b.id === id)) myGone[id] = Math.max(myGone[id] || 0, when);
+    }
+    put_.forEach(b => { if (b.status !== 'wishlist') b.status = 'owned'; if (!GENRES.includes(b.genre)) b.genre = guessGenre(b); });
+    const db = await open();
+    await tx(db, ['books', 'covers'], 'readwrite', t => {
+      put_.forEach(b => t.objectStore('books').put(b));
+      del.forEach(id => { t.objectStore('books').delete(id); t.objectStore('covers').delete(id); myGone[id] = +theirGone[id]; });
+    });
+    del.forEach(forget); setGone(myGone); changed();
+    put_.forEach(b => saveCover(b));
+    return n;
   }
   /* save the whole list (Shelf page): also drops covers of books that are gone */
   async function replaceAll(books) {
@@ -117,5 +177,5 @@ const Store = (() => {
     } catch (e) {}
   }
 
-  return { all, get, put, remove, replaceAll, coverURL, saveCover, fetchMissingCovers, onChange: f => listeners.push(f) };
+  return { all, get, put, remove, unremove, backup, restore, replaceAll, coverURL, saveCover, fetchMissingCovers, onChange: f => listeners.push(f) };
 })();

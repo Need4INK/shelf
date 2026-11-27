@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-34">
+<meta name="app-version" content="book-35">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -78,6 +78,8 @@ dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
  background:#2a0b38;border:1px solid var(--gold2);color:var(--gold);font-size:15px;opacity:0;transition:opacity .3s;pointer-events:none}
 .saved.show{opacity:1}
 .note{font-size:13px;color:rgba(243,227,195,.55);text-align:center;margin:4px 0 0}
+.remove{display:block;margin:22px auto 6px;min-height:44px;padding:0 22px;border-radius:999px;border:1.5px solid rgba(255,154,138,.45);background:rgba(30,6,20,.55);color:#ff9a8a;font:600 17px "EB Garamond",Georgia,serif;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.remove.sure{background:#7a1f2a;border-color:#ff9a8a;color:#ffe6df}
 
 #tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom,0px);
  background:linear-gradient(transparent,#0d0310 calc(100% - env(safe-area-inset-bottom,0px)))}
@@ -199,7 +201,8 @@ function render(){
   </section>
 
   ${b.description?`<section class="card desc clamp" aria-label="Description"><h2>About this book</h2><p id="dText"></p><button class="more" id="more" hidden>Read more</button></section>`:''}
-  <p class="note">Changes save on this phone automatically.</p>`;
+  <p class="note">Changes save on this phone automatically.</p>
+  <button class="remove" id="rm">Remove from collection</button>`;
 
   setBook(document.getElementById('bk'),b);
   if(b.description){
@@ -220,6 +223,19 @@ function render(){
   field(document.getElementById('fSeriesNo'),'seriesNo');
   field(document.getElementById('fEdition'),'edition');
   document.getElementById('fGenre').addEventListener('change',e=>save(x=>{x.genre=e.target.value}));
+  // remove: first tap asks, second tap removes; the shelf then offers Undo for a few seconds
+  const rm=document.getElementById('rm');
+  rm.onclick=async()=>{
+    if(!rm.classList.contains('sure')){rm.classList.add('sure');rm.textContent='Tap again to remove';clearTimeout(rm.t);
+      rm.t=setTimeout(()=>{rm.classList.remove('sure');rm.textContent='Remove from collection'},4000);return}
+    clearTimeout(rm.t);rm.disabled=true;
+    const gone=ALL.find(x=>x.id===id);
+    try{await Store.remove(id)}catch(e){rm.disabled=false;return}
+    try{sessionStorage.setItem('shelf.undo',JSON.stringify({book:gone,at:Date.now()}))}catch(e){}
+    let r=null;try{r=new URL(document.referrer)}catch(e){}
+    if(r&&r.origin===location.origin&&!/book\.html$/.test(r.pathname)&&history.length>1)history.back();
+    else location.replace(gone&&gone.status==='wishlist'?'library.html?list=wishlist':'library.html');
+  };
 }
 const reload=()=>Store.all().then(a=>{ALL=a;render()});
 reload();
