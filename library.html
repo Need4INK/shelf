@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
-<meta name="app-version" content="library-8">
+<meta name="app-version" content="library-9">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -134,6 +134,11 @@ function sizeBooks() {
   c.style.setProperty('--bw', Math.floor(Math.max(70, Math.min(byW, byH))) + 'px');
 }
 sizeBooks(); addEventListener('resize', sizeBooks);
+// size again once the header lettering and the bottom bar picture have their real size (else the first list opened got bigger books)
+// (the iPhone also adds the notch / home-bar margins a moment after the page starts, without telling the page)
+if (window.ResizeObserver) { const ro = new ResizeObserver(() => sizeBooks()); ro.observe($('hdr')); ro.observe(document.body, { box: 'border-box' }); ro.observe(document.getElementById('tabbar'), { box: 'border-box' }); }
+if (document.fonts) document.fonts.ready.then(sizeBooks);
+[150, 500, 1200].forEach(ms => setTimeout(sizeBooks, ms)); addEventListener('pageshow', sizeBooks);
 const load = () => Store.all().then(a => { books = a; render(); });
 load(); Store.onChange(load);
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
