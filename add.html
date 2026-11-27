@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a22">
+<meta name="app-version" content="a23">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -74,6 +74,11 @@ input::placeholder{color:var(--mute);opacity:.8}
 /* step 3: the found book */
 .book{display:grid;grid-template-columns:104px minmax(0,1fr);gap:16px;align-items:start}
 .book .bk{width:104px;cursor:default}
+/* change cover: gold camera badge on the book's corner (same as the Book page) */
+.bkw{position:relative;width:104px}
+.covcam{position:absolute;right:-10px;bottom:-8px;width:38px;height:38px;min-height:0;border-radius:50%;border:0;padding:0;
+ background:linear-gradient(#f6dc96,#c9a24e);box-shadow:0 3px 8px rgba(0,0,0,.6),inset 0 1px 0 #fff4c8,0 0 0 2px rgba(42,20,8,.6)}
+.covcam svg{width:20px;height:20px}
 .book h3{margin:0;font:600 22px/1.15 "EB Garamond",Georgia,serif;color:#f6dcb4}
 .book .sub{color:#e0c79e;font-style:italic;margin:2px 0 4px;font-size:16px}
 .book .by{font-size:17px;margin-top:4px}
@@ -147,7 +152,7 @@ main{padding-bottom:140px}
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a22</p>
+  <p style="font-size:12px;opacity:.5">a23</p>
   <div class="rule" id="steps" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg></div>
 </header>
 <main>
@@ -170,7 +175,7 @@ main{padding-bottom:140px}
       <div class="guide"></div>
       <div class="hint">Hold about 20 cm away, barcode inside the box</div>
     </div>
-    <button class="full" id="scanBtn">Start camera</button>
+    <button class="full hidden" id="scanBtn">Try again</button>
     <button class="other">Choose another way</button>
   </section>
 
@@ -223,6 +228,7 @@ main{padding-bottom:140px}
 <script src="bookmagic.js"></script>
 <script src="store.js"></script>
 <script src="book-frame.js"></script>
+<script src="cover-photo.js"></script>
 <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
 <script>
 {
@@ -247,7 +253,7 @@ function show(id) {
 }
 document.querySelectorAll('.other').forEach(b => b.onclick = () => { status(''); show('s1'); });
 document.querySelectorAll('.way').forEach(b => b.onclick = () => {
-  status(''); const w = b.dataset.way;
+  status(''); photo = null; const w = b.dataset.way;
   if (w === 'scan') { show('s2scan'); startScan(); }
   if (w === 'photo') { show('s2photo'); $('photo').click(); }
   if (w === 'isbn') { show('s2isbn'); $('code').value = ''; setTimeout(() => $('code').focus(), 50); }
@@ -321,12 +327,13 @@ async function lookup(raw) {
 const LANG = { en: 'English', ro: 'Romanian', fr: 'French', de: 'German', es: 'Spanish', it: 'Italian', hu: 'Hungarian', ru: 'Russian', pt: 'Portuguese', nl: 'Dutch', pl: 'Polish', ja: 'Japanese' };
 const year = p => { const m = String(p || '').match(/\d{4}/); return m ? m[0] : p; };
 const facts = b => [['Publisher', b.publisher], ['Published', year(b.published)], ['Pages', b.pages], ['Language', LANG[b.language] || b.language], ['ISBN-13', b.isbn13]].filter(f => f[1]);
+let photo = null, photoURL = null;   // her own cover photo, kept until the book is added
 function showBook(b) {
   const dup = b.isbn13 && books.some(x => x.isbn13 === b.isbn13);
   let list = 'owned', genre = GENRES.includes(b.genre) ? b.genre : guessGenre(b);
   const r = $('s3');
   r.innerHTML = `<h2>Is this your book?</h2>
-    <div class="book"><div class="bk">${bookFrameHTML()}</div>
+    <div class="book"><div class="bkw"><div class="bk">${bookFrameHTML()}</div><button class="covcam" id="covcam" aria-label="Use my own cover photo"><svg viewBox="0 0 24 24" fill="none" stroke="#2a1408" stroke-width="2" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.6"/></svg></button></div>
       <div><h3>${esc(b.title || 'Untitled')}</h3>${b.subtitle ? `<div class="sub">${esc(b.subtitle)}</div>` : ''}
       <div class="by">${esc((b.authors || []).join(', ') || 'Unknown author')}</div>
       ${facts(b).length ? `<dl>${facts(b).map(f => `<dt>${f[0]}</dt><dd>${esc(f[1])}</dd>`).join('')}</dl>` : ''}</div></div>
@@ -339,7 +346,12 @@ function showBook(b) {
     ${dup ? '<p class="dup">This book is already in your collection.</p>' : ''}
     <button class="primary full" id="addBtn" style="margin-top:14px">Add to my library</button>
     <button class="other">Choose another way</button>`;
-  setBook(r.querySelector('.bk'), b);
+  setBook(r.querySelector('.bk'), photo ? { ...b, cover: photoURL } : b);
+  $('covcam').onclick = async () => {
+    const blob = await CoverPhoto.pick(); if (!blob) return;
+    photo = blob; if (photoURL) URL.revokeObjectURL(photoURL); photoURL = URL.createObjectURL(blob);
+    setBook(r.querySelector('.bk'), { ...b, cover: photoURL, color: null });
+  };
   const pick = (box, set) => box.onclick = e => { const t = e.target.closest('button'); if (!t) return;
     box.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === t)); set(t.dataset.v); };
   pick($('list'), v => { list = v; $('addBtn').textContent = v === 'wishlist' ? 'Add to my wishlist' : 'Add to my library'; });
@@ -360,15 +372,18 @@ $('writeForm').onsubmit = e => { e.preventDefault();
 async function addBook(b, list, genre) {
   const { link, ...keep } = b; if (!keep.series) { delete keep.series; delete keep.seriesNo; }
   const nb = { ...keep, status: list, genre, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: Date.now() };
+  if (photo) { if (nb.cover) nb.webCover = nb.cover; nb.cover = 'own:' + Date.now(); delete nb.color; }
   $('addBtn').disabled = true;
   try { await Store.put(nb); } catch (e) { $('addBtn').disabled = false; status('Could not save — storage unavailable.', true); return; }
   books.unshift(nb);
-  Store.saveCover(nb);   // keep the cover picture on the phone
+  if (photo) await Store.setCover(nb.id, photo).catch(() => {});
+  else Store.saveCover(nb);   // keep the cover picture on the phone
   const r = $('s4');
   r.innerHTML = `<h2>Added ✦</h2><div class="bk">${bookFrameHTML()}</div>
     <p>“${esc(nb.title || 'Your book')}” is on your ${list === 'wishlist' ? 'Wishlist' : 'Library'} shelf.</p>
     <div class="row"><button class="grow" id="again">Add another</button><button class="primary grow" id="open">Open book</button></div>`;
   setBook(r.querySelector('.bk'), nb);
+  photo = null;
   $('again').onclick = () => show('s1');
   $('open').onclick = () => { location.href = 'book.html?id=' + encodeURIComponent(nb.id); };
   status(''); show('s4');
@@ -396,10 +411,12 @@ function releaseCamera() {
 }
 function stopScan() {
   scanning = false; clearTimeout(timer);
-  $('scanBtn').textContent = 'Start camera';
   clearTimeout(releaseTimer); releaseTimer = setTimeout(releaseCamera, 3 * 60 * 1000);
 }
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { stopScan(); releaseCamera(); } });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { stopScan(); releaseCamera(); }
+  else if (!$('s2scan').classList.contains('hidden')) startScan(); });   // back in the app: camera on again
+// the camera starts by itself; "Try again" only shows when it couldn't start
+const camFailed = (msg) => { status(msg, true); $('scanBtn').classList.remove('hidden'); };
 function scanFrame() {
   if (!scanning) return;
   const v = $('video'), vw = v.videoWidth, vh = v.videoHeight;
@@ -430,26 +447,25 @@ function scanFrame() {
   timer = setTimeout(scanFrame, 30);
 }
 async function startScan() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { status('Live camera needs the app opened over https. Try “From a photo”.', true); return; }
-  if (!window.ZXing) { status('Scanner library didn’t load — check your connection, or type the ISBN.', true); return; }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { camFailed('Live camera needs the app opened over https. Try “From a photo”.'); return; }
+  if (!window.ZXing) { camFailed('Scanner library didn’t load — check your connection, or type the ISBN.'); return; }
   if (!core) {
     const Z = window.ZXing, hints = new Map();
     hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.UPC_A]);
     hints.set(Z.DecodeHintType.TRY_HARDER, true);
     core = new Z.MultiFormatReader(); core.setHints(hints);
   }
-  status(''); clearTimeout(releaseTimer);
+  status(''); $('scanBtn').classList.add('hidden'); clearTimeout(releaseTimer);
   const live = stream && stream.getVideoTracks().some(t => t.readyState === 'live');
   if (live) {
     lastRead = ''; hits = 0; frameNo = 0; scanning = true;
-    $('scanBtn').textContent = 'Stop camera';
     try { await $('video').play(); } catch (e) {}
     scanFrame(); return;
   }
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } });
   } catch (e) {
-    status(e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow it in Settings › Safari › Camera, or choose another way.' : 'Couldn’t start the camera. Try “From a photo”.', true); return;
+    camFailed(e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow it in Settings › Safari › Camera, or choose another way.' : 'Couldn’t start the camera. Try “From a photo”.'); return;
   }
   const track = stream.getVideoTracks()[0];
   // zoom in so you can hold the phone further away, where the camera can focus
@@ -463,10 +479,9 @@ async function startScan() {
   const v = $('video'); v.srcObject = stream;
   try { await v.play(); } catch (e) {}
   lastRead = ''; hits = 0; frameNo = 0; scanning = true;
-  $('scanBtn').textContent = 'Stop camera';
   scanFrame();
 }
-$('scanBtn').onclick = () => scanning ? stopScan() : startScan();
+$('scanBtn').onclick = () => startScan();
 $('photo').onchange = async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   reader = reader || makeReader(); if (!reader) return;
@@ -484,7 +499,7 @@ loadBooks(); Store.onChange(loadBooks);
 show('s1');
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a22';
+const VERSION = 'a23';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {

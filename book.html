@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-35">
+<meta name="app-version" content="book-36">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -31,6 +31,12 @@ body{min-height:100vh;color:#f3e3c3;font:17px/1.5 "EB Garamond",Georgia,serif;-w
 .hero::before{content:"";position:absolute;top:0;left:50%;width:300px;height:300px;transform:translateX(-50%);
  background:radial-gradient(closest-side,rgba(233,200,115,.22),transparent);pointer-events:none}
 .hero .bk{width:min(52vw,210px)}
+/* change cover: gold camera badge on the book's bottom-right corner */
+.bkw{position:relative}
+.covcam{position:absolute;right:-12px;bottom:-10px;width:46px;height:46px;border-radius:50%;border:0;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;
+ background:linear-gradient(#f6dc96,#c9a24e);box-shadow:0 3px 8px rgba(0,0,0,.6),inset 0 1px 0 #fff4c8,0 0 0 2px rgba(42,20,8,.6);-webkit-tap-highlight-color:transparent}
+.covcam svg{width:24px;height:24px}.covcam:active{transform:scale(.94)}
+.orig{margin:14px 0 -6px;border:0;background:none;color:#e0c79e;font:italic 16px "EB Garamond",Georgia,serif;text-decoration:underline;text-decoration-color:rgba(241,207,124,.5);text-underline-offset:3px;cursor:pointer;min-height:36px}
 h1{font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:32px;line-height:1.08;margin:18px 0 4px;color:#f6e2b0;text-wrap:balance;text-shadow:0 2px 3px rgba(0,0,0,.5)}
 .sub{font-style:italic;color:#e0c79e;margin:0 0 6px;text-wrap:balance}
 .by{font-size:19px;color:#f3e3c3;margin:0}
@@ -140,6 +146,7 @@ dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
 <script src="bookmagic.js"></script>
 <script src="store.js"></script>
 <script src="book-frame.js"></script>
+<script src="cover-photo.js"></script>
 <script>
 {
 let ALL=[];
@@ -172,7 +179,8 @@ function render(){
   ].filter(r=>r[1]);
   page.innerHTML=`
   <section class="hero">
-    <div class="bk" id="bk">${bookFrameHTML()}</div>
+    <div class="bkw"><div class="bk" id="bk">${bookFrameHTML()}</div><button class="covcam" id="covcam" aria-label="Change cover photo"><svg viewBox="0 0 24 24" fill="none" stroke="#2a1408" stroke-width="2" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.6"/></svg></button></div>
+    ${b.webCover&&Store.isOwn(b.cover)?'<button class="orig" id="orig">Use the original cover</button>':''}
     <h1>${esc(b.title||'Untitled')}</h1>
     ${b.subtitle?`<p class="sub">${esc(b.subtitle)}</p>`:''}
     <p class="by">${esc((b.authors||[]).join(', ')||'Unknown author')}</p>
@@ -223,6 +231,14 @@ function render(){
   field(document.getElementById('fSeriesNo'),'seriesNo');
   field(document.getElementById('fEdition'),'edition');
   document.getElementById('fGenre').addEventListener('change',e=>save(x=>{x.genre=e.target.value}));
+  // cover photo: take one or pick from the library, fit the corners, save on the phone
+  document.getElementById('covcam').onclick=async()=>{
+    const blob=await CoverPhoto.pick();if(!blob)return;
+    await Store.setCover(id,blob);
+    save(x=>{if(!Store.isOwn(x.cover)&&x.cover)x.webCover=x.cover;x.cover='own:'+Date.now();delete x.color});render();
+  };
+  const og=document.getElementById('orig');
+  if(og)og.onclick=async()=>{await Store.dropCover(id);const b2=save(x=>{x.cover=x.webCover;delete x.webCover;delete x.color});render();if(b2)Store.saveCover(b2)};
   // remove: first tap asks, second tap removes; the shelf then offers Undo for a few seconds
   const rm=document.getElementById('rm');
   rm.onclick=async()=>{

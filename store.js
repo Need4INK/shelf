@@ -92,8 +92,8 @@ const Store = (() => {
     changed(); return b;
   }
   async function remove(id) {
-    const db = await open();
-    await tx(db, ['books', 'covers'], 'readwrite', t => { t.objectStore('books').delete(id); t.objectStore('covers').delete(id); });
+    const db = await open(), was = await get(id).catch(() => null), keepPhoto = was && isOwn(was.cover);   // her own photo stays for Undo
+    await tx(db, ['books', 'covers'], 'readwrite', t => { t.objectStore('books').delete(id); if (!keepPhoto) t.objectStore('covers').delete(id); });
     const m = gone(); m[id] = Date.now(); setGone(m);
     forget(id); changed();
   }
@@ -101,7 +101,12 @@ const Store = (() => {
   async function unremove(b) { await put(b, false); saveCover(b); }
 
   /* backup file: the books + the removed-list */
-  async function backup() { return { app: 'shelf', saved: Date.now(), books: await all(), removed: gone() }; }
+  async function backup() {
+    const books = await all(), photos = {};
+    // her own cover photos travel inside the backup (web covers are fetched again)
+    for (const b of books) if (isOwn(b.cover)) { try { const bl = await getCoverBlob(b.id); if (bl) photos[b.id] = await new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(bl); }); } catch (e) {} }
+    return { app: 'shelf', saved: Date.now(), books, removed: gone(), photos };
+  }
   /* restore: for each book the newest edit wins; books without an edit time lose to the phone's copy */
   async function restore(data) {
     const list = Array.isArray(data) ? data : data && Array.isArray(data.books) ? data.books : null;
@@ -129,7 +134,11 @@ const Store = (() => {
       del.forEach(id => { t.objectStore('books').delete(id); t.objectStore('covers').delete(id); myGone[id] = +theirGone[id]; });
     });
     del.forEach(forget); setGone(myGone); changed();
-    put_.forEach(b => saveCover(b));
+    const photos = (!Array.isArray(data) && data.photos) || {};
+    for (const b of put_) {
+      if (isOwn(b.cover) && photos[b.id]) { try { await setCover(b.id, await (await fetch(photos[b.id])).blob()); } catch (e) {} }
+      else saveCover(b);
+    }
     return n;
   }
   /* save the whole list (Shelf page): also drops covers of books that are gone */
@@ -157,8 +166,19 @@ const Store = (() => {
       const u = URL.createObjectURL(blob); urls.set(id, u); return u;
     } catch (e) { return null; }
   }
+  /* her own cover photo (book.cover = 'own:<time>', the web cover kept in book.webCover) */
+  const isOwn = u => /^own:/.test(u || '');
+  async function setCover(id, blob) {
+    const db = await open(); await tx(db, 'covers', 'readwrite', t => { t.objectStore('covers').put(blob, id); });
+    forget(id); changed();
+  }
+  async function dropCover(id) {
+    const db = await open(); await tx(db, 'covers', 'readwrite', t => { t.objectStore('covers').delete(id); });
+    forget(id); changed();
+  }
+  async function getCoverBlob(id) { const db = await open(); return tx(db, 'covers', 'readonly', t => req(t.objectStore('covers').get(id))); }
   async function saveCover(b) {
-    if (!b || !b.id || !b.cover || failed.has(b.cover)) return false;
+    if (!b || !b.id || !b.cover || isOwn(b.cover) || failed.has(b.cover)) return false;
     try {
       const r = await fetch(b.cover, { mode: 'cors' });
       if (!r.ok) throw 0;
@@ -173,9 +193,9 @@ const Store = (() => {
     if (!navigator.onLine) return;
     try {
       const db = await open(), have = new Set(await tx(db, 'covers', 'readonly', t => req(t.objectStore('covers').getAllKeys())));
-      for (const b of await all()) if (b.cover && !have.has(b.id)) await saveCover(b);
+      for (const b of await all()) if (b.cover && !isOwn(b.cover) && !have.has(b.id)) await saveCover(b);
     } catch (e) {}
   }
 
-  return { all, get, put, remove, unremove, backup, restore, replaceAll, coverURL, saveCover, fetchMissingCovers, onChange: f => listeners.push(f) };
+  return { all, get, put, remove, unremove, backup, restore, replaceAll, coverURL, saveCover, setCover, dropCover, isOwn, fetchMissingCovers, onChange: f => listeners.push(f) };
 })();
