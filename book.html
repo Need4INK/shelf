@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-32">
+<meta name="app-version" content="book-33">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -99,6 +99,12 @@ dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
   addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#tabbar [data-go]');if(a&&!e.defaultPrevented){e.preventDefault();location.href=a.dataset.go}});
   // iPhone only shows the pressed glow when the page listens for touches
   document.addEventListener('touchstart',()=>{},{passive:true});
+  // the bar keeps its own touches: it never scrolls what is under it (the shelves on Library/Wishlist could take the
+  // touch, so taps were lost), and lifting the finger on the same button counts as a tap
+  document.addEventListener('DOMContentLoaded',()=>{const t=document.getElementById('tabbar');if(!t)return;
+    t.addEventListener('touchmove',e=>{if(e.cancelable)e.preventDefault()},{passive:false});
+    t.addEventListener('touchend',e=>{const a=e.target.closest&&e.target.closest('.tb'),p=e.changedTouches[0];if(!a||!p)return;
+      const h=document.elementFromPoint(p.clientX,p.clientY);if(h&&h.closest&&h.closest('.tb')===a&&e.cancelable){e.preventDefault();a.click()}});});
   document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#tabbar a[aria-label="Home"]');if(!a)return;
     let r=null;try{r=new URL(document.referrer)}catch(err){}
     if(r&&r.origin===location.origin&&/\/(index\.html)?$/.test(r.pathname)&&history.length>1){e.preventDefault();

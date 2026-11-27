@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a18">
+<meta name="app-version" content="a19">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -80,6 +80,12 @@ main{padding-bottom:140px}
   addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#tabbar [data-go]');if(a&&!e.defaultPrevented){e.preventDefault();location.href=a.dataset.go}});
   // iPhone only shows the pressed glow when the page listens for touches
   document.addEventListener('touchstart',()=>{},{passive:true});
+  // the bar keeps its own touches: it never scrolls what is under it (the shelves on Library/Wishlist could take the
+  // touch, so taps were lost), and lifting the finger on the same button counts as a tap
+  document.addEventListener('DOMContentLoaded',()=>{const t=document.getElementById('tabbar');if(!t)return;
+    t.addEventListener('touchmove',e=>{if(e.cancelable)e.preventDefault()},{passive:false});
+    t.addEventListener('touchend',e=>{const a=e.target.closest&&e.target.closest('.tb'),p=e.changedTouches[0];if(!a||!p)return;
+      const h=document.elementFromPoint(p.clientX,p.clientY);if(h&&h.closest&&h.closest('.tb')===a&&e.cancelable){e.preventDefault();a.click()}});});
   document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#tabbar a[aria-label="Home"]');if(!a)return;
     let r=null;try{r=new URL(document.referrer)}catch(err){}
     if(r&&r.origin===location.origin&&/\/(index\.html)?$/.test(r.pathname)&&history.length>1){e.preventDefault();
@@ -101,7 +107,7 @@ main{padding-bottom:140px}
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a18</p>
+  <p style="font-size:12px;opacity:.5">a19</p>
 </header>
 <main>
   <section class="panel">
@@ -417,7 +423,7 @@ const loadBooks = () => Store.all().then(a => { books = a.sort((x, y) => (y.adde
 loadBooks(); Store.onChange(loadBooks);
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a18';
+const VERSION = 'a19';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
