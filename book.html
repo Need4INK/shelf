@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-36">
+<meta name="app-version" content="book-37">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -84,7 +84,12 @@ dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
  background:#2a0b38;border:1px solid var(--gold2);color:var(--gold);font-size:15px;opacity:0;transition:opacity .3s;pointer-events:none}
 .saved.show{opacity:1}
 .note{font-size:13px;color:rgba(243,227,195,.55);text-align:center;margin:4px 0 0}
-.remove{display:block;margin:22px auto 6px;min-height:44px;padding:0 22px;border-radius:999px;border:1.5px solid rgba(255,154,138,.45);background:rgba(30,6,20,.55);color:#ff9a8a;font:600 17px "EB Garamond",Georgia,serif;cursor:pointer;-webkit-tap-highlight-color:transparent}
+/* Edit book + Remove side by side under the cards */
+.acts{display:flex;gap:10px;margin:22px 0 6px}
+.acts button{flex:1}
+.edit{min-height:44px;padding:0 18px;border-radius:999px;border:1.5px solid rgba(232,190,140,.5);background:rgba(30,6,20,.55);color:#f1dcc0;font:600 17px "EB Garamond",Georgia,serif;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.edit.done{background:linear-gradient(180deg,#f3d29a,#d9a066);color:#2a1410;border:0;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+.remove{display:block;margin:0;min-height:44px;padding:0 22px;border-radius:999px;border:1.5px solid rgba(255,154,138,.45);background:rgba(30,6,20,.55);color:#ff9a8a;font:600 17px "EB Garamond",Georgia,serif;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .remove.sure{background:#7a1f2a;border-color:#ff9a8a;color:#ffe6df}
 
 #tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom,0px);
@@ -149,7 +154,7 @@ dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
 <script src="cover-photo.js"></script>
 <script>
 {
-let ALL=[];
+let ALL=[],editing=false;
 const load=()=>ALL;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const page=document.getElementById('page');
@@ -172,15 +177,26 @@ function render(){
   if(!b){page.innerHTML='<div class="empty">This book isn\'t in your collection.<br><a href="./">Back to Home</a></div>';return}
   document.title=b.title||'Book';
   const status=b.status==='wishlist'?'wishlist':'owned',rating=b.rating||0;
-  const rows=[
+  const inp=(fid,v,ph,extra='')=>`<input id="${fid}" placeholder="${ph}" value="${esc(v)}" autocomplete="off"${extra}>`;
+  const rows=editing?[
+    ['Title',inp('fTitle',b.title,'Title')],['Author',inp('fAuthor',(b.authors||[]).join(', '),'Author(s), comma between')],
+    ['Genre',`<select id="fGenre" aria-label="Genre">${GENRES.map(g=>`<option${g===(GENRES.includes(b.genre)?b.genre:'Other')?' selected':''}>${g}</option>`).join('')}</select>`],
+    ['Series',`<div class="ser">${inp('fSeries',b.series,'Series name')}${inp('fSeriesNo',b.seriesNo,'No.',' inputmode="decimal"')}</div>`],
+    ['Edition',inp('fEdition',b.edition,'e.g. Hardback, special edition')],
+    ['Publisher',inp('fPublisher',b.publisher,'Publisher')],['Published',inp('fPublished',year(b.published)||b.published,'Year',' inputmode="numeric"')],
+    ['Pages',inp('fPages',b.pages,'Pages',' inputmode="numeric"')],
+    ['ISBN-13',esc(b.isbn13)],['ISBN-10',esc(b.isbn10)],
+  ]:[
+    ['Genre',esc(GENRES.includes(b.genre)?b.genre:'Other')],['Series',b.series?esc(b.series)+(b.seriesNo?' · Book '+esc(b.seriesNo):''):''],['Edition',esc(b.edition)],
     ['Publisher',esc(b.publisher)],['Published',esc(year(b.published)||b.published)],['Pages',esc(b.pages)],
     ['Language',esc(LANG[b.language]||b.language)],['ISBN-13',esc(b.isbn13)],['ISBN-10',esc(b.isbn10)],
     ['Added',b.added?new Date(b.added).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'']
   ].filter(r=>r[1]);
+  page.classList.toggle('editing',editing);
   page.innerHTML=`
   <section class="hero">
-    <div class="bkw"><div class="bk" id="bk">${bookFrameHTML()}</div><button class="covcam" id="covcam" aria-label="Change cover photo"><svg viewBox="0 0 24 24" fill="none" stroke="#2a1408" stroke-width="2" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.6"/></svg></button></div>
-    ${b.webCover&&Store.isOwn(b.cover)?'<button class="orig" id="orig">Use the original cover</button>':''}
+    <div class="bkw"><div class="bk" id="bk">${bookFrameHTML()}</div>${editing?'<button class="covcam" id="covcam" aria-label="Change cover photo"><svg viewBox="0 0 24 24" fill="none" stroke="#2a1408" stroke-width="2" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.6"/></svg></button>':''}</div>
+    ${editing&&b.webCover&&Store.isOwn(b.cover)?'<button class="orig" id="orig">Use the original cover</button>':''}
     <h1>${esc(b.title||'Untitled')}</h1>
     ${b.subtitle?`<p class="sub">${esc(b.subtitle)}</p>`:''}
     <p class="by">${esc((b.authors||[]).join(', ')||'Unknown author')}</p>
@@ -199,18 +215,15 @@ function render(){
   </section>
 
   <section class="card" aria-label="Details">
-    <h2>Details</h2>
+    <h2>${editing?'Edit details':'Details'}</h2>
     <dl>
-      <dt>Genre</dt><dd><select id="fGenre" aria-label="Genre">${GENRES.map(g=>`<option${g===(GENRES.includes(b.genre)?b.genre:'Other')?' selected':''}>${g}</option>`).join('')}</select></dd>
-      <dt>Series</dt><dd><div class="ser"><input id="fSeries" placeholder="Series name" value="${esc(b.series)}"><input id="fSeriesNo" inputmode="decimal" placeholder="No." value="${esc(b.seriesNo)}"></div></dd>
-      <dt>Edition</dt><dd><input id="fEdition" placeholder="e.g. Hardback, special edition" value="${esc(b.edition)}"></dd>
       ${rows.map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}
     </dl>
   </section>
 
   ${b.description?`<section class="card desc clamp" aria-label="Description"><h2>About this book</h2><p id="dText"></p><button class="more" id="more" hidden>Read more</button></section>`:''}
-  <p class="note">Changes save on this phone automatically.</p>
-  <button class="remove" id="rm">Remove from collection</button>`;
+  ${editing?'<p class="note">Changes save on this phone automatically.</p>':''}
+  <div class="acts">${editing?'<button class="edit done" id="ed">Done</button>':'<button class="edit" id="ed">Edit book</button>'}<button class="remove" id="rm">Remove</button></div>`;
 
   setBook(document.getElementById('bk'),b);
   if(b.description){
@@ -224,13 +237,23 @@ function render(){
     const n=+btn.dataset.n,cur=(load().find(x=>x.id===id)||{}).rating||0,v=n===cur?0:n;   // tap the same pumpkin again to clear
     save(x=>{x.rating=v});page.querySelectorAll('.pk').forEach(p=>p.classList.toggle('on',+p.dataset.n<=v));
   });
-  const field=(el,k,fix=v=>v)=>{el.addEventListener('change',()=>{const b2=save(x=>{const v=fix(el.value.trim());if(v)x[k]=v;else delete x[k]});
+  const field=(el,k,fix=v=>v)=>{el.addEventListener('change',()=>{const v0=fix(el.value.trim());el.value=v0;const b2=save(x=>{if(v0)x[k]=v0;else delete x[k]});
     if(k.startsWith('series')&&b2){const s=document.querySelector('.series');const t=b2.series?b2.series+(b2.seriesNo?' · Book '+b2.seriesNo:''):'';
       if(s){s.textContent=t;s.hidden=!t}else if(t){const n=document.createElement('p');n.className='series';n.textContent=t;document.querySelector('.hero').appendChild(n)}}})};
+  // edit mode: Edit book → fields, cover photo; Done → back to reading
+  document.getElementById('ed').onclick=()=>{editing=!editing;render();scrollTo({top:0,behavior:'smooth'})};
+  if(editing){
   field(document.getElementById('fSeries'),'series');
   field(document.getElementById('fSeriesNo'),'seriesNo');
   field(document.getElementById('fEdition'),'edition');
+  field(document.getElementById('fPublisher'),'publisher');
+  field(document.getElementById('fPublished'),'published');
+  field(document.getElementById('fPages'),'pages',v=>v.replace(/\D/g,''));
   document.getElementById('fGenre').addEventListener('change',e=>save(x=>{x.genre=e.target.value}));
+  const ft=document.getElementById('fTitle');ft.addEventListener('change',()=>{const v=ft.value.trim();if(!v){ft.value=(ALL.find(x=>x.id===id)||{}).title||'';return}
+    save(x=>{x.title=v});document.querySelector('.hero h1').textContent=v;document.title=v});
+  const fa=document.getElementById('fAuthor');fa.addEventListener('change',()=>{const a=fa.value.split(',').map(t=>t.trim()).filter(Boolean);
+    save(x=>{if(a.length)x.authors=a;else delete x.authors});document.querySelector('.hero .by').textContent=a.join(', ')||'Unknown author'});
   // cover photo: take one or pick from the library, fit the corners, save on the phone
   document.getElementById('covcam').onclick=async()=>{
     const blob=await CoverPhoto.pick();if(!blob)return;
@@ -239,11 +262,12 @@ function render(){
   };
   const og=document.getElementById('orig');
   if(og)og.onclick=async()=>{await Store.dropCover(id);const b2=save(x=>{x.cover=x.webCover;delete x.webCover;delete x.color});render();if(b2)Store.saveCover(b2)};
+  }
   // remove: first tap asks, second tap removes; the shelf then offers Undo for a few seconds
   const rm=document.getElementById('rm');
   rm.onclick=async()=>{
-    if(!rm.classList.contains('sure')){rm.classList.add('sure');rm.textContent='Tap again to remove';clearTimeout(rm.t);
-      rm.t=setTimeout(()=>{rm.classList.remove('sure');rm.textContent='Remove from collection'},4000);return}
+    if(!rm.classList.contains('sure')){rm.classList.add('sure');rm.textContent='Tap again';clearTimeout(rm.t);
+      rm.t=setTimeout(()=>{rm.classList.remove('sure');rm.textContent='Remove'},4000);return}
     clearTimeout(rm.t);rm.disabled=true;
     const gone=ALL.find(x=>x.id===id);
     try{await Store.remove(id)}catch(e){rm.disabled=false;return}

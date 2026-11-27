@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
-<meta name="app-version" content="library-13">
+<meta name="app-version" content="library-14">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -18,6 +18,11 @@ body{min-height:100vh;box-sizing:border-box;background:radial-gradient(ellipse a
 h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.3),0 2px 2px #000;margin:2px 0 0;text-align:center}
 .sub{text-align:center;opacity:.75;font-size:17px;margin:0 0 4px}
 /* the bookcase */
+/* iPhone: when the shelves were too few to scroll (a genre with 1–2 books), a swipe moved the whole page instead
+   and taps on the bottom bar were swallowed while it bounced. Keep the page still and the shelves always scrollable. */
+html{height:100%;overflow:hidden;overscroll-behavior:none}
+body{overscroll-behavior:none}
+.case::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% + 1px)}
 .case{position:fixed;left:0;right:0;top:var(--top,180px);bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;
  box-sizing:border-box;padding:24px 8px calc(171px / 851 * 824 * var(--S,.4577) + env(safe-area-inset-bottom,0px) + 12px);
  -webkit-mask-image:linear-gradient(transparent 0,rgba(0,0,0,.35) 14px,#000 38px);mask-image:linear-gradient(transparent 0,rgba(0,0,0,.35) 14px,#000 38px)}

@@ -64,6 +64,10 @@ const Store = (() => {
   /* one time: take out the 25 sample books (demo-01…25) */
   async function cleanDemo(db) {
     let done = null; try { done = localStorage.getItem(DEMO); } catch (e) {}
+    // she wants the sample books back via Restore (28 Nov): forget the automatic removal notes once
+    let freed = null; try { freed = localStorage.getItem('shelf.demoFreed'); } catch (e) {}
+    if (!freed) { const m = gone(); Object.keys(m).forEach(id => { if (/^demo-/.test(id)) delete m[id]; }); setGone(m);
+      try { localStorage.setItem('shelf.demoFreed', '1'); localStorage.setItem(DEMO, String(Date.now())); } catch (e) {} return db; }
     if (done) return db;
     const ids = (await tx(db, 'books', 'readonly', t => req(t.objectStore('books').getAllKeys()))).filter(id => /^demo-/.test(id));
     if (ids.length) {
@@ -116,7 +120,6 @@ const Store = (() => {
     const put_ = [], del = [], n = { added: 0, updated: 0, removed: 0, keptAway: 0 };
     for (const b of list) {
       if (!b || !b.id) continue;
-      if (/^demo-/.test(b.id)) { n.keptAway++; continue; }   // the old sample books never come back
       const have = mine.get(b.id), t = b.edited || 0;
       if (have) { if (t > (have.edited || 0)) { put_.push(b); n.updated++; } }
       else if (myGone[b.id] && myGone[b.id] >= t) n.keptAway++;

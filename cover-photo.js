@@ -112,7 +112,25 @@ const CoverPhoto = (() => {
         mag[i] = Math.sqrt(m2); }
       const sorted = Array.from(mag).sort((p, q) => p - q), t = Math.max(10, sorted[Math.floor(N * .88)]);
       for (let i = 0; i < N; i++) e[i] = mag[i] > t ? 1 : 0; return e; };
-    return fromMask(byColour, 2) || fromMask(byEdges(), 4);
+    // third try: split the photo into colour groups; groups found along the photo's edge are background,
+    // everything else (the cover's own colours) is the cover
+    const byGroups = () => { const K = 7, step = Math.max(1, Math.floor(N / 6000)), smp = [];
+      for (let i = 0; i < N; i += step) smp.push([d[i * 4], d[i * 4 + 1], d[i * 4 + 2]]);
+      smp.sort((p, q) => (p[0] + p[1] + p[2]) - (q[0] + q[1] + q[2]));
+      let G = Array.from({ length: K }, (_, j) => smp[Math.floor((j + .5) / K * smp.length)].slice());
+      const near = (r, g, b) => { let bj = 0, bd = 1e9; for (let j = 0; j < K; j++) { const q = G[j], dd = (r - q[0]) ** 2 + (g - q[1]) ** 2 + (b - q[2]) ** 2; if (dd < bd) { bd = dd; bj = j; } } return bj; };
+      for (let it = 0; it < 10; it++) { const S = G.map(() => [0, 0, 0, 0]);
+        for (const p of smp) { const t = S[near(p[0], p[1], p[2])]; t[0] += p[0]; t[1] += p[1]; t[2] += p[2]; t[3]++; }
+        G = G.map((q, j) => S[j][3] ? [S[j][0] / S[j][3], S[j][1] / S[j][3], S[j][2] / S[j][3]] : q); }
+      const lab = new Uint8Array(N); for (let i = 0; i < N; i++) lab[i] = near(d[i * 4], d[i * 4 + 1], d[i * 4 + 2]);
+      const onEdge = new Float64Array(K); let nE = 0;
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (x < m || y < m || x >= w - m || y >= h - m) { onEdge[lab[y * w + x]]++; nE++; }
+      const g = new Uint8Array(N); for (let i = 0; i < N; i++) g[i] = onEdge[lab[i]] / nE < .03 ? 1 : 0; return g; };
+    // keep the best-shaped answer of the three
+    const tries = [fromMask(byGroups(), 2), fromMask(byColour, 2), fromMask(byEdges(), 4)].filter(Boolean);
+    if (!tries.length) return null;
+    tries.sort((a, b) => b.fill - a.fill);
+    return tries[0].q;
 
     function fromMask(fg, close) {
     // close small gaps (text, pictures on the cover), then fill holes
@@ -152,14 +170,15 @@ const CoverPhoto = (() => {
     q.sort((a, b) => Math.atan2(a[1] - myc, a[0] - mxc) - Math.atan2(b[1] - myc, b[0] - mxc));   // clockwise from left
     let s0 = 0; q.forEach((p, i) => { if (p[0] + p[1] < q[s0][0] + q[s0][1]) s0 = i; }); q = [0, 1, 2, 3].map(i => q[(s0 + i) % 4]);
     // looks like a book? fills its outline, sane angles and sides
-    if (area(q) < bigN * .82 || area(q) > bigN * 1.25) return null;
+    const fill = bigN / area(q);
+    if (fill < .8 || fill > 1.22) return null;
     for (let i = 0; i < 4; i++) { const a = q[(i + 3) % 4], b = q[i], e = q[(i + 1) % 4];
       const v1 = [a[0] - b[0], a[1] - b[1]], v2 = [e[0] - b[0], e[1] - b[1]];
       const ang = Math.acos((v1[0] * v2[0] + v1[1] * v2[1]) / (Math.hypot(...v1) * Math.hypot(...v2) || 1)) * 180 / Math.PI;
       if (ang < 55 || ang > 125) return null; }
     const sides = [0, 1, 2, 3].map(i => Math.hypot(q[(i + 1) % 4][0] - q[i][0], q[(i + 1) % 4][1] - q[i][1]));
     if (Math.max(sides[0], sides[2]) > 2.2 * Math.min(sides[0], sides[2]) || Math.max(sides[1], sides[3]) > 2.2 * Math.min(sides[1], sides[3])) return null;
-    return q.map(p => [Math.min(src.width, Math.max(0, p[0] / k)), Math.min(src.height, Math.max(0, p[1] / k))]);
+    return { fill: Math.min(fill, 1 / fill), q: q.map(p => [Math.min(src.width, Math.max(0, p[0] / k)), Math.min(src.height, Math.max(0, p[1] / k))]) };
     }
   }
   /* the corner editor; resolves with the 4 corners (photo pixels) or null */
