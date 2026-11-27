@@ -2,7 +2,7 @@
    and get a straight 600×900 JPEG (the corner-and-straighten idea comes from the Game Boy catalog app).
    CoverPhoto.pick() → Promise<Blob|null>. Needs nothing else; the page saves the Blob (Store.setCover). */
 const CoverPhoto = (() => {
-  const OW = 600, OH = 900, MAXSRC = 1600;
+  const MAXSRC = 1600;
   let css = false;
   function addCSS() {
     if (css) return; css = true;
@@ -16,7 +16,25 @@ const CoverPhoto = (() => {
 #cph .cph-row{display:flex;gap:10px;margin-top:12px}
 #cph button{flex:1;min-height:50px;border-radius:999px;font:600 18px "EB Garamond",Georgia,serif;border:1.5px solid rgba(232,190,140,.45);background:rgba(30,10,32,.7);color:#f1dcc0;cursor:pointer}
 #cph button.go{background:linear-gradient(180deg,#f3d29a,#d9a066);color:#2a1410;border:0;box-shadow:0 3px 8px rgba(0,0,0,.5)}
-#cph button:disabled{opacity:.5}`;
+#cph button:disabled{opacity:.5}
+#cph .cph-bot{display:flex;gap:16px;align-items:center;margin-top:12px}
+/* the two sliders sit within the height of the book preview */
+#cph .cph-pv{width:92px;flex:none;cursor:default}
+#cph .cph-ctl{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;align-self:stretch;padding:2px 0}
+#cph .cph-lbl{display:flex;justify-content:space-between;align-items:baseline;font:400 15px/1.1 "IM Fell English SC",Georgia,serif;color:#f1cf7c;margin:0}
+#cph .cph-lbl i{font:italic 14px "EB Garamond",Georgia,serif;color:#c4a2b4}
+#cph .cph-sl{display:flex;align-items:center;gap:8px;height:30px}
+#cph .cph-sl svg{flex:none}
+#cph input[type=range]{-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:6px;margin:0;border-radius:3px;background:linear-gradient(90deg,#3a2030,#f1cf7c);outline:none;touch-action:pan-x}
+#cph input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(#f6dc96,#c9a24e);box-shadow:0 2px 6px rgba(0,0,0,.6),inset 0 1px 0 #fff4c8}
+#cph input[type=range]::-moz-range-thumb{width:28px;height:28px;border:0;border-radius:50%;background:#e0bb6a}
+#cph .cph-cur{width:min(44vw,170px);margin:26px auto 8px;cursor:default}
+#cph .cph-ch{flex:none;display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:14px 18px;border-radius:18px;margin-top:12px;min-height:76px;
+ background:rgba(20,4,26,.62);border:1.5px solid rgba(232,190,140,.4);box-shadow:inset 0 0 18px rgba(0,0,0,.5);color:#f3e3c3}
+#cph .cph-ch svg{width:38px;height:38px;flex:none;filter:drop-shadow(0 0 6px rgba(255,190,90,.45))}
+#cph .cph-ch b{display:block;font-size:19px;color:#f6dcb4}
+#cph .cph-ch small{display:block;font:400 14px/1.25 "EB Garamond",Georgia,serif;color:#c4a2b4}
+#cph .cph-fill{flex:1}`;
     document.head.appendChild(s);
   }
   function chooseFile() {
@@ -56,9 +74,18 @@ const CoverPhoto = (() => {
       for (let r = 0; r < 8; r++) if (r !== c) { const f = A[r][c] / A[c][c]; for (let k = c; k < 8; k++) A[r][k] -= f * A[c][k]; B[r] -= f * B[c]; } }
     return B.map((b, i) => b / A[i][i]);
   }
-  function straighten(src, Q) {
-    const sw = src.width, sh = src.height, s = src.getContext('2d').getImageData(0, 0, sw, sh).data;
-    const H = homog([[0, 0], [OW, 0], [OW, OH], [0, OH]], Q), out = new ImageData(OW, OH), o = out.data, off = [.25, .75];
+  /* brightness/contrast in −50…+50 (%) → lookup table */
+  function toneLUT(br = 0, ct = 0) {
+    const t = new Uint8ClampedArray(256), B = 1 + br / 100, C = 1 + ct / 100;
+    for (let i = 0; i < 256; i++) t[i] = (i * B - 128) * C + 128;
+    return t;
+  }
+  let srcPx = null, srcFor = null;   // pixels of the photo, read once per photo
+  function straighten(src, Q, opt = {}) {
+    const OW = opt.w || 600, OH = opt.h || 900, sw = src.width, sh = src.height;
+    if (srcFor !== src) { srcPx = src.getContext('2d').getImageData(0, 0, sw, sh).data; srcFor = src; }
+    const s = srcPx, lut = toneLUT(opt.br, opt.ct);
+    const H = homog([[0, 0], [OW, 0], [OW, OH], [0, OH]], Q), out = new ImageData(OW, OH), o = out.data, off = opt.fast ? [.5] : [.25, .75], nn = off.length * off.length;
     for (let v = 0; v < OH; v++) for (let u = 0; u < OW; u++) {
       let r = 0, g = 0, b = 0;
       for (const oy of off) for (const ox of off) {
@@ -70,9 +97,10 @@ const CoverPhoto = (() => {
         g += (s[i + 1] * (1 - fx) + s[i + 5] * fx) * (1 - fy) + (s[j + 1] * (1 - fx) + s[j + 5] * fx) * fy;
         b += (s[i + 2] * (1 - fx) + s[i + 6] * fx) * (1 - fy) + (s[j + 2] * (1 - fx) + s[j + 6] * fx) * fy;
       }
-      const k = (v * OW + u) * 4; o[k] = r / 4; o[k + 1] = g / 4; o[k + 2] = b / 4; o[k + 3] = 255;
+      const k = (v * OW + u) * 4; o[k] = lut[Math.round(r / nn)]; o[k + 1] = lut[Math.round(g / nn)]; o[k + 2] = lut[Math.round(b / nn)]; o[k + 3] = 255;
     }
     const c = document.createElement('canvas'); c.width = OW; c.height = OH; c.getContext('2d').putImageData(out, 0, 0);
+    if (opt.canvas) return c;
     return new Promise(r => c.toBlob(r, 'image/jpeg', .86));
   }
 
@@ -182,21 +210,47 @@ const CoverPhoto = (() => {
     }
   }
   /* the corner editor; resolves with the 4 corners (photo pixels) or null */
-  function editor(src) {
+  const sun = r => `<svg viewBox="0 0 24 24" width="${r}" height="${r}" fill="none" stroke="#f1cf7c" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>`;
+  const half = r => `<svg viewBox="0 0 24 24" width="${r}" height="${r}"><circle cx="12" cy="12" r="8" fill="none" stroke="#f1cf7c" stroke-width="1.8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="#f1cf7c"/></svg>`;
+  /* the corner editor with a live framed preview and brightness/contrast; resolves with {q, br, ct} or null.
+     start: 'detect' (find the cover), 'full' (the picture's own edges) */
+  function editor(src, start = 'detect') {
     addCSS();
     return new Promise(res => {
       const box = document.createElement('div'); box.id = 'cph';
+      const pv = typeof bookFrameHTML === 'function';
       box.innerHTML = `<h2>Fit the cover</h2><p>Drag the four gold corners onto the corners of the cover</p>
         <div class="cph-wrap"><canvas></canvas></div>
+        <div class="cph-bot">${pv ? `<div class="bk cph-pv">${bookFrameHTML()}</div>` : ''}
+          <div class="cph-ctl">
+            <div class="cph-lbl"><span>Brightness</span><i data-v="br">0%</i></div>
+            <div class="cph-sl">${sun(16)}<input type="range" min="-50" max="50" step="1" value="0" data-k="br" aria-label="Brightness">${sun(24)}</div>
+            <div class="cph-lbl"><span>Contrast</span><i data-v="ct">0%</i></div>
+            <div class="cph-sl">${half(16)}<input type="range" min="-50" max="50" step="1" value="0" data-k="ct" aria-label="Contrast">${half(24)}</div>
+          </div></div>
         <div class="cph-row"><button class="no">Cancel</button><button class="go">Use this cover</button></div>`;
       document.body.appendChild(box);
       const cv = box.querySelector('canvas'), wrap = box.querySelector('.cph-wrap'), ctx = cv.getContext('2d');
       const W = src.width, H = src.height;
       // start: the biggest 2:3 frame in the middle of the photo, a little inside
       let fw = Math.min(W * .8, H * .8 * 2 / 3), fh = fw * 1.5;
-      let found = null; try { found = detect(src); } catch (e) {}
+      let found = null;
+      if (start === 'full') found = [[0, 0], [W, 0], [W, H], [0, H]];
+      else try { found = detect(src); } catch (e) {}
       let q = found || [[(W - fw) / 2, (H - fh) / 2], [(W + fw) / 2, (H - fh) / 2], [(W + fw) / 2, (H + fh) / 2], [(W - fw) / 2, (H + fh) / 2]];
-      box.querySelector('p').textContent = found ? 'Found the cover — drag a gold corner if it’s a little off' : 'Drag the four gold corners onto the corners of the cover';
+      box.querySelector('p').textContent = start === 'full' ? 'Drag a gold corner to crop or straighten' : found ? 'Found the cover — drag a gold corner if it’s a little off' : 'Drag the four gold corners onto the corners of the cover';
+      // live preview: a small straightened copy inside the standard book
+      const tone = { br: 0, ct: 0 }, pvEl = box.querySelector('.cph-pv');
+      let pvT = 0, pvURL = null;
+      const preview = () => { if (!pvEl) return; clearTimeout(pvT); pvT = setTimeout(() => {
+        const c = straighten(src, q, { w: 150, h: 225, fast: true, canvas: true, br: tone.br, ct: tone.ct });
+        c.toBlob(bl => { if (!bl) return; if (pvURL) URL.revokeObjectURL(pvURL); pvURL = URL.createObjectURL(bl);
+          setBook(pvEl, { title: '', cover: pvURL, color: null }); }, 'image/jpeg', .8); }, 60); };
+      box.querySelectorAll('input[type=range]').forEach(r => {
+        const show = () => { const v = +r.value; tone[r.dataset.k] = v; box.querySelector(`[data-v=${r.dataset.k}]`).textContent = (v > 0 ? '+' : '') + v + '%'; };
+        r.addEventListener('input', () => { show(); preview(); });
+        r.addEventListener('dblclick', () => { r.value = 0; show(); preview(); });   // double tap: back to 0
+      });
       let sc = 1, ox = 0, oy = 0, dpr = 1, drag = -1, grab = [0, 0], touchAt = null;
       const R = 13, HIT = 34;   // corner dot radius / finger reach, CSS px
       const fit = () => {
@@ -245,19 +299,51 @@ const CoverPhoto = (() => {
         const x = (m[0] + grab[0] - ox) / sc, y = (m[1] + grab[1] - oy) / sc;
         q[drag] = [Math.max(0, Math.min(W, x)), Math.max(0, Math.min(H, y))]; draw();
       });
-      const up = () => { drag = -1; touchAt = null; draw(); };
+      const up = () => { const was = drag; drag = -1; touchAt = null; draw(); if (was >= 0) preview(); };
       cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
-      const ro = new ResizeObserver(fit); ro.observe(wrap); fit();
-      const close = v => { ro.disconnect(); box.remove(); res(v); };
+      const ro = new ResizeObserver(fit); ro.observe(wrap); fit(); preview();
+      const close = v => { ro.disconnect(); clearTimeout(pvT); if (pvURL) URL.revokeObjectURL(pvURL); box.remove(); res(v); };
       box.querySelector('.no').onclick = () => close(null);
-      box.querySelector('.go').onclick = e => { e.target.disabled = true; e.target.textContent = 'Straightening…'; setTimeout(() => close(q.map(p => p.slice())), 30); };
+      box.querySelector('.go').onclick = e => { e.target.disabled = true; e.target.textContent = 'Straightening…'; setTimeout(() => close({ q: q.map(p => p.slice()), br: tone.br, ct: tone.ct }), 30); };
     });
   }
-  async function pick() {
-    const f = await chooseFile(); if (!f) return null;
-    let src; try { src = await loadImage(f); } catch (e) { return null; }
-    const q = await editor(src); if (!q) return null;
-    return straighten(src, q);
+  const ICON_FIX = '<svg viewBox="0 0 24 24" fill="none" stroke="#f1cf7c" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/><path d="M8 8l8 1-1 7-8-1z" stroke-width="1.4"/></svg>';
+  const ICON_CAM = '<svg viewBox="0 0 24 24" fill="none" stroke="#f1cf7c" stroke-width="1.8" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.6"/></svg>';
+  /* "Change cover": fix the current picture or take a new one; resolves 'fix' | 'new' | null */
+  function chooser(curURL, title) {
+    addCSS();
+    return new Promise(res => {
+      const box = document.createElement('div'); box.id = 'cph';
+      box.innerHTML = `<h2>Change cover</h2><p></p>
+        ${typeof bookFrameHTML === 'function' ? `<div class="bk cph-cur">${bookFrameHTML()}</div>` : ''}
+        <button class="cph-ch" data-a="fix">${ICON_FIX}<span><b>Fix this cover</b><small>Straighten the current picture, crop it, make it lighter</small></span></button>
+        <button class="cph-ch" data-a="new">${ICON_CAM}<span><b>New photo</b><small>Take a photo or choose one from your library</small></span></button>
+        <div class="cph-fill"></div><div class="cph-row"><button class="no">Cancel</button></div>`;
+      box.querySelector('p').textContent = title || '';
+      document.body.appendChild(box);
+      const cur = box.querySelector('.cph-cur'); if (cur) setBook(cur, { title: title || '', cover: curURL, color: null });
+      const close = v => { box.remove(); res(v); };
+      box.querySelector('.no').onclick = () => close(null);
+      box.querySelectorAll('.cph-ch').forEach(b => b.onclick = () => close(b.dataset.a));
+    });
   }
-  return { pick, editor, straighten, loadImage, detect };
+  async function edit(blobOrFile, start) {
+    let src; try { src = await loadImage(blobOrFile); } catch (e) { return null; }
+    const r = await editor(src, start); if (!r) return null;
+    return straighten(src, r.q, { br: r.br, ct: r.ct });
+  }
+  /* current: { blob, own } of the cover now (null for the plain mushroom cover); title for the chooser */
+  async function change(current, title) {
+    if (current && current.blob) {
+      const url = URL.createObjectURL(current.blob);
+      let a; try { a = await chooser(url, title); } finally { URL.revokeObjectURL(url); }
+      if (!a) return null;
+      // her own (already straight) photo opens on its own edges; a web cover is often a photo at an angle: find it
+      if (a === 'fix') return edit(current.blob, current.own ? 'full' : 'detect');
+    }
+    const f = await chooseFile(); if (!f) return null;
+    return edit(f, 'detect');
+  }
+  const pick = () => change(null);
+  return { pick, change, editor, straighten, loadImage, detect };
 })();

@@ -200,5 +200,5 @@ const Store = (() => {
     } catch (e) {}
   }
 
-  return { all, get, put, remove, unremove, backup, restore, replaceAll, coverURL, saveCover, setCover, dropCover, isOwn, fetchMissingCovers, onChange: f => listeners.push(f) };
+  return { all, get, put, remove, unremove, backup, restore, replaceAll, coverURL, saveCover, setCover, dropCover, isOwn, getCoverBlob, fetchMissingCovers, onChange: f => listeners.push(f) };
 })();

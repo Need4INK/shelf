@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-38">
+<meta name="app-version" content="book-39">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -256,7 +256,11 @@ function render(){
     save(x=>{if(a.length)x.authors=a;else delete x.authors});document.querySelector('.hero .by').textContent=a.join(', ')||'Unknown author'});
   // cover photo: take one or pick from the library, fit the corners, save on the phone
   document.getElementById('covcam').onclick=async()=>{
-    const blob=await CoverPhoto.pick();if(!blob)return;
+    // the cover now: saved picture on the phone (own photo or downloaded web cover), else the web address
+    const cur=ALL.find(x=>x.id===id)||{};let bl=null;
+    try{bl=await Store.getCoverBlob(id)}catch(e){}
+    if(!bl&&cur.cover&&!Store.isOwn(cur.cover)){try{const r=await fetch(cur.cover,{mode:'cors'});if(r.ok)bl=await r.blob()}catch(e){}}
+    const blob=await CoverPhoto.change(bl?{blob:bl,own:Store.isOwn(cur.cover)}:null,cur.title);if(!blob)return;
     await Store.setCover(id,blob);
     save(x=>{if(!Store.isOwn(x.cover)&&x.cover)x.webCover=x.cover;x.cover='own:'+Date.now();delete x.color});render();
   };
