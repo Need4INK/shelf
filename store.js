@@ -116,7 +116,12 @@ const Store = (() => {
   async function backupWithCovers() {
     await fetchMissingCovers();                 // web covers not downloaded yet: try once now
     const books = await all(), covers = new Map();
-    for (const b of books) { try { const bl = await getCoverBlob(b.id); if (bl) covers.set(b.id, bl); } catch (e) {} }
+    for (const b of books) { try {
+      let bl = await getCoverBlob(b.id); if (!bl) continue;
+      // covers saved before covers were kept light: slim them once, here and on the phone
+      if (bl.size > SLIM) { const s = await slim(bl); if (s !== bl) { bl = s; const db = await open(); await tx(db, 'covers', 'readwrite', t => { t.objectStore('covers').put(bl, b.id); }); forget(b.id); } }
+      covers.set(b.id, bl);
+    } catch (e) {} }
     return { data: { app: 'shelf', saved: Date.now(), books, removed: gone() }, covers };
   }
   /* restore: for each book the newest edit wins; books without an edit time lose to the phone's copy.
@@ -195,14 +200,27 @@ const Store = (() => {
     const db = await open(); await tx(db, 'covers', 'readwrite', t => { t.objectStore('covers').delete(id); });
     forget(id); changed();
   }
+  /* keep covers light (hundreds of books): a big picture is redrawn at the app's cover size, 600×900 JPEG — the size her own photos have */
+  const SLIM = 150 * 1024;
+  async function slim(blob) {
+    if (!blob || blob.size <= SLIM || typeof createImageBitmap === 'undefined') return blob;
+    try {
+      const im = await createImageBitmap(blob), k = Math.min(1, 600 / im.width, 900 / im.height);
+      const c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); if (im.close) im.close();
+      const out = await new Promise(r => c.toBlob(r, 'image/jpeg', .86));
+      return out && out.size < blob.size ? out : blob;
+    } catch (e) { return blob; }
+  }
   async function getCoverBlob(id) { const db = await open(); return tx(db, 'covers', 'readonly', t => req(t.objectStore('covers').get(id))); }
   async function saveCover(b) {
     if (!b || !b.id || !b.cover || isOwn(b.cover) || failed.has(b.cover)) return false;
     try {
       const r = await fetch(b.cover, { mode: 'cors' });
       if (!r.ok) throw 0;
-      const blob = await r.blob();
+      let blob = await r.blob();
       if (!blob.type.startsWith('image/') || blob.size < 200) throw 0;   // tiny = "no cover" placeholder
+      blob = await slim(blob);
       const db = await open();
       await tx(db, 'covers', 'readwrite', t => { t.objectStore('covers').put(blob, b.id); });
       forget(b.id); changed(); return true;
