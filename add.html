@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a33">
+<meta name="app-version" content="a34">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -98,9 +98,15 @@ dt{color:var(--mute)}dd{margin:0;overflow-wrap:anywhere}
 .ser{display:grid;grid-template-columns:minmax(0,1fr) 72px;gap:8px}
 .ser input{min-height:40px}
 .lbl i{font:italic 14px "EB Garamond",Georgia,serif;letter-spacing:0;opacity:.7}
-.dup{margin:12px 0 0;text-align:center;font-style:italic;font-size:15px;color:var(--red)}
+/* the same book is already here: a glowing note at the top of "Is this your book?" that slowly pulses */
+.dup{display:flex;gap:10px;align-items:center;margin:0 0 14px;padding:12px 14px;border-radius:14px;font-size:16px;line-height:1.35;--glow:255,120,110;animation:dupPulse 1.8s ease-in-out infinite}
+.dup svg{flex:none;width:26px;height:26px}
+.dup b{color:#fff;font-weight:600}
 .dup a{color:var(--accent)}
-.dup.wish{color:var(--accent)}
+.dup.own{background:rgba(120,20,40,.55);border:1.5px solid #ff9a8a;color:#ffd9d0}
+.dup.wish{background:rgba(110,70,10,.5);border:1.5px solid #f1cf7c;color:#fbe7b8;--glow:255,200,100}
+@keyframes dupPulse{0%,100%{box-shadow:0 0 6px rgba(var(--glow),.35)}50%{box-shadow:0 0 22px rgba(var(--glow),.9)}}
+@media (prefers-reduced-motion:reduce){.dup{animation:none;box-shadow:0 0 16px rgba(var(--glow),.7)}}
 .done{text-align:center}
 .done .bk{width:120px;margin:4px auto 14px;cursor:default}
 .done p{margin:0 0 16px;font-size:17px}
@@ -161,7 +167,7 @@ body::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% 
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a33</p>
+  <p style="font-size:12px;opacity:.5">a34</p>
   <div class="rule" id="steps" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg></div>
 </header>
 <main>
@@ -358,6 +364,8 @@ function showBook(b) {
   let list = startList, genre = wished && GENRES.includes(same.genre) ? same.genre : GENRES.includes(b.genre) ? b.genre : guessGenre(b);
   const r = $('s3');
   r.innerHTML = `<h2>Is this your book?</h2>
+    ${wished ? `<div class="dup wish" role="alert"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.6 6.9L22 9.5l-5.6 4.7L18.2 22 12 17.8 5.8 22l1.8-7.8L2 9.5l7.4-.6z" fill="#f1cf7c"/></svg><span><b>“${esc(same.title)}”</b> is on your Wishlist${since(same.added)}.</span></div>`
+      : same ? `<div class="dup own" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="#ff9a8a" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 7v6M12 16.5v.5" stroke-linecap="round"/></svg><span>You already have <b>“${esc(same.title)}”</b>${(same.authors || []).length ? ' by ' + esc(same.authors.join(', ')) : ''}. <a href="book.html?id=${encodeURIComponent(same.id)}">Open it</a></span></div>` : ''}
     <div class="book"><div class="bkw"><div class="bk">${bookFrameHTML()}</div><button class="covcam" id="covcam" aria-label="Use my own cover photo"><svg viewBox="0 0 24 24" fill="none" stroke="#2a1408" stroke-width="2" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.6"/></svg></button></div>
       <div><h3>${esc(b.title || 'Untitled')}</h3>${b.subtitle ? `<div class="sub">${esc(b.subtitle)}</div>` : ''}
       <div class="by">${esc((b.authors || []).join(', ') || 'Unknown author')}</div>
@@ -368,9 +376,7 @@ function showBook(b) {
     <div class="chips" id="genre" role="radiogroup">${GENRES.map(g => `<button data-v="${esc(g)}" aria-pressed="${g === genre}" aria-label="${esc(g)}">${esc(g).replace(' ', '<br>')}</button>`).join('')}</div>
     <div class="lbl">Series <i>(optional)</i></div>
     <div class="ser"><input type="text" id="aSeries" placeholder="Series name" autocomplete="off" value="${esc(b.series || '')}"><input type="text" id="aSeriesNo" inputmode="decimal" placeholder="No." autocomplete="off" value="${esc(b.seriesNo || '')}"></div>
-    ${wished ? `<p class="dup wish">“${esc(same.title)}” is on your Wishlist${since(same.added)}.</p>
-      <button class="primary full" id="moveBtn" style="margin-top:10px">Move it to my Library</button>`
-      : same ? `<p class="dup">You already have “${esc(same.title)}”${(same.authors || []).length ? ' by ' + esc(same.authors.join(', ')) : ''}. <a href="book.html?id=${encodeURIComponent(same.id)}">Open it</a></p>` : ''}
+    ${wished ? '<button class="primary full" id="moveBtn" style="margin-top:14px">Move it to my Library</button>' : ''}
     <button class="${wished ? '' : 'primary '}full" id="addBtn" style="margin-top:${wished ? 10 : 14}px">${wished ? 'Add as a separate book' : same ? 'Add it anyway' : list === 'wishlist' ? 'Add to my wishlist' : 'Add to my library'}</button>
     <button class="other">Choose another way</button>`;
   setBook(r.querySelector('.bk'), photo ? { ...b, cover: photoURL } : b);
@@ -557,7 +563,7 @@ show('s1');
 if (qp.get('title')) { pending = {}; $('writeForm').reset(); $('wT').value = qp.get('title').slice(0, 200); show('s2write'); setTimeout(() => $('wA').focus(), 50); }
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a33';
+const VERSION = 'a34';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
