@@ -14,6 +14,8 @@ function renderGenres(){
     c.setAttribute('aria-label',c.dataset.g+', '+k+' book'+(k===1?'':'s'));
     const l=c.querySelector('.gl');l.style.fontSize='';let f=40;while(l.scrollWidth>111&&f>25){l.style.fontSize=--f+'px'}});
 }
+// genre tiles open the shelf with her owned books of that genre
+document.querySelectorAll('#genres .gc').forEach(c=>c.addEventListener('click',()=>{location.href='library.html?genre='+encodeURIComponent(c.dataset.g)}));
 async function loadBooks(){
   BOOKS=await Store.all();
   // books from before genres: guess one once (she can change it on the book page)
@@ -98,7 +100,7 @@ if(document.fonts)document.fonts.ready.then(()=>{const q=document.getElementById
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)showQuote()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-97';
+const APP_VERSION='home-98';
 // a new version arrived: drop the saved pictures once so new art shows straight away
 try{const v=localStorage.getItem('home.ver');
   if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);

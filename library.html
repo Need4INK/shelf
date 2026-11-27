@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
-<meta name="app-version" content="library-12">
+<meta name="app-version" content="library-13">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -107,15 +107,20 @@ h1{font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shado
 {
 const $ = id => document.getElementById(id);
 const PER = innerWidth >= 700 ? 4 : 3;           // books per shelf
-const list = new URLSearchParams(location.search).get('list') === 'wishlist' ? 'wishlist' : 'owned';
+const qs = new URLSearchParams(location.search);
+const list = qs.get('list') === 'wishlist' ? 'wishlist' : 'owned';
+// ?genre=… (Home's genre tiles): owned books of that genre only
+const genre = list === 'owned' && GENRES.includes(qs.get('genre')) ? qs.get('genre') : null;
 let books = [];
 const esc = s => String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function render() {
   const name = list === 'wishlist' ? 'My Wishlist' : 'My Library';
   $('title').textContent = name; document.title = name;
-  const a = books.filter(b => (b.status === 'wishlist') === (list === 'wishlist'))
+  const a = books.filter(b => (b.status === 'wishlist') === (list === 'wishlist') && (!genre || (GENRES.includes(b.genre) ? b.genre : 'Other') === genre))
     .sort((x, y) => String(y.added || '').localeCompare(String(x.added || '')));
-  $('count').textContent = a.length ? `${a.length} book${a.length > 1 ? 's' : ''}` : '\u00a0';
+  // a genre from Home shows under the title: "Fantasy · 2 books"
+  const n = a.length ? `${a.length} book${a.length > 1 ? 's' : ''}` : '';
+  $('count').textContent = genre ? (n ? `${genre} · ${n}` : genre) : (n || '\u00a0');
   const c = $('case'); c.style.setProperty('--per', PER); c.innerHTML = '';
   const rows = Math.max(3, Math.ceil(a.length / PER));       // three shelves to start, a new one for each new row
   for (let r = 0; r < rows; r++) {
@@ -128,7 +133,7 @@ function render() {
       sh.appendChild(s);
     }
     if (!a.length && r === 0) sh.innerHTML = '<div class="empty" style="grid-column:1/-1">' +
-      (list === 'wishlist' ? 'Your wishlist is empty.' : 'No books on the shelves yet.') + '<br><a href="add.html">Add a book</a></div>';
+      (list === 'wishlist' ? 'Your wishlist is empty.' : genre ? `No ${esc(genre)} books on the shelves yet.` : 'No books on the shelves yet.') + '<br><a href="add.html">Add a book</a></div>';
     c.appendChild(sh);
   }
 }
