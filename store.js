@@ -1,7 +1,8 @@
 /* Book storage on this phone (IndexedDB): the books, plus their covers downloaded as pictures.
    Shared by every page. Load before book-frame.js.
    Store.all() · get(id) · put(book[, mine]) · replaceAll(books) · remove(id) · unremove(book)
-   Store.backup() · restore(data) — newest edit wins (book.edited / removed-list time)
+   Store.backup() · restore(data[, covers]) — newest edit wins (book.edited / removed-list time)
+   Store.backupWithCovers() → { data, covers: Map id → Blob } (every cover on the phone, web ones too, for the .zip backup)
    Store.saveCover(book) · coverURL(id) · fetchMissingCovers() · onChange(fn)
    First run copies the old list (localStorage 'shelf.books.v1') in; the old copy is left untouched. */
 /* the only genres (Home "Collections by Genre"); anything else counts as Other */
@@ -111,8 +112,16 @@ const Store = (() => {
     for (const b of books) if (isOwn(b.cover)) { try { const bl = await getCoverBlob(b.id); if (bl) photos[b.id] = await new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(bl); }); } catch (e) {} }
     return { app: 'shelf', saved: Date.now(), books, removed: gone(), photos };
   }
-  /* restore: for each book the newest edit wins; books without an edit time lose to the phone's copy */
-  async function restore(data) {
+  /* the .zip backup: the books + every cover kept on the phone (her photos and the web covers), so a restore needs no internet */
+  async function backupWithCovers() {
+    await fetchMissingCovers();                 // web covers not downloaded yet: try once now
+    const books = await all(), covers = new Map();
+    for (const b of books) { try { const bl = await getCoverBlob(b.id); if (bl) covers.set(b.id, bl); } catch (e) {} }
+    return { data: { app: 'shelf', saved: Date.now(), books, removed: gone() }, covers };
+  }
+  /* restore: for each book the newest edit wins; books without an edit time lose to the phone's copy.
+     covers (from a .zip backup): id → picture; used for the books taken from the backup, and for books here that have no cover saved */
+  async function restore(data, covers) {
     const list = Array.isArray(data) ? data : data && Array.isArray(data.books) ? data.books : null;
     if (!list) throw new Error('not a backup');
     const theirGone = (!Array.isArray(data) && data.removed) || {};
@@ -137,10 +146,17 @@ const Store = (() => {
       del.forEach(id => { t.objectStore('books').delete(id); t.objectStore('covers').delete(id); myGone[id] = +theirGone[id]; });
     });
     del.forEach(forget); setGone(myGone); changed();
-    const photos = (!Array.isArray(data) && data.photos) || {};
+    const photos = (!Array.isArray(data) && data.photos) || {}, taken = new Set(put_.map(b => b.id));
     for (const b of put_) {
-      if (isOwn(b.cover) && photos[b.id]) { try { await setCover(b.id, await (await fetch(photos[b.id])).blob()); } catch (e) {} }
+      if (covers && covers.has(b.id)) { try { await setCover(b.id, covers.get(b.id)); } catch (e) {} }
+      else if (isOwn(b.cover) && photos[b.id]) { try { await setCover(b.id, await (await fetch(photos[b.id])).blob()); } catch (e) {} }
       else saveCover(b);
+    }
+    // books kept from the phone that have no cover saved yet: fill it from the backup (only if it is the same cover)
+    if (covers) for (const b of list) {
+      if (!b || taken.has(b.id) || !covers.has(b.id)) continue;
+      const have = mine.get(b.id); if (!have || (have.cover || '') !== (b.cover || '')) continue;
+      try { if (!(await getCoverBlob(b.id))) await setCover(b.id, covers.get(b.id)); } catch (e) {}
     }
     return n;
   }
@@ -200,5 +216,5 @@ const Store = (() => {
     } catch (e) {}
   }
 
-  return { all, get, put, remove, unremove, backup, restore, replaceAll, coverURL, saveCover, setCover, dropCover, isOwn, getCoverBlob, fetchMissingCovers, onChange: f => listeners.push(f) };
+  return { all, get, put, remove, unremove, backup, backupWithCovers, restore, replaceAll, coverURL, saveCover, setCover, dropCover, isOwn, getCoverBlob, fetchMissingCovers, onChange: f => listeners.push(f) };
 })();

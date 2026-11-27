@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
-<meta name="app-version" content="backup-24">
+<meta name="app-version" content="backup-25">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -94,7 +94,7 @@ body::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% 
 <div class="rule" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg></div>
 <div class="card">
   <h2>Save a backup</h2>
-  <p>Saves all your books to a file you can keep in Files or send to yourself.</p>
+  <p>Saves all your books and their covers in one file you can keep in Files or send to yourself.</p>
   <button class="btn" id="exportBtn">Save backup</button>
   <p class="last" id="lastSave"></p>
 </div>
@@ -102,7 +102,7 @@ body::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% 
   <h2>Restore a backup</h2>
   <p>Adds the books from a backup file. Books you already have stay as they are.</p>
   <label class="btn" for="importFile">Restore backup</label>
-  <input type="file" id="importFile" accept="application/json,.json" class="hidden">
+  <input type="file" id="importFile" accept=".zip,application/zip,application/x-zip-compressed,application/json,.json" class="hidden">
   <p class="last" id="lastRestore"></p>
 </div>
 <div class="status" id="status"></div>
@@ -116,6 +116,7 @@ body::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% 
 </nav>
 <script src="bookmagic.js"></script>
 <script src="store.js"></script>
+<script src="zip.js"></script>
 <script>
 {
 const $ = id => document.getElementById(id);
@@ -130,18 +131,47 @@ const showLast = () => { let s = null, r = null; try { s = localStorage.getItem(
   $('lastRestore').textContent = r ? `Last restore: ${when(+r)}` : 'Nothing restored yet'; };
 const mark = k => { try { localStorage.setItem(k, Date.now()); } catch (e) {} showLast(); };
 showLast();
+const EXT = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }, TYPE = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif' };
+const bytes = async b => new Uint8Array(await b.arrayBuffer());
 $('exportBtn').onclick = async () => {
-  // the books + the list of removed books, so restoring an older backup never brings removed books back
-  const blob = new Blob([JSON.stringify(await Store.backup(), null, 2)], { type: 'application/json' });
-  const file = new File([blob], `shelf-backup-${new Date().toISOString().slice(0, 10)}.json`, { type: 'application/json' });
-  if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file] }).then(() => mark('backup.saved')).catch(() => {}); return; }
+  // one .zip: backup.json (the books + the list of removed books, so restoring an older backup never brings removed books back)
+  // + covers/<book id>.jpg for every cover on the phone, so a restore needs no internet
+  const btn = $('exportBtn'); if (btn.disabled) return; btn.disabled = true; status('Packing your books and covers…');
+  let blob;
+  try {
+    const { data, covers } = await Store.backupWithCovers(), files = [];
+    files.push({ name: 'backup.json', data: new TextEncoder().encode(JSON.stringify(data, null, 2)) });
+    for (const [id, bl] of covers) files.push({ name: 'covers/' + encodeURIComponent(id) + '.' + (EXT[bl.type] || 'jpg'), data: await bytes(bl) });
+    blob = Zip.make(files);
+    status(`Backup ready: ${data.books.length} book${data.books.length === 1 ? '' : 's'} · ${covers.size} cover${covers.size === 1 ? '' : 's'}`);
+  } catch (err) { status('Could not make the backup.', true); btn.disabled = false; return; }
+  btn.disabled = false;
+  const file = new File([blob], `shelf-backup-${new Date().toISOString().slice(0, 10)}.zip`, { type: 'application/zip' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { share(file); return; }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click(); mark('backup.saved');
 };
+// the iPhone only opens the Share menu straight after a tap; if packing the covers took too long, one more tap opens it
+function share(file) {
+  navigator.share({ files: [file] }).then(() => mark('backup.saved')).catch(err => {
+    if (!err || err.name !== 'NotAllowedError') return;
+    const btn = $('exportBtn'), was = btn.onclick; btn.textContent = 'Share the backup file';
+    btn.onclick = () => { btn.textContent = 'Save backup'; btn.onclick = was; share(file); };
+  });
+}
 // restore: each book keeps whichever copy was changed last (phone or backup); removed books stay removed
 $('importFile').onchange = async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   let n;
-  try { n = await Store.restore(JSON.parse(await f.text())); }
+  status('Reading the backup…');
+  try {
+    const buf = await f.arrayBuffer(), head = new Uint8Array(buf, 0, Math.min(2, buf.byteLength));
+    if (head[0] === 0x50 && head[1] === 0x4b) {          // "PK": the .zip backup (books + covers)
+      const z = await Zip.read(buf), j = z.get('backup.json'); if (!j) throw new Error('no backup.json');
+      const covers = new Map();
+      for (const [name, d] of z) { const m = name.match(/^covers\/(.+)\.(\w+)$/); if (m && d) covers.set(decodeURIComponent(m[1]), new Blob([d], { type: TYPE[m[2].toLowerCase()] || 'image/jpeg' })); }
+      n = await Store.restore(JSON.parse(new TextDecoder().decode(j)), covers);
+    } else n = await Store.restore(JSON.parse(new TextDecoder().decode(buf)));   // older .json backups still work
+  }
   catch (err) { status('That file isn’t a Shelf backup.', true); return; }
   await load(); mark('backup.restored');
   const bk = k => `${k} book${k === 1 ? '' : 's'}`, parts = [];
