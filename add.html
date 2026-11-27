@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a34">
+<meta name="app-version" content="a35">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -123,12 +123,16 @@ a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 #tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.38),transparent)}
 main{padding-bottom:140px}
 </style>
-<style>/* Same as the Library: the page itself never moves or bounces, only its content scrolls (inside the body).
-   On the iPhone a bouncing page swallowed taps on the bottom bar; this keeps the bar quick on every page. */
+<style>/* Same as the Library: the page itself never moves or bounces; the header stays put and the rest scrolls
+   under it, fading out beneath it. (On the iPhone a bouncing page swallowed taps on the bottom bar.) */
 html{height:100%;overflow:hidden;overscroll-behavior:none;background:radial-gradient(ellipse at 50% 0%,#3a1838 0%,#1a0a1e 55%,#0e0416 100%)}
-body{height:100%;min-height:0;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;background:none}
+body{height:100%;min-height:0;box-sizing:border-box;overflow:hidden;padding-bottom:0;background:none}
+#scroll{position:fixed;left:0;right:0;top:var(--top,150px);bottom:0;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;
+ padding-bottom:calc(171px / 851 * 824 * var(--S,.4577) + env(safe-area-inset-bottom,0px) + 24px);
+ -webkit-mask-image:linear-gradient(transparent 0,rgba(0,0,0,.35) 14px,#000 38px);mask-image:linear-gradient(transparent 0,rgba(0,0,0,.35) 14px,#000 38px)}
 /* always a little scrollable, so a swipe never falls through to the page */
-body::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% + 1px)}
+#scroll::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% + 1px)}
+#scroll main{padding-bottom:0}
 </style>
 <script>(function(){
   const p=document.createElement('div');p.style.cssText='position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';
@@ -164,13 +168,13 @@ body::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% 
 </style>
 </head>
 <body>
-<header>
+<header id="hdr">
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a34</p>
+  <p style="font-size:12px;opacity:.5">a35</p>
   <div class="rule" id="steps" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg></div>
 </header>
-<main>
+<div id="scroll"><main>
   <!-- step 1: choose how -->
   <section class="panel" id="s1" data-step="1">
     <h2>How would you like to add it?</h2>
@@ -230,7 +234,8 @@ body::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% 
   <section class="panel hidden done" id="s4" data-step="4"></section>
 
   <div class="status" id="status"></div>
-</main>
+</main></div>
+<script>/* the scrolling part starts right under the header */{const h=document.getElementById('hdr'),s=document.getElementById('scroll');const f=()=>s.style.setProperty('--top',Math.round(h.getBoundingClientRect().bottom)+'px');f();addEventListener('resize',f);if(window.ResizeObserver)new ResizeObserver(f).observe(h);if(document.fonts)document.fonts.ready.then(f);addEventListener('pageshow',f)}</script>
 
 <nav id="tabbar" aria-label="Sections">
   <div class="in">
@@ -266,7 +271,7 @@ function show(id) {
   // the status line sits inside the open card, above "Choose another way"
   const st = $('status'), other = p.querySelector('.other'); other ? p.insertBefore(st, other) : p.appendChild(st);
   const n = +p.dataset.step; document.querySelectorAll('#steps svg').forEach((g, i) => g.classList.toggle('on', i < n));
-  document.body.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('scroll').scrollTo({ top: 0, behavior: 'smooth' });
 }
 document.querySelectorAll('.other').forEach(b => b.onclick = () => { status(''); show('s1'); });
 document.querySelectorAll('.way').forEach(b => b.onclick = () => {
@@ -563,7 +568,7 @@ show('s1');
 if (qp.get('title')) { pending = {}; $('writeForm').reset(); $('wT').value = qp.get('title').slice(0, 200); show('s2write'); setTimeout(() => $('wA').focus(), 50); }
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a34';
+const VERSION = 'a35';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
