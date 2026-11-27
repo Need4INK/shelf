@@ -120,12 +120,12 @@ html.intro-on,html.intro-on body{background:#0e0416!important}   /* dark behind 
  74%{transform:translateY(1px) scale(1.03,.97);animation-timing-function:ease-out}
  86%{transform:translateY(-2px) scale(.995,1.01)}
  100%{transform:none}}
-/* "ha ha ha" left of him (clear of his hat brim): the "ha"s pop in and fade one after another, stepping away from him */
+/* "ha ha ha" left of him (clear of his hat brim): the "ha"s pop in and fade one after another, zig-zagging away from him */
 #reading .giggle{left:57%;top:16%;width:10%;height:30%;z-index:4;pointer-events:none}
 #reading .giggle span{position:absolute;font:italic 30px/1 "IM Fell English",Georgia,serif;color:#7a3410;opacity:0;animation:ha .62s ease-out forwards}
-#reading .giggle span:nth-child(1){right:0;top:34%;animation-delay:.1s}
-#reading .giggle span:nth-child(2){right:42%;top:15%;animation-delay:.34s}
-#reading .giggle span:nth-child(3){right:84%;top:-4%;animation-delay:.58s}
+#reading .giggle span:nth-child(1){right:0;top:30%;animation-delay:.1s}
+#reading .giggle span:nth-child(2){right:42%;top:2%;animation-delay:.34s}
+#reading .giggle span:nth-child(3){right:84%;top:28%;animation-delay:.58s}
 @keyframes ha{0%{opacity:0;transform:scale(.45)}30%{opacity:1;transform:scale(1.18)}50%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.96) translateY(-6px)}}
 /* ---------- Next to Collect: living steam over the mug (homefx.js); the steam is no longer painted in nook_fg ---------- */
 #nook #steam{left:0;top:0;width:100%;height:100%;pointer-events:none}   /* whole card; touches handled on #nook (homefx.js) */
