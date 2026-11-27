@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a19">
+<meta name="app-version" content="a20">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,50 +13,83 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Shelf">
 <meta name="theme-color" content="#0e0416">
+<link rel="stylesheet" href="book-frame.css">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB3UlEQVR42u3bsY3CQBRF0WdEHy4A5AJcBRE94sgSmetwITSARAMWIgHGM+fEG6yWq+8/w7rrxyGw5eBPgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsSBOBAH4kAciANxgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsTBLxxL+CVuz8fnP3y6L1V+EufL1eRg2zpP6zyJg3eJiIMd9CEOfYgDcRge4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOMg+3nhLGy+Qpbw3U0wOxIE4sHM09Gg3ORAH4kAcWEjjEswubHIgDjxW3HOYHIgDcSAOxIHTSlyCNXiwMjkQB+JAHFhIXZ+bHIgDcWDniEuw2lcckwNx4LHiKGtyIA7EgTgQB04rcQlW+wHK5EAciAM7hxtSkwNxIA7EgYU0DV+CNbLtmhw4ymJyIA7EgTgQB+LAUTb+E6z2E7XJgTgQB3YO1+cmB+JAHIgDC2lcgtW+KZsciANxYOdwCWZyIA7EgTgQB+JAHCAOxIE46lXCt8riQBzGhjiUIQ5lxFf2svinrh8HHwweK4gDcSAOxIE4EAfiQByIA8SBOBAH4kAciANxIA7EgThAHIgDcSAOxIE4EAfiQByIA3GAOBAH4uDrXsZIQjfwkiY3AAAAAElFTkSuQmCC">
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB3UlEQVR42u3bsY3CQBRF0WdEHy4A5AJcBRE94sgSmetwITSARAMWIgHGM+fEG6yWq+8/w7rrxyGw5eBPgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsSBOBAH4kAciANxgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsTBLxxL+CVuz8fnP3y6L1V+EufL1eRg2zpP6zyJg3eJiIMd9CEOfYgDcRge4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3GAOMg+3nhLGy+Qpbw3U0wOxIE4sHM09Gg3ORAH4kAcWEjjEswubHIgDjxW3HOYHIgDcSAOxIHTSlyCNXiwMjkQB+JAHFhIXZ+bHIgDcWDniEuw2lcckwNx4LHiKGtyIA7EgTgQB04rcQlW+wHK5EAciAM7hxtSkwNxIA7EgYU0DV+CNbLtmhw4ymJyIA7EgTgQB+LAUTb+E6z2E7XJgTgQB3YO1+cmB+JAHIgDC2lcgtW+KZsciANxYOdwCWZyIA7EgTgQB+JAHCAOxIE46lXCt8riQBzGhjiUIQ5lxFf2svinrh8HHwweK4gDcSAOxIE4EAfiQByIA8SBOBAH4kAciANxIA7EgThAHIgDcSAOxIE4EAfiQByIA3GAOBAH4uDrXsZIQjfwkiY3AAAAAElFTkSuQmCC">
 <style>
-:root{--paper:#1a0a1e;--card:rgba(60,24,62,.6);--ink:#f1dcc0;--mute:#c4a2b4;--line:rgba(232,190,140,.35);--accent:#f1cf7c;--red:#ff9a8a;--gold:linear-gradient(180deg,#f3d29a,#d9a066)}
+:root{--paper:#1a0a1e;--ink:#f1dcc0;--mute:#c4a2b4;--line:rgba(232,190,140,.35);--accent:#f1cf7c;--red:#ff9a8a;--gold:linear-gradient(180deg,#f3d29a,#d9a066)}
 *{box-sizing:border-box;min-width:0}
 html{-webkit-text-size-adjust:100%;background:#0e0416;overflow-x:hidden}
 body{margin:0;min-height:100vh;overflow-x:hidden;color:var(--ink);font:18px/1.45 "EB Garamond",Georgia,serif;
- background:radial-gradient(ellipse at 50% 0%,#3a1838 0%,#1a0a1e 55%,#0e0416 100%) fixed}
+ background:radial-gradient(ellipse at 50% 0%,#3a1838 0%,#1a0a1e 55%,#0e0416 100%) fixed;
+ padding-bottom:calc(171px / 851 * 824 * var(--S,.4577) + env(safe-area-inset-bottom,0px) + 24px)}
 header{padding:calc(env(safe-area-inset-top,0px) + 14px) 22px 0;text-align:center}
-header h1{margin:22px 0 6px;font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.3),0 2px 2px #000}
-header p{margin:0;opacity:.75;font-size:17px}
+header h1{margin:2px 0 0;font:italic 40px/1.1 "IM Fell English",Georgia,serif;color:#f1cf7c;text-shadow:0 0 14px rgba(255,180,80,.3),0 2px 2px #000}
+header p{margin:0 0 4px;opacity:.75;font-size:17px;line-height:normal}
 header p+p{display:none}
-main{max-width:640px;margin:0 auto;padding:22px 22px 0}
-.panel{background:linear-gradient(180deg,rgba(90,40,88,.55),rgba(46,18,48,.7));border:1.5px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 6px 16px rgba(0,0,0,.5)}
-h2{font-size:22px;margin:0 0 12px;color:#f6dcb4}
+/* the Library/Backup gold rule — here with three stars that light up step by step */
+.rule{display:flex;align-items:center;justify-content:center;gap:8px;width:62%;margin:2px auto 0}
+.rule::before,.rule::after{content:"";flex:1;height:1px;opacity:.75}
+.rule::before{background:linear-gradient(90deg,transparent,#d9a95c)}
+.rule::after{background:linear-gradient(90deg,#d9a95c,transparent)}
+.rule svg{width:11px;height:11px;opacity:.3;transition:opacity .3s,filter .3s}
+.rule svg.on{opacity:1;filter:drop-shadow(0 0 4px rgba(255,190,90,.9))}
+main{max-width:640px;margin:0 auto;padding:24px 22px 0}
+/* same painted card as the Book and Backup pages: purple panel + gold rim with leaf sprigs */
+.panel{position:relative;margin:0 0 18px;padding:26px 28px;border-radius:24px;color:#f3e3c3;
+ background:linear-gradient(rgba(40,8,46,.25),rgba(20,4,26,.45)),url(img/panel.jpg) center/cover;
+ box-shadow:0 10px 22px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.4)}
+.panel::before{content:"";position:absolute;inset:0;pointer-events:none;border-style:solid;border-color:transparent;border-width:42px;border-image:url(img/card_frame.webp) 190 stretch}
+.panel>*{position:relative;z-index:1}
+.panel.in{animation:in .28s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+h2{margin:0 0 12px;font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:22px;line-height:1.2;color:#f1cf7c}
+.lead{margin:-4px 0 14px;font-size:16px;opacity:.85}
 .row{display:flex;gap:10px;flex-wrap:wrap}
-button,.btn{font:600 18px "EB Garamond",Georgia,serif;min-height:48px;padding:0 18px;border-radius:999px;border:1.5px solid var(--line);background:rgba(30,10,32,.6);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-align:center}
+button,.btn{font:600 18px "EB Garamond",Georgia,serif;min-height:48px;padding:0 18px;border-radius:999px;border:1.5px solid var(--line);background:rgba(30,10,32,.6);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-align:center;-webkit-tap-highlight-color:transparent}
 button.primary,.btn.primary{background:var(--gold);color:#2a1410;border:0;box-shadow:0 3px 8px rgba(0,0,0,.5)}
 button:active,.btn:active{filter:brightness(1.1);transform:scale(.98)}
-button.warn{color:var(--red)}
 button:disabled{opacity:.5}
 button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.grow{flex:1}
-input[type=text],input[type=search]{font:inherit;font-size:17px;width:100%;min-height:48px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:rgba(20,6,22,.7);color:var(--ink)}
+.grow{flex:1}.full{width:100%}
+input[type=text]{font:inherit;font-size:17px;width:100%;min-height:48px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:rgba(20,6,22,.7);color:var(--ink)}
 input::placeholder{color:var(--mute);opacity:.8}
-.cam{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:4/3;margin-bottom:12px;display:none}
-.cam.on{display:block}
+/* step 1: the four ways */
+.ways{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.way{flex-direction:column;gap:4px;min-height:128px;padding:14px 8px;border-radius:18px;background:rgba(20,4,26,.62);border:1.5px solid rgba(232,190,140,.4);
+ box-shadow:inset 0 0 18px rgba(0,0,0,.5),0 3px 8px rgba(0,0,0,.35)}
+.way svg{width:40px;height:40px;filter:drop-shadow(0 0 6px rgba(255,190,90,.45))}
+.way b{font-weight:600;font-size:18px;color:#f6dcb4;line-height:1.1}
+.way small{font:400 14px/1.2 "EB Garamond",Georgia,serif;color:var(--mute)}
+.way:active{background:rgba(70,30,60,.7)}
+.other{display:block;margin:14px auto 0;min-height:40px;border:0;background:none;color:#e0c79e;font:italic 400 16px "EB Garamond",Georgia,serif;text-decoration:underline;text-decoration-color:rgba(241,207,124,.5);text-underline-offset:3px}
+.cam{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:4/3;margin-bottom:12px;box-shadow:0 0 0 1.5px rgba(232,190,140,.4)}
 .cam video{width:100%;height:100%;object-fit:cover;display:block}
 .cam .guide{position:absolute;left:10%;right:10%;top:32%;bottom:32%;border:3px solid var(--accent);border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.35)}
 .cam .hint{position:absolute;left:0;right:0;bottom:8px;text-align:center;color:#fff;font-size:15px}
 .status{font-size:16px;color:var(--accent);margin-top:10px;min-height:22px;text-align:center}
 .status.err{color:var(--red)}
-.book{display:grid;grid-template-columns:110px minmax(0,1fr);gap:14px}
-.cover{width:110px;aspect-ratio:2/3;border-radius:6px;background:rgba(0,0,0,.3);object-fit:cover;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:13px;text-align:center}
-.book h3{margin:0;font-size:22px;line-height:1.15;color:#f6dcb4}
-.book .sub{color:var(--mute);margin:2px 0 6px}
-.book .by{font-weight:600}
-dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:14px 0 0;font-size:16px}
+.status:empty{display:none}
+.form{display:grid;gap:10px}
+/* step 3: the found book */
+.book{display:grid;grid-template-columns:104px minmax(0,1fr);gap:16px;align-items:start}
+.book .bk{width:104px;cursor:default}
+.book h3{margin:0;font:600 22px/1.15 "EB Garamond",Georgia,serif;color:#f6dcb4}
+.book .sub{color:#e0c79e;font-style:italic;margin:2px 0 4px;font-size:16px}
+.book .by{font-size:17px;margin-top:4px}
+dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;margin:14px 0 0;font-size:15px}
 dt{color:var(--mute)}dd{margin:0;overflow-wrap:anywhere}
-.desc{font-size:16px;margin-top:12px;max-height:9em;overflow:auto}
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.tags span{font-size:14px;background:rgba(20,6,22,.6);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
-.empty{color:var(--mute);font-size:16px;padding:12px 0 0}
-.form{display:grid;gap:8px;margin-top:12px}
+.lbl{margin:16px 0 6px;font:400 15px "IM Fell English SC",Georgia,serif;color:#f1cf7c;letter-spacing:.3px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border-radius:999px;background:#14041c;box-shadow:inset 0 2px 5px rgba(0,0,0,.5)}
+.seg button{min-height:42px;border:0;background:transparent;color:#e7cfa6;font-size:17px}
+.seg button[aria-pressed=true]{background:linear-gradient(#f6dc96,#c9a24e);color:#2a1408;box-shadow:0 2px 4px rgba(0,0,0,.4),inset 0 1px 0 #fff4c8}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{min-height:36px;padding:0 13px;font:500 15px "EB Garamond",Georgia,serif;background:rgba(20,6,22,.6)}
+.chips button[aria-pressed=true]{background:linear-gradient(#f6dc96,#c9a24e);color:#2a1408;border-color:transparent}
+.dup{margin:12px 0 0;text-align:center;font-style:italic;font-size:15px;color:var(--red)}
+.done{text-align:center}
+.done .bk{width:120px;margin:4px auto 14px;cursor:default}
+.done p{margin:0 0 16px;font-size:17px}
 .hidden{display:none!important}
 a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
 #tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom,0px);
@@ -107,30 +140,69 @@ main{padding-bottom:140px}
 <header>
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a19</p>
+  <p style="font-size:12px;opacity:.5">a20</p>
+  <div class="rule" id="steps" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg></div>
 </header>
 <main>
-  <section class="panel">
-    <h2>Add a book</h2>
+  <!-- step 1: choose how -->
+  <section class="panel" id="s1" data-step="1">
+    <h2>How would you like to add it?</h2>
+    <div class="ways">
+      <button class="way" data-way="scan"><svg viewBox="0 0 40 40" fill="none" stroke="#f1cf7c" stroke-width="2" stroke-linecap="round"><path d="M5 13V7h6M29 7h6v6M35 27v6h-6M11 33H5v-6"/><path d="M12 13v14M16 13v14M19 13v14M23 13v14M27 13v14" stroke-width="1.6"/><path d="M8 20h24" stroke="#ff9a6a" stroke-width="1.4"/></svg><b>Scan barcode</b><small>Use the camera</small></button>
+      <button class="way" data-way="photo"><svg viewBox="0 0 40 40" fill="none" stroke="#f1cf7c" stroke-width="2" stroke-linejoin="round"><path d="M5 13h7l3-4h10l3 4h7v19H5z"/><circle cx="20" cy="22" r="6"/><circle cx="20" cy="22" r="2" fill="#f1cf7c" stroke="none"/></svg><b>From a photo</b><small>A picture of the barcode</small></button>
+      <button class="way" data-way="isbn"><svg viewBox="0 0 40 40" fill="none" stroke="#f1cf7c" stroke-width="2" stroke-linecap="round"><rect x="4" y="11" width="32" height="18" rx="4"/><path d="M10 17v6M14 17v6M18 17v6M24 17h4l-4 6h4" stroke-width="1.7"/></svg><b>Type the ISBN</b><small>From the back cover</small></button>
+      <button class="way" data-way="write"><svg viewBox="0 0 40 40" fill="none" stroke="#f1cf7c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M30 5c-9 3-16 11-19 23l-3 7"/><path d="M30 5c1 7-3 14-12 17"/><path d="M14 22c4-1 9-5 12-11"/><path d="M8 35h22" stroke-width="1.5"/></svg><b>Write it in</b><small>Books with no ISBN</small></button>
+    </div>
+  </section>
+
+  <!-- step 2: one way at a time -->
+  <section class="panel hidden" id="s2scan" data-step="2">
+    <h2>Scan barcode</h2>
     <div class="cam" id="cam">
       <video id="video" playsinline muted autoplay></video>
       <div class="guide"></div>
       <div class="hint">Hold about 20 cm away, barcode inside the box</div>
     </div>
-    <div class="row">
-      <button class="primary grow" id="scanBtn">Scan barcode</button>
-      <label class="btn grow" for="photo">Use a photo</label>
-      <input type="file" id="photo" accept="image/*" class="hidden">
-    </div>
-    <form class="row" id="manual" style="margin-top:10px">
-      <input type="text" id="code" inputmode="numeric" autocomplete="off" placeholder="ISBN, e.g. 978-0-14-118776-1" class="grow" style="flex-basis:200px">
-      <button type="submit">Look up</button>
-    </form>
-    <div class="status" id="status"></div>
+    <button class="full" id="scanBtn">Start camera</button>
+    <button class="other">Choose another way</button>
   </section>
 
-  <section class="panel hidden" id="result"></section>
+  <section class="panel hidden" id="s2photo" data-step="2">
+    <h2>From a photo</h2>
+    <p class="lead">Take or choose a sharp, well-lit photo of the barcode on the back.</p>
+    <label class="btn primary full" for="photo">Choose photo</label>
+    <input type="file" id="photo" accept="image/*" class="hidden">
+    <button class="other">Choose another way</button>
+  </section>
 
+  <section class="panel hidden" id="s2isbn" data-step="2">
+    <h2>Type the ISBN</h2>
+    <p class="lead">The 10 or 13 digit number, usually above the barcode.</p>
+    <form class="row" id="manual">
+      <input type="text" id="code" inputmode="numeric" autocomplete="off" placeholder="978…" class="grow" style="flex-basis:150px">
+      <button type="submit" class="primary">Look up</button>
+    </form>
+    <button class="other">Choose another way</button>
+  </section>
+
+  <section class="panel hidden" id="s2write" data-step="2">
+    <h2>Write it in</h2>
+    <p class="lead" id="writeLead">Just the title and author — you can add more later.</p>
+    <form class="form" id="writeForm">
+      <input type="text" id="wT" placeholder="Title" required autocomplete="off">
+      <input type="text" id="wA" placeholder="Author" autocomplete="off">
+      <button type="submit" class="primary">Continue</button>
+    </form>
+    <button class="other">Choose another way</button>
+  </section>
+
+  <!-- step 3: check & add -->
+  <section class="panel hidden" id="s3" data-step="3"></section>
+
+  <!-- added -->
+  <section class="panel hidden done" id="s4" data-step="4"></section>
+
+  <div class="status" id="status"></div>
 </main>
 
 <nav id="tabbar" aria-label="Sections">
@@ -143,16 +215,38 @@ main{padding-bottom:140px}
 </nav>
 <script src="bookmagic.js"></script>
 <script src="store.js"></script>
+<script src="book-frame.js"></script>
 <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
 <script>
 {
 const $ = id => document.getElementById(id) || document.createElement('input');   // parts not on this page are harmless stand-ins
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let books = [], loaded = false;
-const save = () => { if (loaded) Store.replaceAll(books).catch(() => status('Could not save — storage unavailable.', true)); };
-let current = null;
+let books = [];
+let current = null, pending = {};   // pending: ISBN/code kept when a lookup finds nothing and she writes it in
 
 function status(msg, err) { const s = $('status'); s.textContent = msg || ''; s.className = 'status' + (err ? ' err' : ''); }
+
+/* ---------- Steps ---------- */
+const panels = [...document.querySelectorAll('main [data-step]')];
+function show(id) {
+  const p = $(id);
+  if (id !== 's2scan') stopScan();
+  panels.forEach(x => x.classList.toggle('hidden', x !== p));
+  p.classList.remove('in'); void p.offsetWidth; p.classList.add('in');
+  // the status line sits inside the open card, above "Choose another way"
+  const st = $('status'), other = p.querySelector('.other'); other ? p.insertBefore(st, other) : p.appendChild(st);
+  const n = +p.dataset.step; document.querySelectorAll('#steps svg').forEach((g, i) => g.classList.toggle('on', i < n));
+  scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.querySelectorAll('.other').forEach(b => b.onclick = () => { status(''); show('s1'); });
+document.querySelectorAll('.way').forEach(b => b.onclick = () => {
+  status(''); const w = b.dataset.way;
+  if (w === 'scan') { show('s2scan'); startScan(); }
+  if (w === 'photo') { show('s2photo'); $('photo').click(); }
+  if (w === 'isbn') { show('s2isbn'); $('code').value = ''; setTimeout(() => $('code').focus(), 50); }
+  if (w === 'write') { pending = {}; $('writeLead').textContent = 'Just the title and author — you can add more later.'; $('writeForm').reset(); show('s2write'); setTimeout(() => $('wT').focus(), 50); }
+});
+
 
 /* ---------- ISBN helpers ---------- */
 function isbn10ok(s) { if (!/^\d{9}[\dX]$/.test(s)) return false; let t = 0; for (let i = 0; i < 10; i++) t += (s[i] === 'X' ? 10 : +s[i]) * (10 - i); return t % 11 === 0; }
@@ -202,7 +296,6 @@ async function lookup(raw) {
   if (p.kind === 'UPC/EAN' && !p.valid) { status('Unrecognised code.', true); return; }
   if (p.isbn13 && !p.valid) status('Checksum doesn’t match — check the digits. Trying anyway…');
   else status('Looking up ' + (p.isbn13 || p.code) + '…');
-  $('result').classList.add('hidden');
   const [ol, gb] = await Promise.allSettled(p.isbn13
     ? [fromOpenLibrary(p.isbn13), fromGoogle('isbn:' + p.isbn13)]
     : [Promise.resolve(null), fromGoogle(p.code)]);
@@ -213,88 +306,61 @@ async function lookup(raw) {
     source: [ol.value && 'Open Library', gb.value && 'Google Books'].filter(Boolean).join(' + ') } : null;
   if (current && !current.cover && current.isbn13) current.cover = await olCover(current.isbn13);
   status('');
-  current ? showBook(current, false) : showNotFound(base);
+  current ? showBook(current) : showNotFound(base);
 }
 
-/* ---------- Rendering ---------- */
-function coverHTML(b, cls) { return b.cover ? `<img class="${cls}" src="${esc(b.cover)}" alt="" onerror="this.outerHTML='<div class=&quot;${cls}&quot;>No cover</div>'">` : `<div class="${cls}">No cover</div>`; }
-function showBook(b, saved) {
-  const dup = !saved && books.some(x => x.isbn13 && x.isbn13 === b.isbn13);
-  const facts = [['ISBN-13', b.isbn13], ['ISBN-10', b.isbn10], ['Code', !b.isbn13 && b.code], ['Publisher', b.publisher], ['Published', b.published],
-    ['Pages', b.pages], ['Language', b.language], ['Source', b.source], ['Added', b.added && new Date(b.added).toLocaleDateString()]].filter(f => f[1]);
-  const r = $('result');
-  r.innerHTML = `
-    <div class="book">${coverHTML(b, 'cover')}
+/* ---------- Step 3: check & add ---------- */
+const facts = b => [['Publisher', b.publisher], ['Published', b.published], ['Pages', b.pages], ['ISBN', b.isbn13 || b.isbn10 || b.code]].filter(f => f[1]);
+function showBook(b) {
+  const dup = b.isbn13 && books.some(x => x.isbn13 === b.isbn13);
+  let list = 'owned', genre = GENRES.includes(b.genre) ? b.genre : guessGenre(b);
+  const r = $('s3');
+  r.innerHTML = `<h2>Is this your book?</h2>
+    <div class="book"><div class="bk">${bookFrameHTML()}</div>
       <div><h3>${esc(b.title || 'Untitled')}</h3>${b.subtitle ? `<div class="sub">${esc(b.subtitle)}</div>` : ''}
       <div class="by">${esc((b.authors || []).join(', ') || 'Unknown author')}</div></div></div>
-    <dl>${facts.map(f => `<dt>${f[0]}</dt><dd>${esc(f[1])}</dd>`).join('')}</dl>
-    ${b.subjects && b.subjects.length ? `<div class="tags">${b.subjects.map(s => `<span>${esc(s)}</span>`).join('')}</div>` : ''}
-    ${b.description ? `<div class="desc">${esc(b.description)}</div>` : ''}
-    ${b.link ? `<p style="font-size:14px;margin:10px 0 0"><a href="${esc(b.link)}" target="_blank" rel="noopener">More details</a></p>` : ''}
-    <div class="row" style="margin-top:14px">
-      ${saved ? `<button class="warn grow" id="delBtn">Remove from catalog</button><button class="grow" id="closeBtn">Close</button>`
-              : `<button class="primary grow" id="addBtn" ${dup ? 'disabled' : ''}>${dup ? 'Already in catalog' : 'Add to catalog'}</button><button class="grow" id="closeBtn">Discard</button>`}
-    </div>`;
-  r.classList.remove('hidden');
-  r.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  $('closeBtn').onclick = () => r.classList.add('hidden');
-  if ($('addBtn')) $('addBtn').onclick = () => addBook(b);
-  if ($('delBtn')) $('delBtn').onclick = e => {
-    if (e.target.dataset.sure) { books = books.filter(x => x.id !== b.id); save(); render(); r.classList.add('hidden'); }
-    else { e.target.dataset.sure = 1; e.target.textContent = 'Tap again to remove'; }
-  };
+    ${facts(b).length ? `<dl>${facts(b).map(f => `<dt>${f[0]}</dt><dd>${esc(f[1])}</dd>`).join('')}</dl>` : ''}
+    <div class="lbl">Put it on</div>
+    <div class="seg" id="list"><button data-v="owned" aria-pressed="true">My Library</button><button data-v="wishlist" aria-pressed="false">Wishlist</button></div>
+    <div class="lbl">Genre</div>
+    <div class="chips" id="genre">${GENRES.map(g => `<button data-v="${esc(g)}" aria-pressed="${g === genre}">${esc(g)}</button>`).join('')}</div>
+    ${dup ? '<p class="dup">This book is already in your collection.</p>' : ''}
+    <button class="primary full" id="addBtn" style="margin-top:18px">Add to my library</button>
+    <button class="other">Choose another way</button>`;
+  setBook(r.querySelector('.bk'), b);
+  const pick = (box, set) => box.onclick = e => { const t = e.target.closest('button'); if (!t) return;
+    box.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === t)); set(t.dataset.v); };
+  pick($('list'), v => { list = v; $('addBtn').textContent = v === 'wishlist' ? 'Add to my wishlist' : 'Add to my library'; });
+  pick($('genre'), v => genre = v);
+  r.querySelector('.other').onclick = () => { status(''); show('s1'); };
+  $('addBtn').onclick = () => addBook(b, list, genre);
+  show('s3');
 }
 function showNotFound(base) {
-  const r = $('result');
-  r.innerHTML = `<h2>Not found in the book databases</h2>
-    <p style="margin:0;color:var(--mute);font-size:14px">${esc(base.isbn13 || base.code)} — you can still add it by hand.</p>
-    <form class="form" id="nf"><input type="text" id="nfT" placeholder="Title" required><input type="text" id="nfA" placeholder="Author">
-    <div class="row"><button class="primary grow" type="submit">Add to catalog</button><button class="grow" type="button" id="closeBtn">Cancel</button></div></form>`;
-  r.classList.remove('hidden');
-  $('closeBtn').onclick = () => r.classList.add('hidden');
-  $('nf').onsubmit = e => { e.preventDefault(); addBook({ ...base, title: $('nfT').value.trim(), authors: $('nfA').value.trim() ? [$('nfA').value.trim()] : [], source: 'Manual' }); };
+  pending = base;
+  $('writeForm').reset();
+  $('writeLead').textContent = `We couldn’t find ${base.isbn13 || base.code} in the book databases — write it in instead.`;
+  show('s2write');
 }
-function addBook(b) {
-  const nb = { status: 'owned', genre: guessGenre(b), ...b, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: Date.now() };
+$('writeForm').onsubmit = e => { e.preventDefault();
+  const a = $('wA').value.trim();
+  showBook({ ...pending, title: $('wT').value.trim(), authors: a ? [a] : [], source: 'Manual' }); };
+async function addBook(b, list, genre) {
+  const { link, ...keep } = b;
+  const nb = { ...keep, status: list, genre, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: Date.now() };
+  $('addBtn').disabled = true;
+  try { await Store.put(nb); } catch (e) { $('addBtn').disabled = false; status('Could not save — storage unavailable.', true); return; }
   books.unshift(nb);
-  save(); render(); $('result').classList.add('hidden'); $('code').value = '';
-  status('Added “' + (b.title || 'book') + '”.');
-  rememberCoverColour(nb);
   Store.saveCover(nb);   // keep the cover picture on the phone
+  const r = $('s4');
+  r.innerHTML = `<h2>Added ✦</h2><div class="bk">${bookFrameHTML()}</div>
+    <p>“${esc(nb.title || 'Your book')}” is on your ${list === 'wishlist' ? 'Wishlist' : 'Library'} shelf.</p>
+    <div class="row"><button class="grow" id="again">Add another</button><button class="primary grow" id="open">Open book</button></div>`;
+  setBook(r.querySelector('.bk'), nb);
+  $('again').onclick = () => show('s1');
+  $('open').onclick = () => { location.href = 'book.html?id=' + encodeURIComponent(nb.id); };
+  status(''); show('s4');
 }
-// Read the cover's main colour once, when the book is added, and keep it with the book
-// (the home screen tints the book around the cover with it). Needs the cover site to allow it.
-function rememberCoverColour(nb) {
-  if (!nb.cover) return;
-  const im = new Image(); im.crossOrigin = 'anonymous';
-  im.onload = () => {
-    try {
-      const c = document.createElement('canvas'); c.width = c.height = 32; const x = c.getContext('2d', { willReadFrequently: true });
-      x.drawImage(im, 0, 0, 32, 32); const d = x.getImageData(0, 0, 32, 32).data;
-      const bins = Array.from({ length: 12 }, () => ({ w: 0, r: 0, g: 0, b: 0 })); let gr = 0, gg = 0, gb = 0, n = 0, vivid = 0, L = 0;
-      for (let i = 0; i < d.length; i += 4) {
-        const r = d[i], g = d[i + 1], bb = d[i + 2], mx = Math.max(r, g, bb), mn = Math.min(r, g, bb), sat = mx ? (mx - mn) / mx : 0, v = mx / 255;
-        gr += r; gg += g; gb += bb; n++; L += (mx + mn) / 510; if (sat < .25 || v < .15) continue; vivid++;
-        let h = mx === r ? ((g - bb) / (mx - mn)) % 6 : mx === g ? (bb - r) / (mx - mn) + 2 : (r - g) / (mx - mn) + 4; h = (h * 60 + 360) % 360;
-        const k = bins[Math.floor(h / 30)], w = sat * v; k.w += w; k.r += r * w; k.g += g * w; k.b += bb * w;
-      }
-      const best = bins.reduce((a, q) => q.w > a.w ? q : a), hx = (r, g, b2) => '#' + [r, g, b2].map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
-      const color = vivid < n * .12 || !best.w ? hx(gr / n, gg / n, gb / n) : hx(best.r / best.w, best.g / best.w, best.b / best.w);
-      const k = books.find(q => q.id === nb.id); if (k) { k.color = color; save(); }
-    } catch (e) { /* cover site doesn't allow reading its colours */ }
-  };
-  im.src = nb.cover;
-}
-function render() {
-  const q = $('q').value.trim().toLowerCase();
-  const shown = books.filter(b => !q || [b.title, b.subtitle, (b.authors || []).join(' '), b.isbn13, b.isbn10].join(' ').toLowerCase().includes(q));
-  $('count').textContent = books.length ? `${books.length} book${books.length > 1 ? 's' : ''} in your catalog` : 'Your book catalog';
-  $('list').innerHTML = shown.map(b => `<li data-id="${b.id}">${b.cover ? `<img src="${esc(b.cover)}" alt="" loading="lazy">` : '<div class="ph"></div>'}
-    <div><b>${esc(b.title || 'Untitled')}</b><small>${esc((b.authors || []).join(', ') || 'Unknown author')}</small></div></li>`).join('')
-    || `<li class="empty" style="display:block;cursor:default">${books.length ? 'No matches.' : 'No books yet — scan your first one above.'}</li>`;
-}
-$('list').onclick = e => { const li = e.target.closest('li[data-id]'); if (li) showBook(books.find(b => b.id === li.dataset.id), true); };
-$('q').oninput = render;
 
 /* ---------- Scanning ---------- */
 let reader = null, scanning = false, lastRead = '', hits = 0;
@@ -318,7 +384,7 @@ function releaseCamera() {
 }
 function stopScan() {
   scanning = false; clearTimeout(timer);
-  $('cam').classList.remove('on'); $('scanBtn').textContent = 'Scan barcode';
+  $('scanBtn').textContent = 'Start camera';
   clearTimeout(releaseTimer); releaseTimer = setTimeout(releaseCamera, 3 * 60 * 1000);
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { stopScan(); releaseCamera(); } });
@@ -351,9 +417,8 @@ function scanFrame() {
   }
   timer = setTimeout(scanFrame, 30);
 }
-$('scanBtn').onclick = async () => {
-  if (scanning) return stopScan();
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { status('Live camera needs the app opened over https. Use “Use a photo” instead.', true); return; }
+async function startScan() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { status('Live camera needs the app opened over https. Try “From a photo”.', true); return; }
   if (!window.ZXing) { status('Scanner library didn’t load — check your connection, or type the ISBN.', true); return; }
   if (!core) {
     const Z = window.ZXing, hints = new Map();
@@ -365,14 +430,14 @@ $('scanBtn').onclick = async () => {
   const live = stream && stream.getVideoTracks().some(t => t.readyState === 'live');
   if (live) {
     lastRead = ''; hits = 0; frameNo = 0; scanning = true;
-    $('cam').classList.add('on'); $('scanBtn').textContent = 'Stop scanning';
+    $('scanBtn').textContent = 'Stop camera';
     try { await $('video').play(); } catch (e) {}
     scanFrame(); return;
   }
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } });
   } catch (e) {
-    status(e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow it in Settings › Safari › Camera, or use \u201cUse a photo\u201d.' : 'Couldn’t start the camera. Try “Use a photo”.', true); return;
+    status(e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow it in Settings › Safari › Camera, or choose another way.' : 'Couldn’t start the camera. Try “From a photo”.', true); return;
   }
   const track = stream.getVideoTracks()[0];
   // zoom in so you can hold the phone further away, where the camera can focus
@@ -386,9 +451,10 @@ $('scanBtn').onclick = async () => {
   const v = $('video'); v.srcObject = stream;
   try { await v.play(); } catch (e) {}
   lastRead = ''; hits = 0; frameNo = 0; scanning = true;
-  $('cam').classList.add('on'); $('scanBtn').textContent = 'Stop scanning';
+  $('scanBtn').textContent = 'Stop camera';
   scanFrame();
-};
+}
+$('scanBtn').onclick = () => scanning ? stopScan() : startScan();
 $('photo').onchange = async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   reader = reader || makeReader(); if (!reader) return;
@@ -398,32 +464,15 @@ $('photo').onchange = async e => {
   catch (err) { status('No barcode found in that photo. Get closer, keep it sharp and well lit, or type the ISBN.', true); }
   finally { URL.revokeObjectURL(url); }
 };
-$('manual').onsubmit = e => { e.preventDefault(); stopScan(); lookup($('code').value); };
+$('manual').onsubmit = e => { e.preventDefault(); $('code').blur(); lookup($('code').value); };
 
-/* ---------- Backup ---------- */
-$('exportBtn').onclick = () => {
-  const blob = new Blob([JSON.stringify(books, null, 2)], { type: 'application/json' });
-  const file = new File([blob], `shelf-backup-${new Date().toISOString().slice(0, 10)}.json`, { type: 'application/json' });
-  if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file] }).catch(() => {}); return; }
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click();
-};
-$('importFile').onchange = async e => {
-  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-  try {
-    const data = JSON.parse(await f.text()); if (!Array.isArray(data)) throw 0;
-    const have = new Set(books.map(b => b.id)); const fresh = data.filter(b => b && b.id && !have.has(b.id));
-    fresh.forEach(b => { if (b.status !== 'wishlist') b.status = 'owned'; if (!GENRES.includes(b.genre)) b.genre = guessGenre(b); });
-    books = [...fresh, ...books]; save(); render(); status(`Imported ${fresh.length} book${fresh.length === 1 ? '' : 's'}.`);
-    fresh.forEach(b => Store.saveCover(b));
-  } catch (err) { status('That file isn’t a Shelf backup.', true); }
-};
-
-render();
-const loadBooks = () => Store.all().then(a => { books = a.sort((x, y) => (y.added || 0) - (x.added || 0)); loaded = true; render(); });
+const loadBooks = () => Store.all().then(a => { books = a;
+  $('count').textContent = a.length ? `${a.length} book${a.length > 1 ? 's' : ''} in your catalog` : 'Your book catalog'; });
 loadBooks(); Store.onChange(loadBooks);
+show('s1');
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a19';
+const VERSION = 'a20';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {
