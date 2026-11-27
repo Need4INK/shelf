@@ -107,7 +107,7 @@ html.intro-on,html.intro-on body{background:#0e0416!important}   /* dark behind 
 #tabbar .bookhit{position:absolute;left:34.6%;width:30.8%;bottom:calc(0px - env(safe-area-inset-bottom,0px));height:calc(98% + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent;cursor:pointer}   /* middle half of the book */
 
 /* ---------- Latest Addition: the reading pumpkin is his own picture, so he can be tickled (homefx.js) ---------- */
-#pkReader{left:67.606%;top:3.861%;width:27.7%;height:85.71%;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;transform-origin:50% 100%}
+#pkReader{left:67.606%;top:3.861%;width:27.7%;height:89.575%;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;transform-origin:50% 100%}
 /* tickled: a happy startled hop — crouch, spring up, float, land with a squish and a little bounce */
 #pkReader.tickle{animation:tickle .95s linear}
 @keyframes tickle{
