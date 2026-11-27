@@ -41,7 +41,7 @@ html.back #stage{transition:none}   /* coming back to Home: appears whole the mo
  background:linear-gradient(transparent,#0d0310 calc(100% - env(safe-area-inset-bottom,0px)))}
 #tabbar .in{position:relative;width:calc(824px * var(--S,.4577));margin:0 auto}
 #tabbar img{display:block;width:100%;height:auto;pointer-events:none}
-#tabbar .tb{position:absolute;top:0;width:22%;height:100%;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;cursor:pointer}
+#tabbar .tb{position:absolute;top:8%;width:22%;height:calc(92% + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;cursor:pointer}
 #tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.38),transparent)}
 #bar{left:0!important;top:552px!important;width:852px;height:154px;background:url(img/bar_bg.webp) center/100% 100% no-repeat;z-index:3}
 .tab{position:absolute;top:13px;width:114px;height:114px;padding:0;border:0;border-radius:50%;cursor:pointer;
@@ -104,4 +104,4 @@ html.intro-on,html.intro-on body{background:#0e0416!important}   /* dark behind 
 
 #tabbar .barbook{position:absolute;left:19.21%;width:61.57%;height:auto;bottom:23.98%;pointer-events:none}   /* 163..688 of 851: centred on the screen, clear of Home and Backup; bottom on 130 of 171, top above the bar */
 #tabbar .bookmagic{position:absolute;left:-1.6%;width:103.2%;bottom:23.98%;pointer-events:none}
-#tabbar .bookhit{position:absolute;left:34.6%;width:30.8%;bottom:14%;height:84%;-webkit-tap-highlight-color:transparent;cursor:pointer}   /* middle half of the book */
+#tabbar .bookhit{position:absolute;left:34.6%;width:30.8%;bottom:calc(0px - env(safe-area-inset-bottom,0px));height:calc(98% + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent;cursor:pointer}   /* middle half of the book */

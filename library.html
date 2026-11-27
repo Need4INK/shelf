@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
-<meta name="app-version" content="library-14">
+<meta name="app-version" content="library-15">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -50,10 +50,10 @@ body{overscroll-behavior:none}
  background:linear-gradient(transparent,#0d0310 calc(100% - env(safe-area-inset-bottom,0px)))}
 #tabbar .in{position:relative;width:calc(824px * var(--S,.4577));margin:0 auto}
 #tabbar img{display:block;width:100%;height:auto;pointer-events:none}
-#tabbar .tb{position:absolute;top:0;width:22%;height:100%;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;cursor:pointer}
+#tabbar .tb{position:absolute;top:8%;width:22%;height:calc(92% + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;cursor:pointer}
 #tabbar .barbook{position:absolute;left:19.21%;width:61.57%;height:auto;bottom:23.98%;pointer-events:none}
 #tabbar .bookmagic{position:absolute;left:-1.6%;width:103.2%;bottom:23.98%;pointer-events:none}
-#tabbar .bookhit{position:absolute;left:34.6%;width:30.8%;bottom:14%;height:84%;-webkit-tap-highlight-color:transparent;cursor:pointer}
+#tabbar .bookhit{position:absolute;left:34.6%;width:30.8%;bottom:calc(0px - env(safe-area-inset-bottom,0px));height:calc(98% + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent;cursor:pointer}
 #tabbar .tb:active{background:radial-gradient(closest-side,rgba(255,170,90,.38),transparent)}
 </style>
 <script>(function(){
