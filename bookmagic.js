@@ -21,7 +21,7 @@
   const CH='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',P=[];let last=performance.now(),acc=0,run=true,boost=0;
   // touching the middle half of the book: a burst of letters, then it calms back down
   const hit=document.createElement('div');hit.className='bookhit';hit.setAttribute('role','button');hit.setAttribute('aria-label','Magic book');cv.after(hit);
-  hit.addEventListener('pointerdown',e=>{e.preventDefault();say()});
+  hit.addEventListener('pointerdown',e=>{e.preventDefault();boost=1;for(let i=0;i<18;i++)spawn();say()});
   /* the tap: six steam letters n,o,i,d,o,i are born from the pages and move exactly like all the others (nothing steers
      them). Their start points, speeds and tilts are worked out backwards, so their ordinary paths happen to cross
      the line "noi doi" at the same moment, upright and moving up together; then they slowly part and fade. */

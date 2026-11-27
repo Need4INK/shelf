@@ -96,7 +96,7 @@ if(document.fonts)document.fonts.ready.then(()=>{const q=document.getElementById
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)showQuote()});
 
 /* ---------- offline + auto-update ---------- */
-const APP_VERSION='home-85';
+const APP_VERSION='home-86';
 // a new version arrived: drop the saved pictures once so new art shows straight away
 try{const v=localStorage.getItem('home.ver');
   if(v!==APP_VERSION){localStorage.setItem('home.ver',APP_VERSION);
