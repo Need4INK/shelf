@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
-<meta name="app-version" content="library-18">
+<meta name="app-version" content="library-19">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -77,6 +77,11 @@ body{overscroll-behavior:none}
     if(r&&r.origin===location.origin&&/\/(index\.html)?$/.test(r.pathname)&&history.length>1){e.preventDefault();
       // if the phone ignores going back (it can, e.g. after the app was in the background), open Home directly
       const t=setTimeout(()=>{location.href=a.dataset.go||'index.html'},600);addEventListener('pagehide',()=>clearTimeout(t),{once:true});history.back()}});
+  // Back button: go back in the app; if there is nothing to go back to (or the phone ignores it), open Home
+  document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#tabbar [data-back]');if(!a)return;e.preventDefault();
+    let r=null;try{r=new URL(document.referrer)}catch(err){}
+    if(!(r&&r.origin===location.origin&&history.length>1)){location.href='index.html';return}
+    const t=setTimeout(()=>{location.href='index.html'},600);addEventListener('pagehide',()=>clearTimeout(t),{once:true});history.back()});
 })();</script>
 <style>/* All app lettering, kept in the app (no Google Fonts) so text never swaps fonts when a page opens. OFL. */
 @font-face{font-family:"EB Garamond";font-weight:400;src:url(fonts/EBGaramond-400.woff2) format("woff2");font-display:block}
@@ -98,10 +103,10 @@ body{overscroll-behavior:none}
 <div class="case" id="case"></div>
 <nav id="tabbar" aria-label="Sections">
   <div class="in">
-    <img src="img/tabbar.webp" width="851" height="171" alt="">
+    <img src="img/tabbar_add.webp" width="851" height="171" alt="">
     <img class="barbook" src="img/bar_book.webp" alt="">
     <a class="tb" style="left:0" data-go="./" role="link" aria-label="Home"></a>
-    <a class="tb" style="left:78%" data-go="backup.html" role="link" aria-label="Backup"></a>
+    <a class="tb" style="left:78%" data-go="add.html" role="link" aria-label="Add Book"></a>
   </div>
 </nav>
 <script src="bookmagic.js"></script>
