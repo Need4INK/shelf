@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
-<meta name="app-version" content="library-19">
+<meta name="app-version" content="library-20">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -82,6 +82,12 @@ body{overscroll-behavior:none}
     let r=null;try{r=new URL(document.referrer)}catch(err){}
     if(!(r&&r.origin===location.origin&&history.length>1)){location.href='index.html';return}
     const t=setTimeout(()=>{location.href='index.html'},600);addEventListener('pagehide',()=>clearTimeout(t),{once:true});history.back()});
+  // TEMP readout: what the phone reports for the screen (remove after the bar-gap fix)
+  addEventListener('load',()=>{const d=document.createElement('div');d.id='dbgH';d.style.cssText='position:fixed;left:4px;top:calc(env(safe-area-inset-top,0px) + 2px);z-index:9999;font:11px/1.25 monospace;color:#0f0;background:rgba(0,0,0,.75);padding:2px 4px;pointer-events:none;white-space:pre';
+    const q=document.createElement('div');q.style.cssText='position:fixed;top:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden';const w=q.cloneNode();w.style.height='env(safe-area-inset-bottom,0px)';document.body.append(d,q,w);
+    const u=()=>{const v=visualViewport||{},t=document.getElementById('tabbar'),r=t?t.getBoundingClientRect():{},e=document.documentElement;
+      d.textContent='scr '+screen.width+'x'+screen.height+' in '+innerWidth+'x'+innerHeight+' cli '+e.clientHeight+'\nvv '+Math.round(v.height)+' off '+Math.round(v.offsetTop)+' pg '+Math.round(v.pageTop)+' sy '+scrollY+' hs '+e.scrollTop+' bs '+document.body.scrollTop+'\ninset t'+q.offsetHeight+' b'+w.offsetHeight+' bar '+Math.round(r.top)+'-'+Math.round(r.bottom)+' sa '+navigator.standalone};
+    u();setInterval(u,1000)});
 })();</script>
 <style>/* All app lettering, kept in the app (no Google Fonts) so text never swaps fonts when a page opens. OFL. */
 @font-face{font-family:"EB Garamond";font-weight:400;src:url(fonts/EBGaramond-400.woff2) format("woff2");font-display:block}
