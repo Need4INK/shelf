@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="a37">
+<meta name="app-version" content="a38">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add Book</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -126,7 +126,7 @@ main{padding-bottom:140px}
 <style>/* Same as the Library: the page itself never moves or bounces; the header stays put and the rest scrolls
    under it, fading out beneath it. (On the iPhone a bouncing page swallowed taps on the bottom bar.) */
 html{height:100%;overflow:hidden;overscroll-behavior:none;background:radial-gradient(ellipse at 50% 0%,#3a1838 0%,#1a0a1e 55%,#0e0416 100%)}
-body{height:100%;min-height:0;box-sizing:border-box;overflow:hidden;padding-bottom:0;background:none}
+body{height:100vh;min-height:0;box-sizing:border-box;overflow:hidden;padding-bottom:0;background:none}
 #scroll{position:fixed;left:0;right:0;top:var(--top,150px);bottom:0;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;
  padding-bottom:calc(171px / 851 * 824 * var(--S,.4577) + env(safe-area-inset-bottom,0px) + 24px);
  -webkit-mask-image:linear-gradient(transparent 0,rgba(0,0,0,.35) 14px,#000 38px);mask-image:linear-gradient(transparent 0,rgba(0,0,0,.35) 14px,#000 38px)}
@@ -160,12 +160,6 @@ body{height:100%;min-height:0;box-sizing:border-box;overflow:hidden;padding-bott
     let r=null;try{r=new URL(document.referrer)}catch(err){}
     if(!(r&&r.origin===location.origin&&history.length>1)){location.href='index.html';return}
     const t=setTimeout(()=>{location.href='index.html'},600);addEventListener('pagehide',()=>clearTimeout(t),{once:true});history.back()});
-  // TEMP readout: what the phone reports for the screen (remove after the bar-gap fix)
-  addEventListener('load',()=>{const d=document.createElement('div');d.id='dbgH';d.style.cssText='position:fixed;left:4px;top:calc(env(safe-area-inset-top,0px) + 2px);z-index:9999;font:11px/1.25 monospace;color:#0f0;background:rgba(0,0,0,.75);padding:2px 4px;pointer-events:none;white-space:pre';
-    const q=document.createElement('div');q.style.cssText='position:fixed;top:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden';const w=q.cloneNode();w.style.height='env(safe-area-inset-bottom,0px)';document.body.append(d,q,w);
-    const u=()=>{const v=visualViewport||{},t=document.getElementById('tabbar'),r=t?t.getBoundingClientRect():{},e=document.documentElement;
-      d.textContent='scr '+screen.width+'x'+screen.height+' in '+innerWidth+'x'+innerHeight+' cli '+e.clientHeight+'\nvv '+Math.round(v.height)+' off '+Math.round(v.offsetTop)+' pg '+Math.round(v.pageTop)+' sy '+scrollY+' hs '+e.scrollTop+' bs '+document.body.scrollTop+'\ninset t'+q.offsetHeight+' b'+w.offsetHeight+' bar '+Math.round(r.top)+'-'+Math.round(r.bottom)+' sa '+navigator.standalone};
-    u();setInterval(u,1000)});
 })();</script>
 <style>/* All app lettering, kept in the app (no Google Fonts) so text never swaps fonts when a page opens. OFL. */
 @font-face{font-family:"EB Garamond";font-weight:400;src:url(fonts/EBGaramond-400.woff2) format("woff2");font-display:block}
@@ -182,7 +176,7 @@ body{height:100%;min-height:0;box-sizing:border-box;overflow:hidden;padding-bott
 <header id="hdr">
   <h1>Add Book</h1>
   <p id="count">Your book catalog</p>
-  <p style="font-size:12px;opacity:.5">a37</p>
+  <p style="font-size:12px;opacity:.5">a38</p>
   <div class="rule" id="steps" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg><svg viewBox="0 0 10 10"><path d="M5 0L6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8z" fill="#f1cf7c"/></svg></div>
 </header>
 <div id="scroll"><main>
@@ -579,7 +573,7 @@ show('s1');
 if (qp.get('title')) { pending = {}; $('writeForm').reset(); $('wT').value = qp.get('title').slice(0, 200); show('s2write'); setTimeout(() => $('wA').focus(), 50); }
 
 /* ---------- Auto-update ---------- */
-const VERSION = 'a37';
+const VERSION = 'a38';
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 // When the app comes back to the front, check for a newer version and reload into it
 async function checkUpdate() {

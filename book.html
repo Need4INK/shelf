@@ -5,7 +5,7 @@
 <style>html{background:#0e0416;color-scheme:dark;scrollbar-width:none}::-webkit-scrollbar{display:none}</style>
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Cache-Control" content="no-cache">
-<meta name="app-version" content="book-48">
+<meta name="app-version" content="book-49">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -108,7 +108,7 @@ dd input::placeholder{color:rgba(243,227,195,.4);font-style:italic}
 <style>/* Same as the Library: the page itself never moves or bounces, only its content scrolls (inside the body).
    On the iPhone a bouncing page swallowed taps on the bottom bar; this keeps the bar quick on every page. */
 html{height:100%;overflow:hidden;overscroll-behavior:none;background:radial-gradient(120% 60% at 50% 0%,#4a1a5e 0%,#2a0b38 45%,#14051c 100%)}
-body{height:100%;min-height:0;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;background:none}
+body{height:100vh;min-height:0;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;background:none}
 /* always a little scrollable, so a swipe never falls through to the page */
 body::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% + 1px)}
 </style>
@@ -138,12 +138,6 @@ body::before{content:"";float:left;width:1px;margin-right:-1px;height:calc(100% 
     let r=null;try{r=new URL(document.referrer)}catch(err){}
     if(!(r&&r.origin===location.origin&&history.length>1)){location.href='index.html';return}
     const t=setTimeout(()=>{location.href='index.html'},600);addEventListener('pagehide',()=>clearTimeout(t),{once:true});history.back()});
-  // TEMP readout: what the phone reports for the screen (remove after the bar-gap fix)
-  addEventListener('load',()=>{const d=document.createElement('div');d.id='dbgH';d.style.cssText='position:fixed;left:4px;top:calc(env(safe-area-inset-top,0px) + 2px);z-index:9999;font:11px/1.25 monospace;color:#0f0;background:rgba(0,0,0,.75);padding:2px 4px;pointer-events:none;white-space:pre';
-    const q=document.createElement('div');q.style.cssText='position:fixed;top:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden';const w=q.cloneNode();w.style.height='env(safe-area-inset-bottom,0px)';document.body.append(d,q,w);
-    const u=()=>{const v=visualViewport||{},t=document.getElementById('tabbar'),r=t?t.getBoundingClientRect():{},e=document.documentElement;
-      d.textContent='scr '+screen.width+'x'+screen.height+' in '+innerWidth+'x'+innerHeight+' cli '+e.clientHeight+'\nvv '+Math.round(v.height)+' off '+Math.round(v.offsetTop)+' pg '+Math.round(v.pageTop)+' sy '+scrollY+' hs '+e.scrollTop+' bs '+document.body.scrollTop+'\ninset t'+q.offsetHeight+' b'+w.offsetHeight+' bar '+Math.round(r.top)+'-'+Math.round(r.bottom)+' sa '+navigator.standalone};
-    u();setInterval(u,1000)});
 })();</script>
 <style>/* All app lettering, kept in the app (no Google Fonts) so text never swaps fonts when a page opens. OFL. */
 @font-face{font-family:"EB Garamond";font-weight:400;src:url(fonts/EBGaramond-400.woff2) format("woff2");font-display:block}
